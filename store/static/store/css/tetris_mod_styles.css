@@ -1,0 +1,59 @@
+/* CSS MODIFICATIONS FOR DIFFERENT PAGES */
+
+/*STYLING FOR THE INDEX PAGE (/)*/
+/*this is the main body*/
+.main {
+	border: 1px solid gray;
+	grid-column: 3 / -3;
+	grid-row: 2 / 3;
+	text-align: center;
+}
+
+.featured {
+	/*split this grid item further to three grid items*/
+	display: grid;
+	grid-template-columns: auto auto;
+		grid-template-rows: auto auto;
+	border: 1px solid gray;
+	grid-column: 2 / -2;
+	grid-row: 3 / 4;
+	text-align: center;	
+}
+
+.featured-item1 {
+	border: 1px solid gray;
+	grid-column: 1 / 2;
+	grid-row: 1 / 3;
+	text-align: center;	
+}
+
+.featured-item {
+	border: 1px solid gray;
+	grid-column: 2 / 3;
+	grid-row: auto auto;
+	text-align: center;	
+}
+
+.latest-releases {
+	display: grid;
+	grid-template-columns: auto auto;
+		grid-template-rows: auto auto auto;
+	border: 1px solid gray;
+	grid-column: 2 / -2;
+	grid-row: 4 / 5;
+	text-align: center;		
+}
+
+.latest-releases-item {
+	border: 1px solid gray;
+	grid-column: auto auto;
+	grid-row: auto auto;
+	text-align: center;	
+}
+
+/* END OF STYLING FOR THE INDEX PAGE (/)*/
+
+/*STYLING FOR THE STORE PAGE (/store)*/
+
+
+/* END OF STYLING FOR THE INDEX PAGE (/store)*/

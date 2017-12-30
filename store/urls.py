@@ -17,6 +17,7 @@ app_name = 'store'
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name='index'),
     url(r'^about/$', AboutView.as_view(), name='about'),
+    url(r'^customer-care/$', CustomerCareView.as_view(), name='customer_care'),
     url(r'^store/$', StoreView.as_view(), name='store'),
 
 

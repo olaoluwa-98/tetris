@@ -1,0 +1,59 @@
+
+<!-- index page -->
+{% extends "store/base.html" %}
+
+{% block title %}
+	Tetris Clothing Store
+{% endblock %}
+
+{% block extra_css %}
+	
+{% endblock %}
+
+
+{% block content %}
+<div class="main">
+  <h2>I am the main</h2>
+  <a href="{% url 'store:about' %}">Go to the about page</a>
+  {% if products %}
+
+	  {% for product in products %}
+		  {{ product }}
+	  {% endfor %}
+
+  {% else %}
+    
+    No products o
+
+  {% endif %}
+
+  {% if cart %}
+    {{ cart }}
+  {% else %}
+    Nothing o
+  {% endif %}
+
+  {% if wish_list %}
+    {{ wish_list }}
+  {% else %}
+    Nothing o
+  {% endif %}
+</div>
+
+<div class="featured">
+	<div class="featured-item1"></div>
+	<div class="featured-item"></div>
+	<div class="featured-item"></div>
+</div>
+<div class="latest-releases">
+	<div class="latest-releases-item"></div>
+	<div class="latest-releases-item"></div>
+	<div class="latest-releases-item"></div>
+
+	<div class="latest-releases-item"></div>
+	<div class="latest-releases-item"></div>
+	<div class="latest-releases-item"></div>
+</div>
+
+    
+{% endblock %}

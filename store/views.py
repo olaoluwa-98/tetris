@@ -13,7 +13,7 @@ class IndexView(ListView):
     # get products that are 1 or more in store
     queryset = Product.objects.filter(quantity__gte=1).order_by('-created_at')[:5]
     context_object_name = 'products'
-    template_name = 'store/index.html'
+    template_name = 'store/pages/index.html'
 
     # this retrieves data that'll be displayed in the index page
     def get_context_data(self, **kwargs):
@@ -28,8 +28,8 @@ class IndexView(ListView):
     # def get(self, request, *args, **kwargs):
     #     return render(request, self.template_name, {'products': self.queryset, ''})
 
-class AboutView(IndexView):
-    template_name = 'store/about.html'
+class CustomerCareView(IndexView):
+    template_name = 'store/pages/customer_care.html'
 
     def get_context_data(self, **kwargs):
         context = {}
@@ -40,14 +40,28 @@ class AboutView(IndexView):
             context['cart'] = self.request.user.get_cart()
         return context
 
+
+class AboutView(IndexView):
+    template_name = 'store/pages/about.html'
+
+    def get_context_data(self, **kwargs):
+        context = {}
+        context['wish_list'] = []
+        context['cart'] = []
+        if self.request.user.is_authenticated:
+            context['wish_list'] = self.request.user.get_wish()
+            context['cart'] = self.request.user.get_cart()
+        return context
+
+
 class StoreView(LoginRequiredMixin, ListView):
     model = Product
     # get products that are 1 or more in store
     queryset = Product.objects.filter(quantity__gte=1).order_by('-created_at')[:5]
     context_object_name = 'products'
-    template_name = 'store/store.html'
-    success_url = '/store'
-    login_url = '/login'
+    template_name = 'store/pages/store.html'
+    success_url = '/store.'
+    login_url = '/login/'
 
     # this retrieves data that'll be displayed in the index page
     def get_context_data(self, **kwargs):
