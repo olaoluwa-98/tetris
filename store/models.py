@@ -1,21 +1,21 @@
 from django.conf import settings
+from django.urls import reverse
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.auth import get_user_model
 from datetime import datetime
+from django.utils.crypto import get_random_string
 from .addresses import STATES
 
 # this is for when a user gets deleted from the db
 def get_sentinel_user():
-    return get_user_model().objects.get_or_create(username='deleted', is_verified=0, is_active=0)[0]
+    return get_user_model().objects.get_or_create(username='deleted-'+get_random_string(length=10), is_verified=0, is_active=0)[0]
 
 # this returns the location of the uploaded profile picture
 def get_profile_pic_path(instance, filename):
     return 'profile_pictures/{0}-{1}'.format(instance.user.username, filename)
-    # return 'user_{0}/{1}'.format(instance.user.id, filename)
 
 class User(AbstractUser):
-    url = models.CharField(max_length=100, verbose_name='url of the user\'s profile')
     is_verified = models.BooleanField(default=False)
     phone = models.CharField(
         max_length=15, verbose_name='phone number of the user',
@@ -24,22 +24,16 @@ class User(AbstractUser):
     )
     profile_pic_path = models.ImageField(upload_to=get_profile_pic_path, max_length=255)
     # USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['email', 'url', 'is_verified', 'phone']
+    REQUIRED_FIELDS = ['email', 'is_verified', 'phone']
 
     def get_wish(self):
         return Wish.objects.filter(user=self).order_by('-created_at')
     def get_cart(self):
         return Cart.objects.filter(user=self).order_by('-created_at')
 
-    # def save(self, *args, **kwargs):
-    # if not self.id:
-    #   # generate profile url when profile is created
-    #   self.url = '/@' + self.user.username + '/'
-    # super(User, self).save(*args, **kwargs)
-
     def __str__(self):
         return '{0} {1} (@{2}) admin({3})'.format(self.first_name, self.last_name, self.username, self.is_superuser)
-    
+
 
 class Brand(models.Model):
     name = models.CharField( max_length=40, unique=True, verbose_name='name of the brand' )
@@ -56,7 +50,7 @@ class Brand(models.Model):
 
     def __str__(self):
         return '{0} ({1})'.format(self.name, self.email)
-        
+
     class Meta:
         get_latest_by = 'created_at'
         # verbose_name_plural = 'stories'
@@ -138,12 +132,24 @@ class Product(models.Model):
     colour = models.CharField(max_length=15, verbose_name='colour of product')
     price = models.DecimalField(decimal_places=2, max_digits=17)
     quantity = models.IntegerField(verbose_name='current quantity in store')
+    product_url = models.CharField(max_length=100, null=True)
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
         verbose_name='date product was added to db'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date product details were updated last' )
-    
-    # def get_absolute_url(self):
+
+    # Override models save method:
+    def save(self, *args, **kwargs):
+        if not self.id:
+            # generate product url when post is created
+            # product url must be unique
+            self.product_url = '/product/' + get_random_string(length=16) + '/'
+            while Product.objects.filter(product_url=self.product_url).exists():
+                self.product_url = '/product/' + get_random_string(length=16) + '/'
+        super(Product, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return ''.format(self.product_url)
 
     def __str__(self):
         return '{0} {1} [{2}, {3}] ({4})'.format(self.brand.name, self.name, self.gender, self.category.name, self.admin.username)
@@ -156,7 +162,8 @@ class Product(models.Model):
 class Wish(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET(get_sentinel_user),
+        # on_delete=models.SET(get_sentinel_user),
+        on_delete=models.CASCADE,
         related_name='wish_owner',
         verbose_name ='User from the user table'
     )
@@ -175,7 +182,7 @@ class Wish(models.Model):
     def save(self, *args, **kwargs):
         # check if wish item already exists, if it does ignore
         if Wish.objects.filter(user_id=self.user_id, product_id=self.product_id).exists():
-            pass        
+            pass
         else:
             super(Wish, self).save(*args, **kwargs)
 
