@@ -1,0 +1,86 @@
+/*styling for tetris*/
+
+
+/*this is the grid container*/
+body {
+  display: grid;
+  grid-template-columns: 1fr 2fr 6fr 2fr 1fr;
+  grid-template-rows: 1fr 5fr 3fr 4fr 1fr;
+  grid-gap: 5px;
+  border: 1px solid gray;
+  margin: 0px;
+}
+
+/*START OF HEADER STYLING*/
+/*this is the header*/
+.header {
+  /*split the header into columns*/
+  display: grid;
+  grid-template-columns: 1fr 2fr 6fr 2fr 1fr;
+  border: 1px solid gray;
+  grid-column: 1 / -1;
+  grid-row: 1 / 2;
+  align-content: center;
+}
+
+/*the title of the site*/
+.header-title {
+  grid-column: 2 / 3;
+  text-align: center;
+}
+
+/*the links in the middle of the header*/
+.header-links {
+  grid-column: 3 / 4;
+  text-align: center;
+}
+
+/*cart and user icons*/
+.header-icons {
+  grid-column: 4 / 5;
+  text-align: center;
+}
+/*END OF HEADER STYLING*/
+
+/*END OF FOOTER STYLING*/
+/*this is the footer*/
+.footer {
+  display: grid;
+  background-color: #424242;
+  grid-template-columns: 1fr 1fr 2fr 2fr 1fr;
+  grid-template-rows: 6fr 1fr;
+  border: 1px solid gray;
+  grid-column: 1 / -1;
+  grid-row: 5 / 6;
+  align-content: center;
+  text-align: center;
+}
+
+.footer-item-links {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+
+.footer-item-social {
+  grid-column: 3 / 4;
+  grid-row: 1 / 2;
+}
+
+.footer-item-subscribe {
+  grid-column: 4 / 5;
+  grid-row: 1 / 2;
+}
+
+.footer-item-copyright {
+  grid-column: 4 / 5;
+  grid-row: 2 / 3;
+}
+
+/*END OF FOOTER STYLING*/
+
+a:after {
+  content: " (" attr(href) ")";
+}
+a:before {
+  content: "..";
+}

@@ -1,0 +1,57 @@
+
+<!-- base template for tetris website -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>{% block title %}{% endblock %}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {% load static %}
+  <!-- fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
+
+  <!-- CSS Files -->
+  <link rel="stylesheet" type="text/css" href="{% static 'store/css/tetris_styles.css' %}" />
+
+  <!-- extrastyling for specific pages -->
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-title">
+          <a href="{% url 'store:index' %}">Tetris</a>
+        </div>
+        <div class="header-links">
+          <a href="{% url 'store:about' %}">Men's</a>
+          <a href="{% url 'store:about' %}">Women's</a>
+          <a href="{% url 'store:about' %}">All Products</a>
+        </div>
+        <div class="header-icons"></div>
+    </div>
+      {% block body %}
+
+      {% endblock %}
+    <div class="footer">
+      <div class="footer-item-links">
+        Links are here
+      </div>
+      <div class="footer-item-social">
+        Socials are here
+      </div>
+      <div class="footer-item-subscribe">
+        Subscribe here
+      </div>
+      <div class="footer-item-copyright">
+        Copy right is here
+      </div>
+    </div>
+
+</body>
+</html>
+
+<!-- JavaScript Files -->
+<script src="{% static 'store/js/jquery-3.2.1.min.js' %}" ></script>
+<script src="{% static 'store/js/tetris_js.js' %}" ></script>
