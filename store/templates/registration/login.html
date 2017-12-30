@@ -4,7 +4,7 @@
     Login | Tetris Clothing Store
 {% endblock %}
 
-{% block body %}
+{% block content %}
 <form action="/login/" method="post">
     {% csrf_token %}
     {% for field in form %}

@@ -1,11 +1,10 @@
 /*styling for tetris*/
 
-
 /*this is the grid container*/
 body {
   display: grid;
   grid-template-columns: 1fr 2fr 6fr 2fr 1fr;
-  grid-template-rows: 1fr 5fr 3fr 4fr 1fr;
+  grid-template-rows: 1fr 10fr 1fr;
   grid-gap: 5px;
   border: 1px solid gray;
   margin: 0px;
@@ -42,7 +41,20 @@ body {
 }
 /*END OF HEADER STYLING*/
 
-/*END OF FOOTER STYLING*/
+
+/*START OF MAIN BODY STYLING*/
+.main_body {
+  display: grid;
+  grid-template-columns: 1fr 2fr 6fr 2fr 1fr;
+  /*grid-template-rows: 1fr 1fr;*/
+  border: 1px solid gray;
+  grid-column: 1 / -1;
+  grid-row: 2 / 3;
+}
+/*START OF MAIN BODY STYLING*/
+
+
+/*START OF FOOTER STYLING*/
 /*this is the footer*/
 .footer {
   display: grid;
@@ -51,7 +63,7 @@ body {
   grid-template-rows: 6fr 1fr;
   border: 1px solid gray;
   grid-column: 1 / -1;
-  grid-row: 5 / 6;
+  grid-row: 3 / 4;
   align-content: center;
   text-align: center;
 }
@@ -78,9 +90,9 @@ body {
 
 /*END OF FOOTER STYLING*/
 
-a:after {
+/*a:after {
   content: " (" attr(href) ")";
 }
 a:before {
   content: "..";
-}
+}*/

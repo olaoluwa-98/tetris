@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model, authenticate
 from .validators import *
 
 class LoginForm(forms.Form):
-    username = forms.CharField(label='Username', max_length=30, strip=True, validators=[validate_username])
+    username = forms.CharField(label='Username', max_length=30, strip=True)
     password = forms.CharField(widget=forms.PasswordInput)
 
     def clean(self, *args, **kwargs):
@@ -25,6 +25,8 @@ class LoginForm(forms.Form):
         fields = ('username', 'password', )
 
 class RegisterForm(UserCreationForm):
+    # validate username
+    # validators=[validate_username]
     email = forms.EmailField(label='Email', max_length=100)
     first_name = forms.CharField(label='First Name', max_length=100)
     last_name = forms.CharField(label='Last Name', max_length=100)

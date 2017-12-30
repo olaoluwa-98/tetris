@@ -18,7 +18,7 @@ class IndexView(ListView):
     # this retrieves data that'll be displayed in the index page
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
-        context['wish_list'] = []
+        # get cart items from session too
         context['cart'] = []
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.get_wish()
@@ -33,7 +33,7 @@ class CustomerCareView(IndexView):
 
     def get_context_data(self, **kwargs):
         context = {}
-        context['wish_list'] = []
+        # get cart items from session too
         context['cart'] = []
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.get_wish()
@@ -46,10 +46,11 @@ class AboutView(IndexView):
 
     def get_context_data(self, **kwargs):
         context = {}
-        context['wish_list'] = []
+        # get cart items from session too
         context['cart'] = []
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.get_wish()
+            # get cart items from session too
             context['cart'] = self.request.user.get_cart()
         return context
 
@@ -67,6 +68,7 @@ class StoreView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(StoreView, self).get_context_data(**kwargs)
         context['wish_list'] = self.request.user.get_wish()
+        # get cart items from session too
         context['cart'] = self.request.user.get_cart()
         return context
 
@@ -79,7 +81,10 @@ def handle_login(request):
         if user is not None:
             login(request, user)
             HttpResponseRedirect('/store')
-    return render(request, 'registration/login.html', {'form': form})
+    context = {'form': form}
+    # get cart items from session
+    context['cart'] = []
+    return render(request, 'registration/login.html', context)
 
 def handle_register(request):
     if request.user.is_authenticated:
@@ -93,7 +98,10 @@ def handle_register(request):
         if user is not None:
             login(request, user)
             HttpResponseRedirect('/store')
-    return render(request, 'registration/register.html', {'form': form})
+    context = {'form': form}
+    # get cart items from session
+    context['cart'] = []
+    return render(request, 'registration/register.html', context)
 
 @login_required(login_url='/login/')
 def handle_logout(request):

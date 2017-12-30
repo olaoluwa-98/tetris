@@ -1,67 +1,14 @@
-<!-- base template for tetris website -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>{% block title %}{% endblock %}</title>
-  
-  <!-- META -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
-  {% load static %}
-  <!-- FAV -->
-  <link rel="icon" type="image/png" href="{% static 'store/img/logo.png' %}?v=1">
-
-  <!-- FONTS -->
-  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
-
-  <!-- CSS Files -->
-  <link rel="stylesheet" type="text/css" href="{% static 'store/css/tetris_base_styles.css' %}?v=0.1.0" />
-  <link rel="stylesheet" type="text/css" href="{% static 'store/css/tetris_mod_styles.css' %}?v=0.1.0" />
-  <!-- extrastyling for specific pages -->
-  {% block extra_css %}{% endblock %}
-
-  <!-- GLOBALS -->
-  <script type="text/javascript">
-    window.PAGE_PATH = "{{ request.path }}";
-    window.CSRF_TOKEN = "{{ csrf_token }}";
-  </script>
-</head>
-
-<body>
-    <div class="header">
-        <div class="header-title">
-          <a href="{% url 'store:index' %}">Tetris</a>
-        </div>
-        <div class="header-links">
-          <a href="{% url 'store:about' %}">Men's</a>
-          <a href="{% url 'store:about' %}">Women's</a>
-          <a href="{% url 'store:about' %}">All Products</a>
-        </div>
-        <div class="header-icons"></div>
-    </div>
-      {% block body %}
-
-      {% endblock %}
-    <div class="footer">
-      <div class="footer-item-links">
-        Links are here
-      </div>
-      <div class="footer-item-social">
-        Socials are here
-      </div>
-      <div class="footer-item-subscribe">
-        Subscribe here
-      </div>
-      <div class="footer-item-copyright">
-        Copy right is here
-      </div>
-    </div>
-
-</body>
-</html>
-
-<!-- JavaScript Files -->
-<script src="{% static 'store/js/jquery.min.js' %}?v=3.2.1" ></script>
-<script src="{% static 'store/js/tetris_js.js' %}?v=0.1.0" ></script>
+<div class="footer">
+  <div class="footer-item-links">
+    Links are here
+  </div>
+  <div class="footer-item-social">
+    Socials are here
+  </div>
+  <div class="footer-item-subscribe">
+    Subscribe here
+  </div>
+  <div class="footer-item-copyright">
+    Copy right is here
+  </div>
+</div>  

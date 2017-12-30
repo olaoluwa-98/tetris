@@ -30,36 +30,14 @@
 </head>
 
 <body>
+  {% include 'store/header.html' %}
 
-    <div class="header">
-        <div class="header-title">
-          <a href="{% url 'store:index' %}">Tetris</a>
-        </div>
-        <div class="header-links">
-          <a href="{% url 'store:about' %}">Men's</a>
-          <a href="{% url 'store:about' %}">Women's</a>
-          <a href="{% url 'store:about' %}">All Products</a>
-        </div>
-        <div class="header-icons"></div>
-    </div>
-      {% block content %}
+  <div class="main_body">
+    {% block content %}
+    {% endblock %}
+  </div>
 
-      {% endblock %}
-    <div class="footer">
-      <div class="footer-item-links">
-        Links are here
-      </div>
-      <div class="footer-item-social">
-        Socials are here
-      </div>
-      <div class="footer-item-subscribe">
-        Subscribe here
-      </div>
-      <div class="footer-item-copyright">
-        Copy right is here
-      </div>
-    </div>
-
+  {% include 'store/footer.html' %}
 </body>
 </html>
 

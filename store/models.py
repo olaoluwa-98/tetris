@@ -171,6 +171,14 @@ class Wish(models.Model):
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date wish details were updated last' )
 
+    # Override models save method:
+    def save(self, *args, **kwargs):
+        # check if wish item already exists, if it does ignore
+        if Wish.objects.filter(user_id=self.user_id, product_id=self.product_id).exists():
+            pass        
+        else:
+            super(Wish, self).save(*args, **kwargs)
+
     def __str__(self):
         return '{0} -> {1} (added {2})'.format(self.user.username, self.product.name, self.created_at)
 
@@ -199,12 +207,25 @@ class Cart(models.Model):
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date cart item details were updated last' )
 
+    # Override models save method:
+    def save(self, *args, **kwargs):
+        # check if cart item already exists, add more quantity to it
+        cart = Cart.objects.filter(user_id=self.user_id, product_id=self.product_id)
+        if len(cart) == 1:
+            cart[0].quantity += self.quantity
+            super(Cart, cart[0]).save(*args, **kwargs)
+        else:
+            super(Cart, self).save(*args, **kwargs)
+
     def __str__(self):
-        return '{0} -> {1} (added {2})'.format(self.user.username, self.product.name, self.created_at)
+        return 'x{0} {1} -> {2} (added {3})'.format(self.quantity, self.user.username, self.product.name, self.created_at)
 
     class Meta:
         get_latest_by = 'created_at'
         ordering  = ['-created_at', 'user_id']
+
+
+# Not sure to add this.
 # class Size(models.Model):
 #     size_format = models.CharField(max_length=15, verbose_name='size format e.g UK, US')
 #     value = models.IntegerField(verbose_name='size value')

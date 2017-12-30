@@ -14,29 +14,37 @@
 {% block content %}
 <div class="main">
   <h2>I am the main</h2>
-  <a href="{% url 'store:about' %}">Go to the about page</a>
+  <p style="text-decoration: underline;">LATEST</p>
   {% if products %}
 
 	  {% for product in products %}
-		  {{ product }}
+		  {{ forloop.counter }}. {{ product.name }}<br>
 	  {% endfor %}
 
-  {% else %}
-    
-    No products o
-
+  {% else %}    
+    No products
   {% endif %}
-
+  <br><p style="text-decoration: underline;">CART</p>
   {% if cart %}
-    {{ cart }}
-  {% else %}
-    Nothing o
+
+    {% for cart_item in cart %}
+      {{ forloop.counter }}. {{ cart_item.product.name }}<br>
+    {% endfor %}
+
+  {% else %}    
+    Empty cart
   {% endif %}
+
+  <br><p style="text-decoration: underline;">WISH LIST</p>
 
   {% if wish_list %}
-    {{ wish_list }}
-  {% else %}
-    Nothing o
+
+    {% for wish_item in wish_list %}
+      {{ forloop.counter }}. {{ wish_item.product.name }}<br>
+    {% endfor %}
+
+  {% else %}    
+    Empty wish list
   {% endif %}
 </div>
 

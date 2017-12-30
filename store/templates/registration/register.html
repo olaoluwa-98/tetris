@@ -1,3 +1,17 @@
+<!-- index page -->
+{% extends "store/base.html" %}
+
+{% block title %}
+    Register | Tetris Clothing Store
+{% endblock %}
+
+{% block extra_css %}
+    
+{% endblock %}
+
+
+{% block content %}
+
 <form action="/register/" method="post">
     {% csrf_token %}
     {% for field in form %}
@@ -12,3 +26,4 @@
     <input type="submit" value="Submit" />
 </form>
 
+{% endblock %}
