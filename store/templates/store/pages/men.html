@@ -7,25 +7,19 @@
 
 <!-- extra styling -->
 {% block extra_css %}
-{% load static %}
   <style type="text/css">
-    body {
-      background-image: url("{% static 'store/img/index-bg.jpg'%}");
-      background-repeat: no-repeat;
-    }
+
   </style>
 {% endblock %}
 
 {% block content %}
-{% load static %}
 <div class="main">
   <h2>I am the main</h2>
   <p style="text-decoration: underline;">LATEST</p>
   {% if products %}
 
 	  {% for product in products %}
-		  {{ forloop.counter }}. <a href="{{ product.product_url }}">{{ product.name }}</a>
-      <img style="width: 100px;height: 100px" src="media/{{ product.product_images.all.0.product_image_url }}"><br>
+		  {{ forloop.counter }}. <a href="{{ product.product_url }}">{{ product.name }}</a><br>
 	  {% endfor %}
 
   {% else %}
@@ -43,6 +37,7 @@
   {% endif %}
 
   <br><p style="text-decoration: underline;">WISH LIST</p>
+
   {% if wish_list %}
 
     {% for wish_item in wish_list %}

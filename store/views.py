@@ -54,22 +54,87 @@ class AboutView(IndexView):
             context['cart'] = self.request.user.get_cart()
         return context
 
+class CartView(ListView):
+    model = Cart
+    # queryset = Cart.objects.filter(user_id=self.request.user.id).order_by('-created_at')
+    context_object_name = 'products'
+    template_name = 'store/pages/cart.html'
+    success_url = '/store/'
 
-class StoreView(LoginRequiredMixin, ListView):
+    def get_context_data(self, **kwargs):
+        # context = [super(CartView, self).get_context_data(**kwargs)]
+        context = {}
+        # get cart items from session too
+        context['cart'] = []
+        if self.request.user.is_authenticated:
+            context['wish_list'] = self.request.user.get_wish()
+            context['cart'] = self.request.user.get_cart()
+        return context
+
+class WishListView(LoginRequiredMixin, ListView):
+    model = Wish
+    # queryset = Cart.objects.filter(user_id=self.request.user.id).order_by('-created_at')
+    context_object_name = 'products'
+    template_name = 'store/pages/wish_list.html'
+    success_url = '/store/'
+
+    def get_context_data(self, **kwargs):
+        # context = [super(CartView, self).get_context_data(**kwargs)]
+        context = {}
+        # get cart items from session too
+        context['wish_list'] = self.request.user.get_wish()
+        context['cart'] = self.request.user.get_cart()
+        return context
+
+class StoreView(ListView):
     model = Product
     # get products that are 1 or more in store
     queryset = Product.objects.filter(quantity__gte=1).order_by('-created_at')[:5]
     context_object_name = 'products'
     template_name = 'store/pages/store.html'
-    success_url = '/store.'
-    login_url = '/login/'
+    success_url = '/store/'
 
-    # this retrieves data that'll be displayed in the index page
     def get_context_data(self, **kwargs):
         context = super(StoreView, self).get_context_data(**kwargs)
-        context['wish_list'] = self.request.user.get_wish()
         # get cart items from session too
-        context['cart'] = self.request.user.get_cart()
+        context['cart'] = []
+        if self.request.user.is_authenticated:
+            context['wish_list'] = self.request.user.get_wish()
+            context['cart'] = self.request.user.get_cart()
+        return context
+
+class MenStoreView(ListView):
+    model = Product
+    # get products that are 1 or more in store
+    queryset = Product.objects.filter(quantity__gte=1, gender='male').order_by('-created_at')[:5]
+    context_object_name = 'products'
+    template_name = 'store/pages/men.html'
+    success_url = '/store/'
+
+    def get_context_data(self, **kwargs):
+        context = super(MenStoreView, self).get_context_data(**kwargs)
+        # get cart items from session too
+        context['cart'] = []
+        if self.request.user.is_authenticated:
+            context['wish_list'] = self.request.user.get_wish()
+            context['cart'] = self.request.user.get_cart()
+        return context
+
+class WomenStoreView(ListView):
+    model = Product
+    # get products that are 1 or more in store
+    queryset = Product.objects.filter(quantity__gte=1, gender='female').order_by('-created_at')[:5]
+    context_object_name = 'products'
+    template_name = 'store/pages/women.html'
+    success_url = '/store/'
+
+    def get_context_data(self, **kwargs):
+        context = super(WomenStoreView, self).get_context_data(**kwargs)
+        # get cart items from session too
+        context['cart'] = []
+        if self.request.user.is_authenticated:
+            context['wish_list'] = self.request.user.get_wish()
+            context['cart'] = self.request.user.get_cart()
         return context
 
 def handle_login(request):

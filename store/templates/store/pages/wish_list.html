@@ -3,13 +3,21 @@
 {% extends "store/base.html" %}
 
 {% block title %}
-	About | Tetris Clothing Store
+	Wish List | Tetris Clothing Store
 {% endblock %}
 
 
 {% block content %}
 <div class="main">
-  <h2>I am the main</h2>
-  <a href="{% url 'store:index' %}">Go to the index</a>
-</div>    
+  <br><p style="text-decoration: underline;">WISH LIST</p>
+  {% if wish_list %}
+
+    {% for wish_item in wish_list %}
+      {{ forloop.counter }}. <a href="{{ wish_item.product.product_url }}">{{ wish_item.product.name }}</a><br>
+    {% endfor %}
+
+  {% else %}
+    Empty wish list
+  {% endif %}
+</div>
 {% endblock %}

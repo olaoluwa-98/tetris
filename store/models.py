@@ -43,6 +43,8 @@ class Brand(models.Model):
     	help_text='Please use the following format: <em>+234 XXX XXX XXXX</em>.',
     	# validators=[]
     )
+    desc = models.CharField(max_length=255, verbose_name='description of brand')
+    brand_image_url = models.ImageField(upload_to='img/brands/', max_length=255, blank=True)
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
     	verbose_name='date brand was added to db'
     )
@@ -58,13 +60,13 @@ class Brand(models.Model):
 
         # not sure if I should add these
         # ordering  = ['-created_at', 'name']
-        # permissions = (('can_have_items', 'Can have items'),)
+        # permissions = (('can_have_products', 'Can have products'),)
 
 class ShippingAddress(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET(get_sentinel_user),
-        related_name='shipping_addresses_owner',
+        related_name='shipping_addresses',
         verbose_name ='User from the user table'
     )
     zip_code = models.CharField( max_length=10, verbose_name='zip code' )
@@ -80,6 +82,11 @@ class ShippingAddress(models.Model):
     def __str__(self):
         return '{0}, {1}, {2}. ({3})'.format(self.address, self.city, self.state, self.user.username)
 
+    class Meta:
+        verbose_name_plural = 'Shipping Addresses'
+        get_latest_by = 'created_at'
+        ordering  = ['user_id',]
+
 class ProductCategory(models.Model):
     name = models.CharField(max_length=30, verbose_name='name of category')
     CAT_TYPES = (
@@ -88,6 +95,8 @@ class ProductCategory(models.Model):
         ('other', 'Other')
     )
     cat_type = models.CharField(max_length=10, choices=CAT_TYPES, verbose_name='type of category')
+    desc = models.CharField(max_length=255, verbose_name='description of product category')
+    cat_image_url = models.ImageField(upload_to='img/product_categories/', max_length=255, blank=True)
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
         verbose_name='date product category was added to db'
     )
@@ -106,19 +115,19 @@ class Product(models.Model):
     admin = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET(get_sentinel_user),
-        related_name='product_adder',
+        related_name='products',
         verbose_name ='Admin from the user table'
     )
     brand = models.ForeignKey(
         Brand,
         on_delete=models.CASCADE,
-        related_name='product_brand',
+        related_name='products',
         verbose_name ='Brand of the Product'
     )
     category = models.ForeignKey(
         ProductCategory,
         on_delete=models.CASCADE,
-        related_name='product_category',
+        related_name='products',
         verbose_name ='Category of the Product'
     )
     GENDER = (
@@ -127,12 +136,14 @@ class Product(models.Model):
         ('unisex', 'Unisex')
     )
     name = models.CharField(max_length=50, verbose_name='name of product')
+    desc = models.CharField(max_length=255, verbose_name='description of product')
     gender = models.CharField(max_length=15, choices=GENDER, verbose_name='gender of product')
     size = models.CharField(max_length=15, verbose_name='size of product')
     colour = models.CharField(max_length=15, verbose_name='colour of product')
-    price = models.DecimalField(decimal_places=2, max_digits=17)
+    price_per_unit = models.DecimalField(decimal_places=2, max_digits=17)
     quantity = models.IntegerField(verbose_name='current quantity in store')
-    product_url = models.CharField(max_length=100, null=True)
+    sales_count = models.IntegerField(verbose_name='number of sales of this product', default=0)
+    product_url = models.CharField(max_length=100, null=True, help_text='type anything in this field. it\'ll be generated automatically')
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
         verbose_name='date product was added to db'
     )
@@ -164,13 +175,13 @@ class Wish(models.Model):
         settings.AUTH_USER_MODEL,
         # on_delete=models.SET(get_sentinel_user),
         on_delete=models.CASCADE,
-        related_name='wish_owner',
+        related_name='wishes',
         verbose_name ='User from the user table'
     )
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name='wish_product',
+        related_name='wishes',
         verbose_name ='Product'
     )
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
@@ -180,7 +191,7 @@ class Wish(models.Model):
 
     # Override models save method:
     def save(self, *args, **kwargs):
-        # check if wish item already exists, if it does ignore
+        # check if wish product already exists, if it does ignore
         if Wish.objects.filter(user_id=self.user_id, product_id=self.product_id).exists():
             pass
         else:
@@ -199,24 +210,24 @@ class Cart(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET(get_sentinel_user),
-        related_name='cart_owner',
+        related_name='cart',
         verbose_name ='User from the user table'
     )
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name='cart_product',
+        related_name='cart',
         verbose_name ='product in the cart'
     )
-    quantity = models.IntegerField(verbose_name='quantity of the item added')
+    quantity = models.IntegerField(verbose_name='quantity of the product added')
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
-        verbose_name='date cart item was added to db'
+        verbose_name='date cart product was added to db'
     )
-    updated_at = models.DateTimeField( auto_now=True, verbose_name='date cart item details were updated last' )
+    updated_at = models.DateTimeField( auto_now=True, verbose_name='date cart product details were updated last' )
 
     # Override models save method:
     def save(self, *args, **kwargs):
-        # check if cart item already exists, add more quantity to it
+        # check if cart product already exists, add more quantity to it
         cart = Cart.objects.filter(user_id=self.user_id, product_id=self.product_id)
         if len(cart) == 1:
             cart[0].quantity += self.quantity
@@ -231,6 +242,94 @@ class Cart(models.Model):
         get_latest_by = 'created_at'
         ordering  = ['-created_at', 'user_id']
 
+
+class Order(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET(get_sentinel_user),
+        related_name='orders',
+        verbose_name ='User from the user table'
+    )
+    ORDER_STATUS = (
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('delivered', 'Delivered'),
+        ('cancelled', 'Cancelled')
+    )
+    ref = models.CharField(verbose_name='reference of the order', max_length=100, null=True, help_text='type anything in this field. it\'ll be generated automatically')
+    status = models.CharField(choices=ORDER_STATUS, default='pending', max_length=100, verbose_name='status of the order e.g pending, processing, cancelled, delivered')
+    created_at = models.DateTimeField( default=datetime.now(), editable=False,
+        verbose_name='date order was placed'
+    )
+    updated_at = models.DateTimeField( auto_now=True, verbose_name='date order details were updated last' )
+
+    # Override models save method:
+    def save(self, *args, **kwargs):
+        if not self.id:
+            # generate reference for the order
+            # order reference must be unique
+            self.ref = get_random_string(length=16)
+            while Order.objects.filter(ref=self.ref).exists():
+                self.ref = get_random_string(length=16)
+        super(Order, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return '{0} ordered {1} [{2}]'.format(self.user.username, self.ref, self.status)
+
+    class Meta:
+        get_latest_by = 'created_at'
+        ordering  = ['-created_at', 'user_id']
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='order_items',
+        verbose_name ='order product belongs to'
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='order_items',
+        verbose_name ='product ordered'
+    )
+    quantity = models.IntegerField(verbose_name='quantity of the product ordered')
+    price_per_unit = models.DecimalField(decimal_places=2, max_digits=17, verbose_name='cost of one of the products ordered')
+    created_at = models.DateTimeField( default=datetime.now(), editable=False,
+        verbose_name='date product was ordered'
+    )
+    updated_at = models.DateTimeField( auto_now=True, verbose_name='date order details were updated last' )
+
+    def __str__(self):
+        return 'x{0} {1} [{2}]'.format(self.quantity, self.product.name, self.order.ref)
+
+    class Meta:
+        verbose_name_plural = 'Order Items'
+        get_latest_by = 'created_at'
+        ordering  = ['order',]
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='product_images',
+        verbose_name ='product image belongs to'
+    )
+    product_image_url = models.ImageField(upload_to='img/products/', max_length=255, blank=True)
+    created_at = models.DateTimeField( default=datetime.now(), editable=False,
+        verbose_name='date image was added to db'
+    )
+    updated_at = models.DateTimeField( auto_now=True, verbose_name='date image was updated last' )
+
+    def __str__(self):
+        return '{0}\'s image'.format(self.product.name)
+
+    class Meta:
+        verbose_name_plural = 'Product Images'
+        get_latest_by = 'created_at'
+        ordering  = ['product_id',]
 
 # Not sure to add this.
 # class Size(models.Model):

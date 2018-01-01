@@ -1,21 +1,39 @@
 <div class="header">
   <div class="header-title">
-    <a href="{% url 'store:index' %}">Tetris</a>
+    <a href="{% url 'store:index' %}">TETRIS</a>
   </div>
   <div class="header-links">
-    <a href="{% url 'store:about' %}">Men's</a>
-    <a href="{% url 'store:about' %}">Women's</a>
-    <a href="{% url 'store:about' %}">All Products</a>
+    <a href="{% url 'store:men' %}">Men</a>
+    <a href="{% url 'store:women' %}">Women</a>
+    <a href="{% url 'store:store' %}">All Products</a>
   </div>
+
   <div class="header-icons">
-    <a href="{% url 'store:about' %}">
-      Cart ({{ cart | length }})
+    <a href="{% url 'store:cart' %}">
+      <i class="fa fa-search" aria-hidden="true"></i>
     </a>
-    <a href="{% url 'store:about' %}">
-      Wish List ({{ wish_list | length }})
+    <a href="{% url 'store:cart' %}">
+      <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+      <!-- ({{ cart | length }}) -->
     </a>
-    {% if user.is_authenticated %}
-      @{{ user.username }}
-    {% endif %}
+    <div class="dropdown">
+      <a href="javascript:void(0);" class="dropbtn" ><i class="fa fa-user" aria-hidden="true"></i></a>
+      <div class="dropdown-content">
+        {% if user.is_authenticated %}
+
+          <a href="{% url 'store:wish_list' %}">
+            Wish List ({{ wish_list | length }})
+          </a>
+          <a href="">
+            Profile
+          </a>
+          <a href="{% url 'store:logout' %}">Logout</a>
+        {% else %}
+          <a href="{% url 'store:login' %}">Login</a>
+          <a href="{% url 'store:register' %}">Register</a>
+        {% endif %}
+      </div>
+    </div>
+
   </div>
 </div>
