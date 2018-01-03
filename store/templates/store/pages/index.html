@@ -5,20 +5,54 @@
 	Tetris Clothing Store
 {% endblock %}
 
-<!-- extra styling -->
-{% block extra_css %}
-{% load static %}
-  <style type="text/css">
-    body {
-      background-image: url("{% static 'store/img/index-bg.jpg'%}");
-      background-repeat: no-repeat;
-    }
-  </style>
-{% endblock %}
-
 {% block content %}
-{% load static %}
-<div class="main">
+
+<section class="hero is-medium">
+  <div class="hero-head">
+    {% include 'store/header.html' %}
+  </div>
+
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <p class="title">
+        Title
+      </p>
+      <p class="subtitle">
+        Subtitle
+      </p>
+    </div>
+  </div>
+
+  <div class="hero-foot">
+    <nav class="tabs is-boxed is-fullwidth">
+      <div class="container">
+        <ul>
+          <li class="is-active">
+            <a>Overview</a>
+          </li>
+          <li>
+            <a>Modifiers</a>
+          </li>
+          <li>
+            <a>Grid</a>
+          </li>
+          <li>
+            <a>Elements</a>
+          </li>
+          <li>
+            <a>Components</a>
+          </li>
+          <li>
+            <a>Layout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+</section>
+
+
+<!-- {% load static %}
   <h2>I am the main</h2>
   <p style="text-decoration: underline;">LATEST</p>
   {% if products %}
@@ -51,27 +85,5 @@
 
   {% else %}
     Empty wish list
-  {% endif %}
-</div>
-
-<!-- featured products -->
-<div class="featured">
-	<div class="featured-item1"></div>
-	<div class="featured-item"></div>
-	<div class="featured-item"></div>
-</div>
-
-
-<!-- latest products -->
-<div class="latest-releases">
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-</div>
-
-
+  {% endif %} -->
 {% endblock %}

@@ -1,39 +1,68 @@
-<div class="header">
-  <div class="header-title">
-    <a href="{% url 'store:index' %}">TETRIS</a>
-  </div>
-  <div class="header-links">
-    <a href="{% url 'store:men' %}">Men</a>
-    <a href="{% url 'store:women' %}">Women</a>
-    <a href="{% url 'store:store' %}">All Products</a>
-  </div>
-
-  <div class="header-icons">
-    <a href="{% url 'store:cart' %}">
-      <i class="fa fa-search" aria-hidden="true"></i>
-    </a>
-    <a href="{% url 'store:cart' %}">
-      <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-      <!-- ({{ cart | length }}) -->
-    </a>
-    <div class="dropdown">
-      <a href="javascript:void(0);" class="dropbtn" ><i class="fa fa-user" aria-hidden="true"></i></a>
-      <div class="dropdown-content">
-        {% if user.is_authenticated %}
-
-          <a href="{% url 'store:wish_list' %}">
-            Wish List ({{ wish_list | length }})
-          </a>
-          <a href="">
-            Profile
-          </a>
-          <a href="{% url 'store:logout' %}">Logout</a>
-        {% else %}
-          <a href="{% url 'store:login' %}">Login</a>
-          <a href="{% url 'store:register' %}">Register</a>
-        {% endif %}
+<nav class="navbar">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="{% url 'store:index' %}">
+        {% load static %}
+        <img src="{% static 'store/img/logo.png' %}?v=1" alt="TETRIS: a clothing store" width="112" height="28">
+      </a>
+      <div class="navbar-burger burger" data-target="navbarExampleTransparentExample">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
     </div>
+    <div id="navbarMenuHeroB" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="{% url 'store:men' %}">
+          Men's
+        </a>
 
+        <a class="navbar-item" href="{% url 'store:women' %}">
+          Women's
+        </a>
+
+        <a class="navbar-item" href="{% url 'store:store' %}">
+          All Products
+        </a>
+
+        <div class="navbar-item">
+          <p class="control">
+              <a class="button is-primary" href="{% url 'store:cart' %}">
+                <span class="icon">
+                  <i class="fa fa-shopping-cart"></i>
+                </span>
+                <span>Cart ({{ cart | length }})</span>
+              </a>
+            </p>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="javascript:void(0);">
+          </a>
+          <div class="navbar-dropdown is-boxed">
+            {% if user.is_authenticated %}
+            <a class="navbar-item" href="">
+              Profile
+            </a>
+            <a class="navbar-item" href="{% url 'store:wish_list' %}">
+              Wish List ({{ wish_list | length }})
+            </a>
+            <a class="navbar-item" href="{% url 'store:cart' %}">
+              Orders
+            </a>
+            <a class="navbar-item" href="{% url 'store:logout' %}">
+              Logout
+            </a>
+            {% else %}
+              <a class="navbar-item" href="{% url 'store:login' %}">
+                Login
+              </a>
+              <a class="navbar-item is-active" href="{% url 'store:register'%}">
+                Register
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+</nav>
