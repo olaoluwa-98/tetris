@@ -26,8 +26,12 @@ class User(AbstractUser):
     # USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['email', 'is_verified', 'phone']
 
+    def get_orders(self):
+        return Order.objects.filter(user=self).order_by('-created_at')
+
     def get_wish(self):
         return Wish.objects.filter(user=self).order_by('-created_at')
+
     def get_cart(self):
         return Cart.objects.filter(user=self).order_by('-created_at')
 
@@ -45,10 +49,21 @@ class Brand(models.Model):
     )
     desc = models.CharField(max_length=255, verbose_name='description of brand')
     brand_image_url = models.ImageField(upload_to='img/brands/', max_length=255, blank=True)
+    brand_url = models.CharField(max_length=100, null=True, help_text='type anything in this field. it\'ll be generated automatically')
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
     	verbose_name='date brand was added to db'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date brand details were updated last' )
+
+    # Override models save method:
+    def save(self, *args, **kwargs):
+        if not self.id:
+            # generate brand url when post is created
+            # brand url must be unique
+            self.brand_url = '/brand/' + get_random_string(length=16) + '/'
+            while Brand.objects.filter(brand_url=self.brand_url).exists():
+                self.brand_url = '/brand/' + get_random_string(length=16) + '/'
+        super(Brand, self).save(*args, **kwargs)
 
     def __str__(self):
         return '{0} ({1})'.format(self.name, self.email)
@@ -148,6 +163,15 @@ class Product(models.Model):
         verbose_name='date product was added to db'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date product details were updated last' )
+
+    def get_carts(self):
+        return Cart.objects.filter(product=self).order_by('-created_at')
+
+    def get_wishes(self):
+        return Wish.objects.filter(product=self).order_by('-created_at')
+
+    def get_orders(self):
+        return OrderItem.objects.filter(product=self).order_by('-created_at')
 
     # Override models save method:
     def save(self, *args, **kwargs):
@@ -262,6 +286,9 @@ class Order(models.Model):
         verbose_name='date order was placed'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date order details were updated last' )
+
+    def get_order_items(self):
+        return OrderItem.objects.filter(order=self).order_by('-created_at')
 
     # Override models save method:
     def save(self, *args, **kwargs):

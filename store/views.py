@@ -4,29 +4,28 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .collections import Collections
 # from .serializers import *
 from .models import *
 from .forms import *
 
+col = Collections()
+
 class IndexView(ListView):
     model = Product
-    # get products that are 1 or more in store
-    queryset = Product.objects.filter(quantity__gte=1).order_by('-created_at')[:5]
-    context_object_name = 'products'
     template_name = 'store/pages/index.html'
 
     # this retrieves data that'll be displayed in the index page
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
         # get cart items from session too
+        context['popular_products'] = col.popular_products(6)
+        context['popular_brands'] = col.popular_brands(4)
         context['cart'] = []
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.get_wish()
             context['cart'] = self.request.user.get_cart()
         return context
-
-    # def get(self, request, *args, **kwargs):
-    #     return render(request, self.template_name, {'products': self.queryset, ''})
 
 class CustomerCareView(IndexView):
     template_name = 'store/pages/customer_care.html'

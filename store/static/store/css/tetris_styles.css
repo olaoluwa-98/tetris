@@ -1,4 +1,4 @@
-/*styling for tetris*/
+/* Tetris customized styling*/
 
 /*START OF FOOTER STYLING*/
 /*this is the footer*/
@@ -8,10 +8,10 @@
   font-family: MaisonNeue-Light;
   grid-template-columns: 3fr 4fr 3fr 5fr 3fr;
   grid-template-rows: 1fr 5fr 1fr;
-  border: 1px solid gray;
-  /*align-content: center;*/
+  /*border: 1px solid gray;*/
   text-align: left;
   color: #d7dbdc;
+  padding: 0;
 }
 
 .footer a {
