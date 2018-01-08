@@ -4,18 +4,102 @@
     Login | Tetris Clothing Store
 {% endblock %}
 
+{% load static %}
+{% block extra_css %}
+  <style type="text/css">
+  </style>
+{% endblock %}
+
 {% block content %}
-<form action="/login/" method="post">
-    {% csrf_token %}
-    {% for field in form %}
-    <div class="form-group">        
-        {{ field.label_tag }} {{ field }}
-        {% if field.help_text %}
-        <p class="help-text">{{ field.help_text|safe }}</p>
-        {% endif %}
-        {{ field.errors }}
+
+<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
+  <div class="hero-head">
+    {% include 'store/header.html' %}
+  </div>
+
+  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+    <div class="container has-text-centered">
+      <p class="title" style="color: white;">
+        Login to Shop the New Look
+      </p>
+      <p class="subtitle" style="color: white;">
+        The new look of simple
+      </p>
+      <a href="{% url 'store:store' %}" style="color: white;">
+        Shop tetris
+      </a>
     </div>
-{% endfor %}
-    <input type="submit" value="Submit" />
-</form>
+  </div>
+</section>
+
+<section class="section">
+  <div class="columns">
+    <div class="column"></div>
+
+    <!-- center-box is a tetris styling -->
+    <div class="column box center-box">
+      <form action="/login/" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="redirect_url" value="{% if request.GET.next %}{{ request.GET.next }}{% else %}/{% endif %}">
+      <div class="field">
+        <label class="label">Username</label>
+        <div class="control has-icons-left has-icons-right">
+          <input class="input {% if form.username.errors %}is-danger{% endif %} is-medium" type="text" name="username" placeholder="username"
+          required value="{% if form.username.value %}{{ form.username.value }}{% endif %}">
+          <span class="icon is-small is-left">
+            <i class="fa fa-user"></i>
+          </span>
+          {% if form.username.errors %}
+          <span class="icon is-small is-right">
+            <i class="fa fa-warning"></i>
+          </span>
+          {% endif %}
+        </div>
+        <p class="help is-danger">
+          {{ form.username.errors }}
+        </p>
+          </div>
+
+          <div class="field">
+              <label class="label">Password</label>
+            <p class="control has-icons-left">
+              <input class="input {% if form.password.errors %}is-danger{% endif %} is-medium" type="password" name="password" placeholder="Password">
+              <span class="icon is-small is-left">
+                <i class="fa fa-lock"></i>
+              </span>
+            </p>
+            <p class="help is-danger">
+              {{ form.password.errors }}
+            </p>
+          </div>
+          <p class="help is-danger">
+              {{ form.non_field_errors }}
+          </p>
+          <div class="field">
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" name="remember">
+                Remember me
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <p class="control">
+              <a href="{% url 'store:register' %}">Not registered?</a>
+              <a href="{% url 'store:password_reset' %}">Forgot password?</a>
+            </p>
+          </div>
+          <div class="field">
+            <p class="control">
+              <button class="button is-danger">
+                Login
+              </button>
+            </p>
+          </div>
+      </form>
+    </div>
+    <div class="column"></div>
+  </div>
+</section>
+
 {% endblock %}

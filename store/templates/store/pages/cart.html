@@ -1,23 +1,108 @@
-
-<!-- about page -->
-{% extends "store/base.html" %}
+{% extends 'store/base.html' %}
 
 {% block title %}
-	Cart | Tetris Clothing Store
+    Cart | Tetris Clothing Store
 {% endblock %}
 
+{% load static %}
+{% block extra_css %}
+  <style type="text/css">
+  </style>
+{% endblock %}
 
 {% block content %}
-<div class="main">
-  <br><p style="text-decoration: underline;">CART</p>
-  {% if cart %}
 
-    {% for cart_item in cart %}
-      {{ forloop.counter }}. <a href="{{ cart_item.product.product_url }}">{{ cart_item.product.name }}</a><br>
-    {% endfor %}
+<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
+  <div class="hero-head">
+    {% include 'store/header.html' %}
+  </div>
 
-  {% else %}
-    Empty cart
-  {% endif %}
-</div>
+  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+    <div class="container has-text-centered">
+      <p class="title" style="color: white;">
+        Tetris
+      </p>
+      <p class="subtitle" style="color: white;">
+        The new look of simple
+      </p>
+      <a href="{% url 'store:store' %}" style="color: white;">
+        Go back to shopping Tetris
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+	<div class="columns">
+		<div class="column"></div>
+		<div class="column">
+			<div class="tabs is-centered">
+			  <ul>
+			    <li><a href="{% url 'store:index' %}">Profile</a></li>
+			    <li class="is-active"><a href="javascript:void(0);">Cart</a></li>
+			    <li><a href="{% url 'store:index' %}">Orders</a></li>
+			    <li><a href="{% url 'store:wish_list' %}">Wishlist</a></li>
+			    <li><a href="{% url 'store:index' %}">Settings</a></li>
+			  </ul>
+			</div>
+			{% if cart %}
+			{% for cart_item in cart %}
+			<div class="box">
+			  <article class="media">
+			    <div class="media-left">
+			      <figure class="image is-64x64">
+			        <img src="{{ cart_item.product.product_images.all.0.product_image_url }}" alt="Image">
+			      </figure>
+			    </div>
+			    <div class="media-content">
+			      <div class="content">
+			        <p>
+			          <strong>{{ cart_item.product.name }}</strong> <small>@{{ cart_item.product.brand.name }}</small>
+			          <small style="font-weight: bold">N{{ cart_item.product.price_per_unit }}</small>
+			          <br>
+			        </p>
+			      </div>
+			      <nav class="level is-mobile">
+			        <div class="level-left">
+			          <a class="level-item">
+			            <span class="icon is-small" title="remove this item"><i class="fa fa-close"></i></span>
+			          </a>
+			          <div class="field has-addons has-addons-right">
+			            <p class="control">
+			              <input class="input is-small" type="number" placeholder="Qty" value="{{ cart_item.quantity }}">
+			            </p>
+			            <p class="control">
+			              <a class="button is-small is-primary">
+			                Qty
+			              </a>
+			            </p>
+			          </div>
+			        </div>
+			      </nav>
+			    </div>
+			  </article>
+			</div>
+			{% if forloop.last %}
+				<div class="field is-grouped is-grouped-centered">
+				  <p class="control">
+				    <a class="button is-primary">
+				      Checkout
+				    </a>
+				  </p>
+				  <p class="control">
+				    <a class="button is-light">
+				      Empty Cart
+				    </a>
+				  </p>
+				</div>
+			{% endif %}
+
+			{% endfor %}
+			{% else %}
+				Empty cart
+			{% endif %}
+		</div>
+		<div class="column"></div>
+	</div>
+</section>
 {% endblock %}

@@ -1,29 +1,122 @@
-<!-- index page -->
-{% extends "store/base.html" %}
+{% extends 'store/base.html' %}
 
 {% block title %}
-  Register | Tetris Clothing Store
+    Register | Tetris Clothing Store
 {% endblock %}
 
+{% load static %}
 {% block extra_css %}
-
+  <style type="text/css">
+  </style>
 {% endblock %}
-
 
 {% block content %}
 
-<form action="/register/" method="post">
-  {% csrf_token %}
-  {% for field in form %}
-  <div class="form-group">
-    {{ field.label_tag }} {{ field }}
-    {% if field.help_text %}
-    <p class="help-text">{{ field.help_text|safe }}</p>
-    {% endif %}
-    {{ field.errors }}
+<section class="hero is-medium is-primary">
+  <div class="hero-head">
+    {% include 'store/header.html' %}
   </div>
-{% endfor %}
-    <input type="submit" value="Submit" />
-</form>
+
+  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+    <div class="container has-text-centered">
+      <p class="title" style="color: white;">
+        Register to Join the New Look
+      </p>
+      <p class="subtitle" style="color: white;">
+        The new look of simple
+      </p>
+      <a href="{% url 'store:store' %}" style="color: white;">
+        Shop tetris
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="columns">
+    <div class="column"></div>
+    <!-- center-box is a tetris styling -->
+    <div class="column box center-box">
+      <form action="/register/" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="redirect_url" value="{% if request.GET.next %}{{ request.GET.next }}{% else %}/{% endif %}">
+      <div class="field">
+        <label class="label">Username</label>
+        <div class="control has-icons-left has-icons-right">
+          <input class="input {% if form.username.errors %}is-danger{% endif %} is-medium" type="text" name="username" placeholder="username"
+          required value="{% if form.username.value %}{{ form.username.value }}{% endif %}">
+          <span class="icon is-small is-left">
+            <i class="fa fa-user"></i>
+          </span>
+          {% if form.username.errors %}
+          <span class="icon is-small is-right">
+            <i class="fa fa-warning"></i>
+          </span>
+          {% endif %}
+        </div>
+        <p class="help is-danger">
+          {{ form.username.errors }}
+        </p>
+      </div>
+
+      <div class="field">
+        <label class="label">Email</label>
+        <div class="control has-icons-left has-icons-right">
+          <input class="input {% if form.email.errors %}is-danger{% endif %} is-medium" type="email" name="email" placeholder="email address"
+          required value="{% if form.email.value %}{{ form.email.value }}{% endif %}">
+          <span class="icon is-small is-left">
+            <i class="fa fa-envelope"></i>
+          </span>
+          {% if form.email.errors %}
+          <span class="icon is-small is-right">
+            <i class="fa fa-warning"></i>
+          </span>
+          {% endif %}
+        </div>
+        <p class="help is-danger">
+          {{ form.email.errors }}
+        </p>
+        </div>
+
+          <div class="field">
+              <label class="label">Password</label>
+            <p class="control has-icons-left">
+              <input class="input{% if form.password.errors %}is-danger{% endif %} is-medium" type="password" name="password" placeholder="Password">
+              <span class="icon is-small is-left">
+                <i class="fa fa-lock"></i>
+              </span>
+            </p>
+            <p class="help is-danger">
+              {{ form.password.errors }}
+            </p>
+          </div>
+          <p class="help is-danger">
+              {{ form.non_field_errors }}
+          </p>
+          <div class="field">
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" name="terms">
+                I agree to the <a href="#">terms and conditions</a>
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <p class="control">
+              <a href="{% url 'store:login' %}">Registered?</a>
+            </p>
+          </div>
+          <div class="field">
+            <p class="control">
+              <button class="button is-danger">
+                Create Account
+              </button>
+            </p>
+          </div>
+      </form>
+    </div>
+    <div class="column"></div>
+  </div>
+</section>
 
 {% endblock %}

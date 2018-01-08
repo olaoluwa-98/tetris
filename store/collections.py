@@ -31,14 +31,13 @@ class Collections:
         )
         return popular_products[:limit]
 
-    def related_products(self, product, limit=5):
-        # uses popular posts in the krak that post is in
-        related_products = Product.objects.filter(krak=post.krak).exclude(id=product.id)
-        # sort by wish and datetime
-        # preference goes to recent posts with more wish
-        related_products = sorted(
-            related_products,
-            key=lambda p: (86400 * p.get_orders().count()) + calendar.timegm(p.created_at.utctimetuple()),
-            reverse=True
-        )
-        return related_products[:limit]
+    # def related_products(self, product, limit=5):
+    #     related_products = Product.objects.filter(krak=product.krak).exclude(id=product.id)
+    #     # sort by wish and datetime
+    #     # preference goes to recent posts with more wish
+    #     related_products = sorted(
+    #         related_products,
+    #         key=lambda p: (86400 * p.get_orders().count()) + calendar.timegm(p.created_at.utctimetuple()),
+    #         reverse=True
+    #     )
+    #     return related_products[:limit]

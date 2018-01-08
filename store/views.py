@@ -138,13 +138,13 @@ class WomenStoreView(ListView):
 
 def handle_login(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect('/store')
+        return HttpResponseRedirect('/')
     form = LoginForm(request.POST or None)
     if form.is_valid():
         user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
         if user is not None:
             login(request, user)
-            HttpResponseRedirect('/store')
+            return HttpResponseRedirect(request.POST['redirect_url'])
     context = {'form': form}
     # get cart items from session
     context['cart'] = []
@@ -152,16 +152,19 @@ def handle_login(request):
 
 def handle_register(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect('/store')
+        return HttpResponseRedirect('/')
     form = RegisterForm(request.POST or None)
     if form.is_valid():
-        user = form.save()
-        user.refresh_from_db()  # load the profile instance created by the signal
+        username = form.cleaned_data['username'].lower()
+        email = form.cleaned_data['email'].lower()
+
+        user = user = get_user_model()(username=username, email=email)
+        user.set_password(form.cleaned_data['password'])
         user.save()
-        user = authenticate(username=user.username, password=form.cleaned_data.get('password1'))
+        user = authenticate(username=user.username, password=form.cleaned_data.get('password'))
         if user is not None:
             login(request, user)
-            HttpResponseRedirect('/store')
+            return HttpResponseRedirect(request.POST['redirect_url'])
     context = {'form': form}
     # get cart items from session
     context['cart'] = []
@@ -170,4 +173,4 @@ def handle_register(request):
 @login_required(login_url='/login/')
 def handle_logout(request):
     logout(request)
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect('/login')
