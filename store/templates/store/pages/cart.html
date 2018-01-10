@@ -38,7 +38,7 @@
 		<div class="column">
 			<div class="tabs is-centered">
 			  <ul>
-			    <li><a href="{% url 'store:index' %}">Profile</a></li>
+			    <li><a href="{% url 'store:profile' %}">Profile</a></li>
 			    <li class="is-active"><a href="javascript:void(0);">Cart</a></li>
 			    <li><a href="{% url 'store:index' %}">Orders</a></li>
 			    <li><a href="{% url 'store:wish_list' %}">Wishlist</a></li>
@@ -51,13 +51,14 @@
 			  <article class="media">
 			    <div class="media-left">
 			      <figure class="image is-64x64">
-			        <img src="{{ cart_item.product.product_images.all.0.product_image_url }}" alt="Image">
+			        <img src="{{ MEDIA_URL }}{{ cart_item.product.product_images.all.0.product_image_url }}" alt="Image">
 			      </figure>
 			    </div>
 			    <div class="media-content">
 			      <div class="content">
 			        <p>
-			          <strong>{{ cart_item.product.name }}</strong> <small>@{{ cart_item.product.brand.name }}</small>
+			          <strong><a href="{{ wish_item.product.product_url}}">{{ cart_item.product.name }}</a></strong>
+			          <small><a href="{{ wish_item.product.brand.brand_url}}">@{{ cart_item.product.brand.name }}</a></small>
 			          <small style="font-weight: bold">N{{ cart_item.product.price_per_unit }}</small>
 			          <br>
 			        </p>

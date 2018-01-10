@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.views.generic import ListView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .collections import Collections
 # from .serializers import *
@@ -26,6 +27,7 @@ class IndexView(ListView):
             context['wish_list'] = self.request.user.get_wish()
             context['cart'] = self.request.user.get_cart()
         return context
+
 
 class CustomerCareView(IndexView):
     template_name = 'store/pages/customer_care.html'
@@ -53,6 +55,7 @@ class AboutView(IndexView):
             context['cart'] = self.request.user.get_cart()
         return context
 
+
 class CartView(ListView):
     model = Cart
     # queryset = Cart.objects.filter(user_id=self.request.user.id).order_by('-created_at')
@@ -70,6 +73,7 @@ class CartView(ListView):
             context['cart'] = self.request.user.get_cart()
         return context
 
+
 class WishListView(LoginRequiredMixin, ListView):
     model = Wish
     # queryset = Cart.objects.filter(user_id=self.request.user.id).order_by('-created_at')
@@ -84,6 +88,7 @@ class WishListView(LoginRequiredMixin, ListView):
         context['wish_list'] = self.request.user.get_wish()
         context['cart'] = self.request.user.get_cart()
         return context
+
 
 class StoreView(ListView):
     model = Product
@@ -102,6 +107,7 @@ class StoreView(ListView):
             context['cart'] = self.request.user.get_cart()
         return context
 
+
 class MenStoreView(ListView):
     model = Product
     # get products that are 1 or more in store
@@ -118,6 +124,7 @@ class MenStoreView(ListView):
             context['wish_list'] = self.request.user.get_wish()
             context['cart'] = self.request.user.get_cart()
         return context
+
 
 class WomenStoreView(ListView):
     model = Product
@@ -136,6 +143,27 @@ class WomenStoreView(ListView):
             context['cart'] = self.request.user.get_cart()
         return context
 
+
+class ProfileView(LoginRequiredMixin, ListView):
+    model = get_user_model()
+    # queryset = Cart.objects.filter(user_id=self.request.user.id).order_by('-created_at')
+    context_object_name = 'user_details'
+    template_name = 'store/pages/profile.html'
+    success_url = '/store/'
+
+    def post(self, request, *args, **kwargs):
+        print(args, ':::kwargs->', kwargs)
+
+
+    def get_context_data(self, **kwargs):
+        # context = [super(CartView, self).get_context_data(**kwargs)]
+        context = {}
+        # get cart items from session too
+        context['wish_list'] = self.request.user.get_wish()
+        context['cart'] = self.request.user.get_cart()
+        return context
+
+
 def handle_login(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect('/')
@@ -149,6 +177,7 @@ def handle_login(request):
     # get cart items from session
     context['cart'] = []
     return render(request, 'registration/login.html', context)
+
 
 def handle_register(request):
     if request.user.is_authenticated:
@@ -169,6 +198,7 @@ def handle_register(request):
     # get cart items from session
     context['cart'] = []
     return render(request, 'registration/register.html', context)
+
 
 @login_required(login_url='/login/')
 def handle_logout(request):

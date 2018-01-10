@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^about/$', AboutView.as_view(), name='about'),
     url(r'^cart/$', CartView.as_view(), name='cart'),
     url(r'^customer-care/$', CustomerCareView.as_view(), name='customer_care'),
+    url(r'^profile/$', ProfileView.as_view(), name='profile'),
     url(r'^store/$', StoreView.as_view(), name='store'),
     url(r'^store/men/$', MenStoreView.as_view(), name='men'),
     url(r'^store/women/$', WomenStoreView.as_view(), name='women'),

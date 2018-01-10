@@ -1,0 +1,138 @@
+{% extends 'store/base.html' %}
+
+{% block title %}
+    Profile | Tetris Clothing Store
+{% endblock %}
+
+{% load static %}
+{% block extra_css %}
+  <style type="text/css">
+  </style>
+{% endblock %}
+
+{% block content %}
+
+<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
+  <div class="hero-head">
+    {% include 'store/header.html' %}
+  </div>
+
+  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+    <div class="container has-text-centered">
+      <p class="title" style="color: white;">
+        Tetris {{ user }}
+      </p>
+      <p class="subtitle" style="color: white;">
+        The new look of simple
+      </p>
+      <a href="{% url 'store:store' %}" style="color: white;">
+        Go back to shopping Tetris
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+	<div class="columns">
+		<div class="column"></div>
+		<div class="column">
+			<div class="tabs is-centered">
+			  <ul>
+			    <li class="is-active"><a href="javascript:void(0);">Profile</a></li>
+			    <li><a href="{% url 'store:cart' %}">Cart</a></li>
+			    <li><a href="{% url 'store:index' %}">Orders</a></li>
+			    <li><a href="{% url 'store:wish_list' %}">Wishlist</a></li>
+			    <li><a href="{% url 'store:index' %}">Settings</a></li>
+			  </ul>
+			  </div>
+			  <form action="/profile/" method="post">
+			  	{% csrf_token %}
+			  	<div class="field is-horizontal">
+			  	<div class="field-body">
+		  	    <div class="field">
+		  	    	<label class="label">First name</label>
+		  	      <p class="control is-expanded has-icons-left">
+		  	        <input class="input {% if form.first_name.errors %}is-danger{% endif %}" type="text" name="first_name" placeholder="First Name"
+		  	        value="{{ user.first_name}}">
+		  	        <span class="icon is-small is-left">
+		  	          <i class="fa fa-user"></i>
+		  	        </span>
+		  	      </p>
+		  	    </div>
+		  	    <div class="field">
+		  	    	<label class="label">Last name</label>
+		  	      <p class="control is-expanded has-icons-left">
+		  	        <input class="input {% if form.last_name.errors %}is-danger{% endif %}" type="text" name="last_name" placeholder="Last name"
+		  	        value="{{ user.last_name}}">
+		  	        <span class="icon is-small is-left">
+		  	          <i class="fa fa-user"></i>
+		  	        </span>
+		  	      </p>
+		  	    </div>
+		  	  </div>
+		  	</div>
+
+		  	<div class="field is-horizontal">
+	  	  	<div class="field-body">
+	    	    <div class="field">
+    			    <label class="label">Username</label>
+    			    <div class="control has-icons-left has-icons-right">
+    			      <input class="input {% if form.username.errors %}is-danger{% endif %}" type="text" placeholder="Username"
+    			      value="{{ user.username}}">
+    			      <span class="icon is-small is-left">
+    			        <i class="fa fa-user"></i>
+    			      </span>
+    			      <span class="icon is-small is-right">
+    			        <i class="fa fa-check"></i>
+    			      </span>
+    			    </div>
+    			    <p class="help is-success">This username is available</p>
+    			  </div>
+
+	    	    <div class="field">
+    			    <label class="label">Email</label>
+    			    <div class="control has-icons-left has-icons-right">
+    			      <input class="input is-danger" type="email" placeholder="Email input" value="hello@">
+    			      <span class="icon is-small is-left">
+    			        <i class="fa fa-envelope"></i>
+    			      </span>
+    			      <span class="icon is-small is-right">
+    			        <i class="fa fa-warning"></i>
+    			      </span>
+    			    </div>
+    			    <p class="help is-danger">This email is invalid</p>
+    			  </div>
+	    	  </div>
+	    	</div>
+
+	    	<div class="field is-horizontal">
+
+	    	  <div class="field-body">
+	    	    <div class="field is-expanded">
+	    	    	<div class="label">Phone number</div>
+	    	      <div class="field has-addons">
+	    	        <p class="control">
+	    	          <a class="button is-static">
+	    	            +234
+	    	          </a>
+	    	        </p>
+	    	        <p class="control is-expanded">
+	    	          <input class="input" type="tel" placeholder="Your phone number">
+	    	        </p>
+	    	      </div>
+	    	      <p class="help">Do not enter the first zero</p>
+	    	    </div>
+	    	  </div>
+	    	</div>
+	    	<div class="field is-grouped is-grouped-centered">
+	    	  <p class="control">
+	    	    <input type="submit" class="button is-primary" value="Update Profile">
+	    	  </p>
+	    	</div>
+
+			</form>
+		</div>
+		<div class="column"></div>
+	</div>
+</section>
+{% endblock %}
