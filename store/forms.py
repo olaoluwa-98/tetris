@@ -75,3 +75,38 @@ class RegisterForm(ModelForm):
             raise ValidationError("A user with that email address already exists.")
 
         return cleaned_data
+
+
+class ProfileForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.current_user = args[1]
+        super(ProfileForm, self).__init__(*args, **kwargs)
+    username = forms.CharField(label='Username', max_length=30, strip=True)
+    email = forms.EmailField(label='Email', max_length=60, required=False)
+    first_name = forms.CharField(label='First Name', max_length=30, strip=True)
+    last_name = forms.CharField(label='Last Name', max_length=30, strip=True)
+    phone = forms.CharField(label='Phone Number', max_length=13, min_length=10, strip=True)
+
+    def clean(self, *args, **kwargs):
+        cleaned_data = super(ProfileForm, self).clean()
+        username = cleaned_data.get('username')
+        email = cleaned_data.get('email')
+        phone = cleaned_data.get('phone')
+
+        # disallow blacklisted names as username
+        # username blacklist file
+        with open(os.path.dirname(__file__) + '/username_blacklist.txt') as ub_file:
+            username_blacklist = ub_file.read().splitlines()
+        # username must not be in username blacklist
+        if username in username_blacklist:
+            raise ValidationError("The username you've chosen is not allowed! Please use another.")
+
+        # email must be unique
+        # NB: users w/o emails have their email field as empty string
+        if self.current_user.email != email and get_user_model().objects.filter(email=email).exists() and email != "":
+            raise ValidationError("A user with that email address already exists.")
+
+        return cleaned_data
+    class Meta:
+        model = get_user_model()
+        fields = ('username', 'email', 'first_name', 'last_name', 'phone', )

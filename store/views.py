@@ -5,12 +5,19 @@ from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from .collections import Collections
 # from .serializers import *
 from .models import *
 from .forms import *
 
 col = Collections()
+
+# def get_cart(session, user=None):
+#     if user is None:
+
+
+
 
 class IndexView(ListView):
     model = Product
@@ -152,8 +159,14 @@ class ProfileView(LoginRequiredMixin, ListView):
     success_url = '/store/'
 
     def post(self, request, *args, **kwargs):
-        print(args, ':::kwargs->', kwargs)
-
+        form = ProfileForm(request.POST or None, request.user)
+        context = {'form': form}
+        # get cart items from session
+        context['cart'] = []
+        if form.is_valid():
+            context['success'] = 'Your profile has been updated'
+            return render(request, 'store/pages/profile.html', context)
+        return render(request, 'store/pages/profile.html', context)
 
     def get_context_data(self, **kwargs):
         # context = [super(CartView, self).get_context_data(**kwargs)]
@@ -204,3 +217,56 @@ def handle_register(request):
 def handle_logout(request):
     logout(request)
     return HttpResponseRedirect('/login')
+
+
+@csrf_exempt
+def add_to_cart(request):
+    if request.user.is_authenticated:
+        product = Product(pk=request.POST['product_id'])
+        if product:
+            cart_item = Cart(user= request.user, product=product, quantity=request.POST['quantity'])
+            if cart_item.save():
+                response = JsonResponse({'status' : 'success', 'msg': 'added successfully' })
+                response.status_code = 200
+                return response
+
+        response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
+        response.status_code = 402
+        return response
+
+    else:
+        cart = request.session['cart']
+        product_id = request.POST['product_id']
+        qty = request.POST['quantity']
+
+        response = JsonResponse({'status' : 'success', 'msg': 'added successfully' })
+        response.status_code = 200
+        return response
+
+@csrf_exempt
+def empty_cart(request):
+    if request.user.is_authenticated:
+        carts = Cart.objects.filter(user_id=request.user.id)
+        for cart in carts:
+            cart.delete()
+        if request.session.get('cart'):
+            request.session['cart'] = ''
+        response = JsonResponse({'status' : 'success', 'msg': 'cart emptied' })
+        response.status_code = 200
+        return response
+
+    if request.session.get('cart'):
+        request.session['cart'] = ''
+    response = JsonResponse({'status' : 'success', 'msg': 'cart emptied' })
+    response.status_code = 200
+    return response
+
+@csrf_exempt
+@login_required(login_url='/login/')
+def empty_wish_list(request):
+        wishes = Wish.objects.filter(user_id=request.user.id)
+        for wish in wishes:
+            wish.delete()
+        response = JsonResponse({'status' : 'success', 'msg': 'wish list emptied' })
+        response.status_code = 200
+        return response

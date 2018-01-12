@@ -75,12 +75,7 @@
 			{% if forloop.last %}
 				<div class="field is-grouped is-grouped-centered">
 				  <p class="control">
-				    <a class="button is-primary">
-				      Add all to cart
-				    </a>
-				  </p>
-				  <p class="control">
-				    <a class="button is-light">
+				    <a class="button is-light" id="empty_wish_list" onclick="empty_wish_list()">
 				      Empty wish list
 				    </a>
 				  </p>
@@ -89,7 +84,13 @@
 
 			{% endfor %}
 			{% else %}
-				Empty wish list
+				<div class="field is-grouped is-grouped-centered">
+				  <p class="control">
+				    <a class="button is-light">
+				      Your wish list is empty
+				    </a>
+				  </p>
+				</div>
 			{% endif %}
 		</div>
 		<div class="column"></div>
