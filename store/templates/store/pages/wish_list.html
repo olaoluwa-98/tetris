@@ -18,14 +18,14 @@
   </div>
 
   <div class="hero-body" style="font-family: LobsterTwo-Italic;">
-    <div class="container has-text-centered">
+    <div class="container has-text-centered text-white">
       <p class="title" style="color: white;">
         Tetris
       </p>
-      <p class="subtitle" style="color: white;">
+      <p class="subtitle">
         The new look of simple
       </p>
-      <a href="{% url 'store:store' %}" style="color: white;">
+      <a href="{% url 'store:store' %}">
         Go back to shopping Tetris
       </a>
     </div>
@@ -35,7 +35,7 @@
 <section class="section">
 	<div class="columns">
 		<div class="column"></div>
-		<div class="column">
+		<div class="column box center-box">
 			<div class="tabs is-centered">
 			  <ul>
 			    <li><a href="{% url 'store:profile' %}">Profile</a></li>
@@ -47,7 +47,7 @@
 			</div>
 			{% if wish_list %}
 			{% for wish_item in wish_list %}
-			<div class="box">
+			<div class="box item">
 			  <article class="media">
 			    <div class="media-left">
 			      <figure class="image is-64x64">

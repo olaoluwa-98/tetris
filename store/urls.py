@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^$', IndexView.as_view(), name='index'),
     url(r'^about/$', AboutView.as_view(), name='about'),
     url(r'^add-to-cart', add_to_cart, name ="add_to_cart"),
+    url(r'^add-to-wish-list', add_to_wish_list, name ="add_to_wish_list"),
     url(r'^cart/$', CartView.as_view(), name='cart'),
     url(r'^customer-care/$', CustomerCareView.as_view(), name='customer_care'),
     url(r'^empty-cart', empty_cart, name ="empty_cart"),

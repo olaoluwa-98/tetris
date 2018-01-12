@@ -78,3 +78,7 @@
   transform: translate(0px,-100px);
 }
 /*END OF CENTER BOX STYLING*/
+
+div.text-white p, div.text-white a{
+  color: white;
+}

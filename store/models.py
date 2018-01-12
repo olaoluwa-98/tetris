@@ -254,8 +254,11 @@ class Cart(models.Model):
         # check if cart product already exists, add more quantity to it
         cart = Cart.objects.filter(user_id=self.user_id, product_id=self.product_id)
         if len(cart) == 1:
-            cart[0].quantity += self.quantity
-            super(Cart, cart[0]).save(*args, **kwargs)
+            cart[0].quantity += int(self.quantity)
+            if cart[0].quantity < 1:
+                super(Cart, cart[0]).delete(*args, **kwargs)
+            else:
+                super(Cart, cart[0]).save(*args, **kwargs)
         else:
             super(Cart, self).save(*args, **kwargs)
 

@@ -12,20 +12,20 @@
 
 {% block content %}
 
-<section class="hero is-medium is-primary">
+<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
   <div class="hero-head">
     {% include 'store/header.html' %}
   </div>
 
   <div class="hero-body" style="font-family: LobsterTwo-Italic;">
-    <div class="container has-text-centered">
-      <p class="title" style="color: white;">
+    <div class="container has-text-centered text-white">
+      <p class="title">
         Register to Join the New Look
       </p>
-      <p class="subtitle" style="color: white;">
+      <p class="subtitle">
         The new look of simple
       </p>
-      <a href="{% url 'store:store' %}" style="color: white;">
+      <a href="{% url 'store:store' %}">
         Shop tetris
       </a>
     </div>
@@ -93,7 +93,7 @@
           <p class="help is-danger">
               {{ form.non_field_errors }}
           </p>
-          <div class="field">
+          <div class="field is-grouped is-grouped-centered">
             <div class="control">
               <label class="checkbox">
                 <input type="checkbox" name="terms">
@@ -101,12 +101,12 @@
               </label>
             </div>
           </div>
-          <div class="field">
+          <div class="field is-grouped is-grouped-centered">
             <p class="control">
               <a href="{% url 'store:login' %}">Registered?</a>
             </p>
           </div>
-          <div class="field">
+          <div class="field is-grouped is-grouped-centered">
             <p class="control">
               <button class="button is-danger">
                 Create Account

@@ -17,15 +17,15 @@
     {% include 'store/header.html' %}
   </div>
 
-  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
-    <div class="container has-text-centered">
-      <p class="title" style="color: white;">
+  <div class="hero-body" style="font-family: LobsterTwo-Italic;" class="text-white">
+    <div class="container has-text-centered text-white">
+      <p class="title">
         Tetris
       </p>
-      <p class="subtitle" style="color: white;">
+      <p class="subtitle">
         The new look of simple
       </p>
-      <a href="{% url 'store:store' %}" style="color: white;">
+      <a href="{% url 'store:store' %}">
         Go back to shopping Tetris
       </a>
     </div>
@@ -35,19 +35,23 @@
 <section class="section">
 	<div class="columns">
 		<div class="column"></div>
-		<div class="column">
+		<div class="column box center-box">
 			<div class="tabs is-centered">
 			  <ul>
+			  	{% if user.is_authenticated %}
 			    <li><a href="{% url 'store:profile' %}">Profile</a></li>
 			    <li class="is-active"><a href="javascript:void(0);">Cart</a></li>
 			    <li><a href="{% url 'store:index' %}">Orders</a></li>
 			    <li><a href="{% url 'store:wish_list' %}">Wishlist</a></li>
 			    <li><a href="{% url 'store:index' %}">Settings</a></li>
+			    {% else %}
+			    <li class="is-active"><a href="javascript:void(0);">Cart</a></li>
+			    {% endif %}
 			  </ul>
 			</div>
 			{% if cart %}
 			{% for cart_item in cart %}
-			<div class="box">
+			<div class="box item">
 			  <article class="media">
 			    <div class="media-left">
 			      <figure class="image is-64x64">
@@ -70,10 +74,12 @@
 			          </a>
 			          <div class="field has-addons has-addons-right">
 			            <p class="control">
-			              <input class="input is-small" type="number" placeholder="Qty" value="{{ cart_item.quantity }}">
+			              <input class="input is-small" type="number" placeholder="Qty" value="{{ cart_item.quantity }}"
+			               id="qty_{{ cart_item.product.id }}">
 			            </p>
 			            <p class="control">
-			              <a class="button is-small is-primary">
+			              <a class="button is-small is-danger" onclick="change_qty({{ cart_item.product.id }}, {{ cart_item.quantity }} )"
+			              id="qty_btn_{{ cart_item.id }}" >
 			                Qty
 			              </a>
 			            </p>
@@ -86,7 +92,7 @@
 			{% if forloop.last %}
 				<div class="field is-grouped is-grouped-centered">
 				  <p class="control">
-				    <a class="button is-primary" id="checkout_btn">
+				    <a class="button is-danger" id="checkout_btn">
 				      Checkout
 				    </a>
 				  </p>
