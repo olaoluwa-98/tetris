@@ -47,13 +47,15 @@ class Collections:
         return categories[:limit]
 
 
-    # def related_products(self, product, limit=5):
-    #     related_products = Product.objects.filter(krak=product.krak).exclude(id=product.id)
-    #     # sort by wish and datetime
-    #     # preference goes to recent posts with more wish
-    #     related_products = sorted(
-    #         related_products,
-    #         key=lambda p: (86400 * p.get_orders().count()) + calendar.timegm(p.created_at.utctimetuple()),
-    #         reverse=True
-    #     )
-    #     return related_products[:limit]
+    def related_products(self, product, limit=5):
+        related_products = Product.objects.filter(
+            gender=product.gender
+        ).exclude(pk=product.pk)
+
+        # sort by wish and datetime
+        # related_products = sorted(
+        #     related_products,
+        #     key=lambda p: (86400 * p.get_orders().count()) + calendar.timegm(p.created_at.utctimetuple()),
+        #     reverse=True
+        # )
+        return related_products[:limit]

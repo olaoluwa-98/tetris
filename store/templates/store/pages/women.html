@@ -1,71 +1,43 @@
 <!-- index page -->
-{% extends "store/base.html" %}
-
-{% block title %}
-	Tetris Clothing Store
-{% endblock %}
+{% extends "store/base.html" %} {% block title %} Tetris Clothing Store {% endblock %}
 
 <!-- extra styling -->
 {% block extra_css %}
-  <style type="text/css">
+<style type="text/css">
 
-  </style>
-{% endblock %}
-
-{% block content %}
+</style>
+{% endblock %} {% block content %}
 <div class="main">
-  <h2>I am the main</h2>
-  <p style="text-decoration: underline;">LATEST</p>
-  {% if products %}
+    <h2>I am the main</h2>
+    <p style="text-decoration: underline;">LATEST</p>
+    {% if products %} {% for product in products %} {{ forloop.counter }}. <a href="{{ product.get_absolute_url }}">{{ product.name }}</a><br> {% endfor %} {% else %} No products {% endif %}
+    <br>
+    <p style="text-decoration: underline;">CART</p>
+    {% if cart %} {% for cart_item in cart %} {{ forloop.counter }}. <a href="{{ cart_item.product.get_absolute_url }}">{{ cart_item.product.name }}</a><br> {% endfor %} {% else %} Empty cart {% endif %}
 
-	  {% for product in products %}
-		  {{ forloop.counter }}. <a href="{{ product.product_url }}">{{ product.name }}</a><br>
-	  {% endfor %}
+    <br>
+    <p style="text-decoration: underline;">WISH LIST</p>
 
-  {% else %}
-    No products
-  {% endif %}
-  <br><p style="text-decoration: underline;">CART</p>
-  {% if cart %}
-
-    {% for cart_item in cart %}
-      {{ forloop.counter }}. <a href="{{ cart_item.product.product_url }}">{{ cart_item.product.name }}</a><br>
-    {% endfor %}
-
-  {% else %}
-    Empty cart
-  {% endif %}
-
-  <br><p style="text-decoration: underline;">WISH LIST</p>
-
-  {% if wish_list %}
-
-    {% for wish_item in wish_list %}
-      {{ forloop.counter }}. <a href="{{ wish_item.product.product_url }}">{{ wish_item.product.name }}</a><br>
-    {% endfor %}
-
-  {% else %}
-    Empty wish list
-  {% endif %}
+    {% if wish_list %} {% for wish_item in wish_list %} {{ forloop.counter }}. <a href="{{ wish_item.product.get_absolute_url }}">{{ wish_item.product.name }}</a><br> {% endfor %} {% else %} Empty wish list {% endif %}
 </div>
 
 <!-- featured products -->
 <div class="featured">
-	<div class="featured-item1"></div>
-	<div class="featured-item"></div>
-	<div class="featured-item"></div>
+    <div class="featured-item1"></div>
+    <div class="featured-item"></div>
+    <div class="featured-item"></div>
 </div>
 
 
 <!-- latest products -->
 <div class="latest-releases">
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
+    <div class="latest-releases-item"></div>
+    <div class="latest-releases-item"></div>
+    <div class="latest-releases-item"></div>
 
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
+    <div class="latest-releases-item"></div>
+    <div class="latest-releases-item"></div>
+    <div class="latest-releases-item"></div>
 </div>
 
 

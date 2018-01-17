@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from datetime import datetime
 from django.utils.crypto import get_random_string
 from .addresses import STATES
+from autoslug import AutoSlugField
+from django.urls import reverse
 
 # this is for when a user gets deleted from the db
 def get_sentinel_user():
@@ -49,11 +51,18 @@ class Brand(models.Model):
     )
     desc = models.CharField(max_length=255, verbose_name='description of brand')
     brand_image_url = models.ImageField(upload_to='img/brands/', max_length=255, blank=True)
-    brand_url = models.CharField(max_length=100, null=True, help_text='type anything in this field. it\'ll be generated automatically')
+    slug = AutoSlugField(populate_from='name',
+        unique=True,
+        sep='',
+        )
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
-    	verbose_name='date brand was added to db'
+        verbose_name='date brand was added to db'
     )
+
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date brand details were updated last' )
+
+    def get_absolute_url(self):
+        return '/brand/{0}/'.format(self.slug)
 
     def get_carts(self):
         return Cart.objects.filter(product__brand=self).order_by('-created_at')
@@ -64,27 +73,11 @@ class Brand(models.Model):
     def get_orders(self):
         return OrderItem.objects.filter(product__brand=self).order_by('-created_at')
 
-    # Override models save method:
-    def save(self, *args, **kwargs):
-        if not self.id:
-            # generate brand url when post is created
-            # brand url must be unique
-            self.brand_url = '/brand/' + get_random_string(length=16) + '/'
-            while Brand.objects.filter(brand_url=self.brand_url).exists():
-                self.brand_url = '/brand/' + get_random_string(length=16) + '/'
-        super(Brand, self).save(*args, **kwargs)
-
     def __str__(self):
         return '{0} ({1})'.format(self.name, self.email)
 
     class Meta:
         get_latest_by = 'created_at'
-        # verbose_name_plural = 'stories'
-        # order_with_respect_to = 'question'
-
-        # not sure if I should add these
-        # ordering  = ['-created_at', 'name']
-        # permissions = (('can_have_products', 'Can have products'),)
 
 class ShippingAddress(models.Model):
     user = models.ForeignKey(
@@ -167,7 +160,10 @@ class Product(models.Model):
     price_per_unit = models.DecimalField(decimal_places=2, max_digits=17)
     quantity = models.IntegerField(verbose_name='current quantity in store')
     sales_count = models.IntegerField(verbose_name='number of sales of this product', default=0)
-    product_url = models.CharField(max_length=100, null=True, help_text='type anything in this field. it\'ll be generated automatically')
+    slug = AutoSlugField(populate_from='name',
+        unique=True,
+        sep='',
+        )
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
         verbose_name='date product was added to db'
     )
@@ -182,18 +178,8 @@ class Product(models.Model):
     def get_orders(self):
         return OrderItem.objects.filter(product=self).order_by('-created_at')
 
-    # Override models save method:
-    def save(self, *args, **kwargs):
-        if not self.id:
-            # generate product url when post is created
-            # product url must be unique
-            self.product_url = '/product/' + get_random_string(length=16) + '/'
-            while Product.objects.filter(product_url=self.product_url).exists():
-                self.product_url = '/product/' + get_random_string(length=16) + '/'
-        super(Product, self).save(*args, **kwargs)
-
     def get_absolute_url(self):
-        return ''.format(self.product_url)
+        return reverse('store:product', kwargs={'slug': self.slug})
 
     def __str__(self):
         return '{0} {1} [{2}, {3}] ({4})'.format(self.brand.name, self.name, self.gender, self.category.name, self.admin.username)

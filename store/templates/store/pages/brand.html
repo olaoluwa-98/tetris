@@ -1,59 +1,45 @@
-
-<!-- index page -->
-{% extends "store/base.html" %}
+{% extends 'store/base.html' %}
 
 {% block title %}
-	Tetris Clothing Store
+    {{ brand.name }}} | Tetris Clothing Store
 {% endblock %}
 
+{% load static %}
 {% block extra_css %}
-	
+  <style type="text/css">
+  </style>
 {% endblock %}
-
 
 {% block content %}
-<div class="main">
-  <h2>I am the main</h2>
-  <a href="{% url 'store:about' %}">Go to the about page</a>
-  {% if products %}
 
-	  {% for product in products %}
-		  {{ product }}
-	  {% endfor %}
+<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
+  <div class="hero-head">
+    {% include 'store/header.html' %}
+  </div>
 
-  {% else %}
-    
-    No products o
+  <div class="hero-body" style="font-family: LobsterTwo-Italic;" class="text-white">
+    <div class="container has-text-centered text-white">
+      <p class="title">
+        Tetris
+      </p>
+      <p class="subtitle">
+        The new look of simple
+      </p>
+      <a href="{% url 'store:store' %}">
+        Go back to shopping Tetris
+      </a>
+    </div>
+  </div>
+</section>
 
-  {% endif %}
-
-  {% if cart %}
-    {{ cart }}
-  {% else %}
-    Nothing o
-  {% endif %}
-
-  {% if wish_list %}
-    {{ wish_list }}
-  {% else %}
-    Nothing o
-  {% endif %}
-</div>
-
-<div class="featured">
-	<div class="featured-item1"></div>
-	<div class="featured-item"></div>
-	<div class="featured-item"></div>
-</div>
-<div class="latest-releases">
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-</div>
-
-    
+<section class="section">
+  <div class="columns">
+    <div class="column"></div>
+    <div class="column box is-half center-box">
+      {{ brand }}
+      {{ brand.products.all }}
+    </div>
+    <div class="column"></div>
+  </div>
+</section>
 {% endblock %}

@@ -1,122 +1,107 @@
-{% extends 'store/base.html' %}
+{% extends 'store/base.html' %} {% block title %} Cart | Tetris Clothing Store {% endblock %} {% load static %} {% block extra_css %}
+<style type="text/css">
 
-{% block title %}
-    Cart | Tetris Clothing Store
-{% endblock %}
-
-{% load static %}
-{% block extra_css %}
-  <style type="text/css">
-  </style>
-{% endblock %}
-
-{% block content %}
+</style>
+{% endblock %} {% block content %}
 
 <section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
-  <div class="hero-head">
-    {% include 'store/header.html' %}
-  </div>
+    <div class="hero-head">
+        {% include 'store/header.html' %}
+    </div>
 
-  <div class="hero-body" style="font-family: LobsterTwo-Italic;" class="text-white">
-    <div class="container has-text-centered text-white">
-      <p class="title">
-        Tetris
-      </p>
-      <p class="subtitle">
-        The new look of simple
-      </p>
-      <a href="{% url 'store:store' %}">
+    <div class="hero-body" style="font-family: LobsterTwo-Italic;" class="text-white">
+        <div class="container has-text-centered text-white">
+            <p class="title">
+                Tetris
+            </p>
+            <p class="subtitle">
+                The new look of simple
+            </p>
+            <a href="{% url 'store:store' %}">
         Go back to shopping Tetris
       </a>
+        </div>
     </div>
-  </div>
 </section>
 
 <section class="section">
-	<div class="columns">
-		<div class="column"></div>
-		<div class="column box center-box">
-			<div class="tabs is-centered">
-			  <ul>
-			  	{% if user.is_authenticated %}
-			    <li><a href="{% url 'store:profile' %}">Profile</a></li>
-			    <li class="is-active"><a href="javascript:void(0);">Cart</a></li>
-			    <li><a href="{% url 'store:index' %}">Orders</a></li>
-			    <li><a href="{% url 'store:wish_list' %}">Wishlist</a></li>
-			    <li><a href="{% url 'store:index' %}">Settings</a></li>
-			    {% else %}
-			    <li class="is-active"><a href="javascript:void(0);">Cart</a></li>
-			    {% endif %}
-			  </ul>
-			</div>
-			{% if cart %}
-			{% for cart_item in cart %}
-			<div class="box item cart_item_{{cart_item.product.id}}">
-			  <article class="media">
-			    <div class="media-left">
-			      <figure class="image is-64x64">
-			        <img src="{{ MEDIA_URL }}{{ cart_item.product.product_images.all.0.product_image_url }}" alt="Image">
-			      </figure>
-			    </div>
-			    <div class="media-content">
-			      <div class="content">
-			        <p>
-			          <strong><a href="{{ cart_item.product.product_url}}">{{ cart_item.product.name }}</a></strong>
-			          <small><a href="{{ cart_item.product.brand.brand_url}}">@{{ cart_item.product.brand.name }}</a></small>
-			          <small style="font-weight: bold">N{{ cart_item.product.price_per_unit }}</small>
-			          <br>
-			        </p>
-			      </div>
-			      <nav class="level is-mobile">
-			        <div class="level-left">
-			          <a class="level-item">
-			            <span class="icon is-small" id="remove_from_cart_{{cart_item.productid}}"
-			            onclick="remove_from_cart({{cart_item.product.id}})" title="remove this item"><i class="fa fa-close"></i></span>
-			          </a>
-			          <div class="field has-addons has-addons-right">
-			            <p class="control">
-			              <input class="input is-small" type="number" placeholder="Qty" value="{{ cart_item.quantity }}"
-			               id="qty_{{ cart_item.product.id }}">
-			            </p>
-			            <p class="control">
-			              <a class="button is-small is-danger" onclick="change_qty({{ cart_item.product.id }}, {{ cart_item.quantity }} )"
-			              id="qty_btn_{{ cart_item.id }}" >
-			                Qty
-			              </a>
-			            </p>
-			          </div>
-			        </div>
-			      </nav>
-			    </div>
-			  </article>
-			</div>
-			{% if forloop.last %}
-				<div class="field is-grouped is-grouped-centered">
-				  <p class="control">
-				    <a class="button is-danger" id="checkout_btn">
+    <div class="columns">
+        <div class="column"></div>
+        <div class="column box center-box is-half">
+            <div class="tabs is-centered ">
+                <ul>
+                    {% if user.is_authenticated %}
+                    <li><a href="{% url 'store:profile' %}">Profile</a></li>
+                    <li class="is-active"><a href="javascript:void(0);">Cart</a></li>
+                    <li><a href="{% url 'store:index' %}">Orders</a></li>
+                    <li><a href="{% url 'store:wish_list' %}">Wishlist</a></li>
+                    <li><a href="{% url 'store:index' %}">Settings</a></li>
+                    {% else %}
+                    <li class="is-active"><a href="javascript:void(0);">Cart</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% if cart %} {% for cart_item in cart %}
+            <div class="box item cart_item_{{cart_item.product.id}}">
+                <article class="media">
+                    <div class="media-left">
+                        <figure class="image is-64x64">
+                            <a href="{{ cart_item.product.get_absolute_url}}"><img src="{{ MEDIA_URL }}{{ cart_item.product.product_images.all.0.product_image_url }}" alt="{{ cart_item.product.name }}">
+                            </a>
+                        </figure>
+                    </div>
+                    <div class="media-content">
+                        <div class="content">
+                            <strong><a href="{{ cart_item.product.get_absolute_url}}">{{ cart_item.product.name }}</a></strong>
+                            <p style="font-weight: bold; color: green; margin-bottom: 0px">
+                                N{{ cart_item.product.price_per_unit }}
+                            </p>
+                            <nav class="level is-mobile">
+                                <div class="level-left">
+                                    <div class="field has-addons has-addons-right">
+                                        <p class="control">
+                                            <input class="input is-small" type="number" style="width: 75px"
+                                            placeholder="Qty" value="{{ cart_item.quantity }}" id="qty_{{ cart_item.product.id }}">
+                                        </p>
+                                        <p class="control">
+                                        <a class="button is-small is-danger"
+                                            onclick="change_qty({{ cart_item.product.id }}, {{ cart_item.quantity }} )" id="qty_btn_{{ cart_item.id }}">Qty
+                                        </a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                    <div class="media-right">
+                    <button id="remove_from_cart_{{cart_item.productid}}" onclick="remove_from_cart({{cart_item.product.id}})" title="remove this item" class="delete"></button>
+                    </div>
+                </article>
+            </div>
+            {% if forloop.last %}
+            <div class="field is-grouped is-grouped-centered">
+                <p class="control">
+                    <a class="button is-danger" id="checkout_btn">
 				      Checkout
 				    </a>
-				  </p>
-				  <p class="control">
-				    <a class="button is-light" id="empty_cart" onclick="empty_cart()">
+                </p>
+                <p class="control">
+                    <a class="button is-light" id="empty_cart" onclick="empty_cart()">
 				      Empty Cart
 				    </a>
-				  </p>
-				</div>
-			{% endif %}
-
-			{% endfor %}
-			{% else %}
-				<div class="field is-grouped is-grouped-centered">
-				  <p class="control">
-				    <a class="button is-light">
+                </p>
+            </div>
+            {% endif %} {% endfor %} {% else %}
+            <div class="field is-grouped is-grouped-centered">
+                <p class="control">
+                    <a class="button is-light">
 				      Your cart is empty
 				    </a>
-				  </p>
-				</div>
-			{% endif %}
-		</div>
-		<div class="column"></div>
-	</div>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        <div class="column"></div>
+    </div>
 </section>
 {% endblock %}

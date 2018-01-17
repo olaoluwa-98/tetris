@@ -1,100 +1,87 @@
-{% extends 'store/base.html' %}
+{% extends 'store/base.html' %} {% block title %} Wishlist | Tetris Clothing Store {% endblock %} {% load static %} {% block extra_css %}
+<style type="text/css">
 
-{% block title %}
-    Wishlist | Tetris Clothing Store
-{% endblock %}
-
-{% load static %}
-{% block extra_css %}
-  <style type="text/css">
-  </style>
-{% endblock %}
-
-{% block content %}
+</style>
+{% endblock %} {% block content %}
 
 <section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
-  <div class="hero-head">
-    {% include 'store/header.html' %}
-  </div>
+    <div class="hero-head">
+        {% include 'store/header.html' %}
+    </div>
 
-  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
-    <div class="container has-text-centered text-white">
-      <p class="title" style="color: white;">
-        Tetris
-      </p>
-      <p class="subtitle">
-        The new look of simple
-      </p>
-      <a href="{% url 'store:store' %}">
+    <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+        <div class="container has-text-centered text-white">
+            <p class="title" style="color: white;">
+                Tetris
+            </p>
+            <p class="subtitle">
+                The new look of simple
+            </p>
+            <a href="{% url 'store:store' %}">
         Go back to shopping Tetris
       </a>
+        </div>
     </div>
-  </div>
 </section>
 
 <section class="section">
-	<div class="columns">
-		<div class="column"></div>
-		<div class="column box center-box">
-			<div class="tabs is-centered">
-			  <ul>
-			    <li><a href="{% url 'store:profile' %}">Profile</a></li>
-			    <li><a href="{% url 'store:cart' %}">Cart</a></li>
-			    <li><a href="{% url 'store:index' %}">Orders</a></li>
-			    <li class="is-active"><a href="javascript:void(0);">Wishlist</a></li>
-			    <li><a href="{% url 'store:index' %}">Settings</a></li>
-			  </ul>
-			</div>
-			{% if wish_list %}
-			{% for wish_item in wish_list %}
-			<div class="box item wish_item_{{wish_item.product.id}}">
-			  <article class="media">
-			    <div class="media-left">
-			      <figure class="image is-64x64">
-			        <img src="{{ MEDIA_URL }}{{ wish_item.product.product_images.all.0.product_image_url }}" alt="Image">
-			      </figure>
-			    </div>
-			    <div class="media-content">
-			      <div class="content">
-			        <p>
-			          <strong><a href="{{ wish_item.product.product_url}}">{{ wish_item.product.name }}</a></strong> <small>@<a href="{{ wish_item.product.brand.brand_url}}">{{ wish_item.product.brand.name }}</a></small>
-			          <small style="font-weight: bold">N{{ wish_item.product.price_per_unit }}</small>
-			          <br>
-			        </p>
-			      </div>
-			      <nav class="level is-mobile">
-			        <div class="level-left">
-			          <a class="level-item">
-			            <span class="icon is-small" id="remove_from_wish_list_{{wish_item.productid}}"
-			            onclick="remove_from_wish_list({{wish_item.product.id}})" title="remove this item"><i class="fa fa-close"></i></span>
-			          </a>
-			        </div>
-			      </nav>
-			    </div>
-			  </article>
-			</div>
-			{% if forloop.last %}
-				<div class="field is-grouped is-grouped-centered">
-				  <p class="control">
-				    <a class="button is-light" id="empty_wish_list" onclick="empty_wish_list()">
+    <div class="columns">
+        <div class="column"></div>
+        <div class="column box center-box is-half">
+            <div class="tabs is-centered">
+                <ul>
+                    <li><a href="{% url 'store:profile' %}">Profile</a></li>
+                    <li><a href="{% url 'store:cart' %}">Cart</a></li>
+                    <li><a href="{% url 'store:index' %}">Orders</a></li>
+                    <li class="is-active"><a href="javascript:void(0);">Wishlist</a></li>
+                    <li><a href="{% url 'store:index' %}">Settings</a></li>
+                </ul>
+            </div>
+            {% if wish_list %} {% for wish_item in wish_list %}
+            <div class="box item wish_item_{{wish_item.product.id}}">
+                <article class="media">
+                    <div class="media-left">
+                        <figure class="image is-64x64">
+                            <img src="{{ MEDIA_URL }}{{ wish_item.product.product_images.all.0.product_image_url }}" alt="Image">
+                        </figure>
+                    </div>
+                    <div class="media-content">
+                        <div class="content">
+                            <p>
+                                <strong><a href="{{ wish_item.product.get_absolute_url}}">{{ wish_item.product.name }}</a></strong> <small>@<a href="{{ wish_item.product.brand.get_absolute_url}}">{{ wish_item.product.brand.name }}</a></small>
+                                <small style="font-weight: bold">N{{ wish_item.product.price_per_unit }}</small>
+                                <br>
+                            </p>
+                        </div>
+                        <nav class="level is-mobile">
+                            <div class="level-left">
+                                <a class="level-item">
+                                    <span class="icon is-small" id="remove_from_wish_list_{{wish_item.productid}}" onclick="remove_from_wish_list({{wish_item.product.id}})" title="remove this item"><i class="fa fa-close"></i></span>
+                                </a>
+                            </div>
+                        </nav>
+                    </div>
+                </article>
+            </div>
+            {% if forloop.last %}
+            <div class="field is-grouped is-grouped-centered">
+                <p class="control">
+                    <a class="button is-light" id="empty_wish_list" onclick="empty_wish_list()">
 				      Empty wish list
 				    </a>
-				  </p>
-				</div>
-			{% endif %}
-
-			{% endfor %}
-			{% else %}
-				<div class="field is-grouped is-grouped-centered">
-				  <p class="control">
-				    <a class="button is-light">
+                </p>
+            </div>
+            {% endif %} {% endfor %} {% else %}
+            <div class="field is-grouped is-grouped-centered">
+                <p class="control">
+                    <a class="button is-light">
 				      Your wish list is empty
 				    </a>
-				  </p>
-				</div>
-			{% endif %}
-		</div>
-		<div class="column"></div>
-	</div>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        <div class="column"></div>
+    </div>
 </section>
 {% endblock %}

@@ -19,17 +19,21 @@ urlpatterns = [
     url(r'^about/$', AboutView.as_view(), name='about'),
     url(r'^add-to-cart', add_to_cart, name ="add_to_cart"),
     url(r'^add-to-wish-list', add_to_wish_list, name ="add_to_wish_list"),
+    url(r'^brand/(?P<slug>[\w-]+)/$', BrandDetailView.as_view(), name='brand'),
     url(r'^cart/$', CartView.as_view(), name='cart'),
     url(r'^customer-care/$', CustomerCareView.as_view(), name='customer_care'),
     url(r'^empty-cart', empty_cart, name ="empty_cart"),
     url(r'^empty-wish-list', empty_wish_list, name ="empty_wish_list"),
     url(r'^profile/$', ProfileView.as_view(), name='profile'),
+    url(r'^product/(?P<slug>[\w-]+)/$', ProductDetailView.as_view(), name='product'),
     url(r'^remove-from-wish-list', remove_from_wish_list, name ="remove_from_wish_list"),
     url(r'^remove-from-cart', remove_from_cart, name ="remove_from_cart"),
     url(r'^store/$', StoreView.as_view(), name='store'),
     url(r'^store/men/$', MenStoreView.as_view(), name='men'),
     url(r'^store/women/$', WomenStoreView.as_view(), name='women'),
     url(r'^wish-list/$', WishListView.as_view(), name='wish_list'),
+
+
 
     # auth
     url(r'^login/$', handle_login, name='login'),

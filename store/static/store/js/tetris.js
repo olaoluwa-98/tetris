@@ -50,7 +50,6 @@ function add_to_cart(product_id){
         'product_id': product_id, 'quantity': 1,
       },
       success: function(data) {
-        add_btn.css('color', 'red');
         add_btn.attr('disabled', 'disabled');
       },
       error: function (data) {
@@ -89,7 +88,6 @@ function add_to_wish_list(product_id){
         'product_id': product_id,
       },
       success: function(data) {
-        add_btn.css('color', 'red');
         add_btn.attr('disabled', 'disabled');
       },
       error: function (data) {
@@ -143,4 +141,35 @@ function change_qty(product_id, ori_qty){
         },
       });
   }
+}
+
+
+
+var slideIndex = 1;
+showSlides(slideIndex);
+
+// Next/previous controls
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+// Thumbnail image controls
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  var i;
+  var slides = document.getElementsByClassName("mySlides");
+  var dots = document.getElementsByClassName("dot");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";
+  }
+  for (i = 0; i < dots.length; i++) {
+      dots[i].className = dots[i].className.replace(" active", "");
+  }
+  slides[slideIndex-1].style.display = "block";
+  dots[slideIndex-1].className += " active";
 }

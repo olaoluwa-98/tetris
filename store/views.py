@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
@@ -28,6 +28,7 @@ def get_cart(request):
         return real_cart
     elif request.user.is_authenticated:
         return request.user.get_cart()
+
 
 class IndexView(ListView):
     model = Product
@@ -68,12 +69,9 @@ class AboutView(IndexView):
 
 class CartView(ListView):
     model = Cart
-    context_object_name = 'products'
     template_name = 'store/pages/cart.html'
-    success_url = '/store/'
 
     def get_context_data(self, **kwargs):
-        # context = [super(CartView, self).get_context_data(**kwargs)]
         context = {}
         context['cart'] = get_cart(self.request)
         if self.request.user.is_authenticated:
@@ -83,14 +81,38 @@ class CartView(ListView):
 
 class WishListView(LoginRequiredMixin, ListView):
     model = Wish
-    context_object_name = 'products'
     template_name = 'store/pages/wish_list.html'
     success_url = '/store/'
 
     def get_context_data(self, **kwargs):
-        # context = [super(CartView, self).get_context_data(**kwargs)]
         context = {}
+        context['cart'] = get_cart(self.request)
         context['wish_list'] = self.request.user.get_wish()
+        return context
+
+
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'store/pages/product_detail.html'
+    def get_context_data(self, **kwargs):
+        product = Product.objects.get(slug=self.kwargs['slug'])
+        context = { 'product': product}
+        context['related_products'] = col.related_products(product, 4)
+        context['cart'] = get_cart(self.request)
+        if self.request.user.is_authenticated:
+            context['wish_list'] = self.request.user.get_wish()
+        return context
+
+
+class BrandDetailView(DetailView):
+    model = Brand
+    template_name = 'store/pages/brand.html'
+    def get_context_data(self, **kwargs):
+        brand = Brand.objects.get(slug=self.kwargs['slug'])
+        context = { 'brand': brand}
+        context['cart'] = get_cart(self.request)
+        if self.request.user.is_authenticated:
+            context['wish_list'] = self.request.user.get_wish()
         return context
 
 
@@ -151,7 +173,6 @@ class WomenStoreView(ListView):
 
 class ProfileView(LoginRequiredMixin, ListView):
     model = get_user_model()
-    context_object_name = 'user_details'
     template_name = 'store/pages/profile.html'
     success_url = '/store/'
 
@@ -174,6 +195,7 @@ class ProfileView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {}
+        context['cart'] = get_cart(self.request)
         context['wish_list'] = self.request.user.get_wish()
         return context
 
