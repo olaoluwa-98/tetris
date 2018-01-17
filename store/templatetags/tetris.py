@@ -21,8 +21,10 @@ def product_wished(product_id, user):
 
 # return true if user has the product carted
 @register.filter(name='product_carted')
-def product_carted(product_id, user):
-	if user.is_authenticated():
-		return Cart.objects.filter(product_id=product_id, user=user).exists()
-
+def product_carted(product_id, request):
+	if request.user.is_authenticated:
+		return Cart.objects.filter(product_id=product_id, user=request.user).exists()
+	else:
+		if request.session.get('cart_item_ids'):
+			return str(product_id)+'x' in request.session['cart_item_ids']
 	return False

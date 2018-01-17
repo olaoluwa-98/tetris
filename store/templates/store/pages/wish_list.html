@@ -47,7 +47,7 @@
 			</div>
 			{% if wish_list %}
 			{% for wish_item in wish_list %}
-			<div class="box item">
+			<div class="box item wish_item_{{wish_item.product.id}}">
 			  <article class="media">
 			    <div class="media-left">
 			      <figure class="image is-64x64">
@@ -65,7 +65,8 @@
 			      <nav class="level is-mobile">
 			        <div class="level-left">
 			          <a class="level-item">
-			            <span class="icon is-small" title="remove this item"><i class="fa fa-close"></i></span>
+			            <span class="icon is-small" id="remove_from_wish_list_{{wish_item.productid}}"
+			            onclick="remove_from_wish_list({{wish_item.product.id}})" title="remove this item"><i class="fa fa-close"></i></span>
 			          </a>
 			        </div>
 			      </nav>

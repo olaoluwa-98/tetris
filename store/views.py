@@ -13,11 +13,21 @@ from .forms import *
 
 col = Collections()
 
-# def get_cart(session, user=None):
-#     if user is None:
-
-
-
+def get_cart(request):
+    # request.session['cart_item_ids'] = ''
+    if request.session.get('cart_item_ids'):
+        cart = request.session['cart_item_ids'].split('-')[1:]
+        cart_item_ids = []
+        real_cart = [Cart(product_id= int(cart[0][0])  , quantity= int(cart[0][2]))]
+        for x in range(1, len(cart) - 1):
+            real_cart.append( Cart(product_id= int(cart[x][0])  , quantity= int(cart[x][2])) )
+        if request.user.is_authenticated:
+            cart_from_db_ids = [x.product_id for x in request.user.get_cart()]
+            real_cart = [ x for x in real_cart if x.product_id not in cart_from_db_ids]
+            real_cart += list(request.user.get_cart())
+        return real_cart
+    elif request.user.is_authenticated:
+        return request.user.get_cart()
 
 class IndexView(ListView):
     model = Product
@@ -26,13 +36,11 @@ class IndexView(ListView):
     # this retrieves data that'll be displayed in the index page
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
-        # get cart items from session too
         context['popular_products'] = col.popular_products(6)
         context['popular_brands'] = col.popular_brands(4)
-        context['cart'] = []
+        context['cart'] = get_cart(self.request)
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.get_wish()
-            context['cart'] = self.request.user.get_cart()
         return context
 
 
@@ -41,11 +49,9 @@ class CustomerCareView(IndexView):
 
     def get_context_data(self, **kwargs):
         context = {}
-        # get cart items from session too
-        context['cart'] = []
+        context['cart'] = get_cart(self.request)
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.get_wish()
-            context['cart'] = self.request.user.get_cart()
         return context
 
 
@@ -54,18 +60,14 @@ class AboutView(IndexView):
 
     def get_context_data(self, **kwargs):
         context = {}
-        # get cart items from session too
-        context['cart'] = []
+        context['cart'] = get_cart(self.request)
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.get_wish()
-            # get cart items from session too
-            context['cart'] = self.request.user.get_cart()
         return context
 
 
 class CartView(ListView):
     model = Cart
-    # queryset = Cart.objects.filter(user_id=self.request.user.id).order_by('-created_at')
     context_object_name = 'products'
     template_name = 'store/pages/cart.html'
     success_url = '/store/'
@@ -73,17 +75,14 @@ class CartView(ListView):
     def get_context_data(self, **kwargs):
         # context = [super(CartView, self).get_context_data(**kwargs)]
         context = {}
-        # get cart items from session too
-        context['cart'] = []
+        context['cart'] = get_cart(self.request)
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.get_wish()
-            context['cart'] = self.request.user.get_cart()
         return context
 
 
 class WishListView(LoginRequiredMixin, ListView):
     model = Wish
-    # queryset = Cart.objects.filter(user_id=self.request.user.id).order_by('-created_at')
     context_object_name = 'products'
     template_name = 'store/pages/wish_list.html'
     success_url = '/store/'
@@ -91,9 +90,7 @@ class WishListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         # context = [super(CartView, self).get_context_data(**kwargs)]
         context = {}
-        # get cart items from session too
         context['wish_list'] = self.request.user.get_wish()
-        context['cart'] = self.request.user.get_cart()
         return context
 
 
@@ -107,11 +104,14 @@ class StoreView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(StoreView, self).get_context_data(**kwargs)
-        # get cart items from session too
-        context['cart'] = []
+        context['popular_products'] = col.popular_products(6)
+        context['popular_brands'] = col.popular_brands(4)
+        context['latest_products'] = col.latest_products(6)
+        context['categories'] = col.categories(4)
+        context['cart'] = get_cart(self.request)
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.get_wish()
-            context['cart'] = self.request.user.get_cart()
+
         return context
 
 
@@ -125,11 +125,10 @@ class MenStoreView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(MenStoreView, self).get_context_data(**kwargs)
-        # get cart items from session too
-        context['cart'] = []
+        context['cart'] = get_cart(self.request)
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.get_wish()
-            context['cart'] = self.request.user.get_cart()
+
         return context
 
 
@@ -143,17 +142,15 @@ class WomenStoreView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(WomenStoreView, self).get_context_data(**kwargs)
-        # get cart items from session too
-        context['cart'] = []
+        context['cart'] = get_cart(self.request)
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.get_wish()
-            context['cart'] = self.request.user.get_cart()
+
         return context
 
 
 class ProfileView(LoginRequiredMixin, ListView):
     model = get_user_model()
-    # queryset = Cart.objects.filter(user_id=self.request.user.id).order_by('-created_at')
     context_object_name = 'user_details'
     template_name = 'store/pages/profile.html'
     success_url = '/store/'
@@ -161,8 +158,8 @@ class ProfileView(LoginRequiredMixin, ListView):
     def post(self, request, *args, **kwargs):
         form = ProfileForm(request.POST or None, request.user)
         context = {'form': form}
-        # get cart items from session
-        context['cart'] = []
+
+        context['cart'] = get_cart(self.request)
         if form.is_valid():
             user = request.user
             user.first_name = form.cleaned_data['first_name']
@@ -176,11 +173,8 @@ class ProfileView(LoginRequiredMixin, ListView):
         return render(request, 'store/pages/profile.html', context)
 
     def get_context_data(self, **kwargs):
-        # context = [super(CartView, self).get_context_data(**kwargs)]
         context = {}
-        # get cart items from session too
         context['wish_list'] = self.request.user.get_wish()
-        context['cart'] = self.request.user.get_cart()
         return context
 
 
@@ -192,10 +186,14 @@ def handle_login(request):
         user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
         if user is not None:
             login(request, user)
+            if request.session.get('cart_item_ids'):
+                cart = request.session['cart_item_ids'].split('-')[1:]
+                for x in range(0, len(cart) - 1):
+                    cart_item = Cart(user=user, product_id= int(cart[x][0])  , quantity= int(cart[x][2]))
+                    cart_item.save()
             return HttpResponseRedirect(request.POST['redirect_url'])
     context = {'form': form}
-    # get cart items from session
-    context['cart'] = []
+    context['cart'] = get_cart(request)
     return render(request, 'registration/login.html', context)
 
 
@@ -213,10 +211,14 @@ def handle_register(request):
         user = authenticate(username=user.username, password=form.cleaned_data.get('password'))
         if user is not None:
             login(request, user)
+            if request.session.get('cart_item_ids'):
+                cart = request.session['cart_item_ids'].split('-')[1:]
+                for x in range(0, len(cart) - 1):
+                    cart_item = Cart(user=user, product_id= int(cart[x][0])  , quantity= int(cart[x][2]))
+                    cart_item.save()
             return HttpResponseRedirect(request.POST['redirect_url'])
     context = {'form': form}
-    # get cart items from session
-    context['cart'] = []
+    context['cart'] = get_cart(request)
     return render(request, 'registration/register.html', context)
 
 
@@ -228,6 +230,18 @@ def handle_logout(request):
 
 @csrf_exempt
 def add_to_cart(request):
+    if request.session.get('cart_item_ids'):
+        if request.POST['product_id'] + 'x' in request.session.get('cart_item_ids'):
+            product = request.POST['product_id'] + 'x'
+            cart = request.session.get('cart_item_ids')
+            index = cart.find(product)
+            new_qty = int(cart[ index + 2]) + int(request.POST['quantity'])
+            request.session['cart_item_ids'] = cart.replace(product + cart[ index + 2], \
+                product + str(new_qty))
+        else:
+            request.session['cart_item_ids'] += '-{0}x{1}'.format(request.POST['product_id'], request.POST['quantity'])
+    else:
+        request.session['cart_item_ids'] = '-{0}x{1}'.format(request.POST['product_id'], request.POST['quantity'])
     if request.user.is_authenticated:
         cart_item = Cart(user_id=request.user.id, product_id=request.POST['product_id'], quantity=request.POST['quantity'])
         if cart_item:
@@ -239,15 +253,28 @@ def add_to_cart(request):
         response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
         response.status_code = 402
         return response
+    response = JsonResponse({'status' : 'success', 'msg': 'added successfully' })
+    response.status_code = 200
+    return response
 
-    else:
-        cart = request.session['cart']
-        product_id = request.POST['product_id']
-        qty = request.POST['quantity']
+@csrf_exempt
+def remove_from_cart(request):
+    if request.session.get('cart_item_ids'):
+        product = '-' + request.POST['product_id'] + 'x'
+        cart = request.session.get('cart_item_ids')
 
-        response = JsonResponse({'status' : 'success', 'msg': 'added successfully' })
+        index = cart.find(product)
+        request.session['cart_item_ids'] = cart.replace(product + cart[ index + 3], '')
+        print (request.session['cart_item_ids'])
+    if request.user.is_authenticated:
+        cart_item = Cart.objects.filter(user = request.user, product_id = request.POST['product_id'])
+        cart_item.delete()
+        response = JsonResponse({'status' : 'success', 'msg': 'removed successfully' })
         response.status_code = 200
         return response
+    response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
+    response.status_code = 402
+    return response
 
 @csrf_exempt
 @login_required(login_url='/login/')
@@ -264,7 +291,23 @@ def add_to_wish_list(request):
     return response
 
 @csrf_exempt
+@login_required(login_url='/login/')
+def remove_from_wish_list(request):
+    wish_item = Wish.objects.filter(user = request.user, product_id = request.POST['product_id'])
+    if wish_item:
+        wish_item.delete()
+        response = JsonResponse({'status' : 'success', 'msg': 'removed successfully' })
+        response.status_code = 200
+        return response
+
+    response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
+    response.status_code = 402
+    return response
+
+@csrf_exempt
 def empty_cart(request):
+    if request.session.get('cart_item_ids'):
+        request.session['cart_item_ids'] = ''
     if request.user.is_authenticated:
         carts = Cart.objects.filter(user_id=request.user.id)
         for cart in carts:
@@ -274,11 +317,8 @@ def empty_cart(request):
         response = JsonResponse({'status' : 'success', 'msg': 'cart emptied' })
         response.status_code = 200
         return response
-
-    if request.session.get('cart'):
-        request.session['cart'] = ''
-    response = JsonResponse({'status' : 'success', 'msg': 'cart emptied' })
-    response.status_code = 200
+    response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
+    response.status_code = 402
     return response
 
 @csrf_exempt

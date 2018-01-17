@@ -68,7 +68,7 @@
                 <i class="fa fa-heart"></i>
               </span>
               <!-- {{ product.get_wishes.count }} -->
-              <span class="icon" style="cursor: pointer; {% if product.id|product_carted:user %}color:red;{%endif%}"
+              <span class="icon" style="cursor: pointer; {% if product.id|product_carted:request %}color:red;{%endif%}"
                 onclick="add_to_cart({{ product.id }})" id="add_to_cart_{{product.id}}">
                 <i class="fa fa-shopping-cart"></i>
               </span>

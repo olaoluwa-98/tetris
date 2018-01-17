@@ -51,7 +51,7 @@
 			</div>
 			{% if cart %}
 			{% for cart_item in cart %}
-			<div class="box item">
+			<div class="box item cart_item_{{cart_item.product.id}}">
 			  <article class="media">
 			    <div class="media-left">
 			      <figure class="image is-64x64">
@@ -61,8 +61,8 @@
 			    <div class="media-content">
 			      <div class="content">
 			        <p>
-			          <strong><a href="{{ wish_item.product.product_url}}">{{ cart_item.product.name }}</a></strong>
-			          <small><a href="{{ wish_item.product.brand.brand_url}}">@{{ cart_item.product.brand.name }}</a></small>
+			          <strong><a href="{{ cart_item.product.product_url}}">{{ cart_item.product.name }}</a></strong>
+			          <small><a href="{{ cart_item.product.brand.brand_url}}">@{{ cart_item.product.brand.name }}</a></small>
 			          <small style="font-weight: bold">N{{ cart_item.product.price_per_unit }}</small>
 			          <br>
 			        </p>
@@ -70,7 +70,8 @@
 			      <nav class="level is-mobile">
 			        <div class="level-left">
 			          <a class="level-item">
-			            <span class="icon is-small" title="remove this item"><i class="fa fa-close"></i></span>
+			            <span class="icon is-small" id="remove_from_cart_{{cart_item.productid}}"
+			            onclick="remove_from_cart({{cart_item.product.id}})" title="remove this item"><i class="fa fa-close"></i></span>
 			          </a>
 			          <div class="field has-addons has-addons-right">
 			            <p class="control">

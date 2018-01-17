@@ -59,6 +59,26 @@ function add_to_cart(product_id){
     });
 }
 
+function remove_from_cart(product_id){
+  var remove_btn = $('#remove_from_cart_' + product_id);
+  remove_btn.attr('disabled', 'disabled');
+  $.ajax({
+      url: '/remove-from-cart',
+      type: "POST",
+      data: {
+        'product_id': product_id,
+      },
+      success: function(data) {
+        remove_btn.css('color', 'red');
+        remove_btn.attr('disabled', 'disabled');
+        $('.cart_item_'+ product_id).css('display', 'none');
+      },
+      error: function (data) {
+        remove_btn.removeAttr('disabled');
+      },
+    });
+}
+
 function add_to_wish_list(product_id){
   var add_btn = $('#add_to_wish_list_' + product_id);
   add_btn.attr('disabled', 'disabled');
@@ -74,6 +94,26 @@ function add_to_wish_list(product_id){
       },
       error: function (data) {
         add_btn.removeAttr('disabled');
+      },
+    });
+}
+
+function remove_from_wish_list(product_id){
+  var remove_btn = $('#remove_from_wish_list_' + product_id);
+  remove_btn.attr('disabled', 'disabled');
+  $.ajax({
+      url: '/remove-from-wish-list',
+      type: "POST",
+      data: {
+        'product_id': product_id,
+      },
+      success: function(data) {
+        remove_btn.css('color', 'red');
+        remove_btn.attr('disabled', 'disabled');
+        $('.wish_item_'+ product_id).css('display', 'none');
+      },
+      error: function (data) {
+        remove_btn.removeAttr('disabled');
       },
     });
 }
@@ -103,25 +143,4 @@ function change_qty(product_id, ori_qty){
         },
       });
   }
-}
-
-
-function remove_from_cart(product_id){
-  var remove_btn = $('#remove_from_cart_' + product_id);
-  remove_btn.attr('disabled', 'disabled');
-  remove_btn.text('Removing...');
-  $.ajax({
-      url: '/remove-from-cart',
-      type: "POST",
-      data: {
-        'product_id': product_id,
-      },
-      success: function(data) {
-        $('.box').css('display', 'none');
-      },
-      error: function (data) {
-        remove_btn.removeAttr('disabled');
-        remove_btn.text('Remove');
-      },
-    });
 }

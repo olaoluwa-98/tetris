@@ -1,16 +1,147 @@
-
 <!-- store page -->
 {% extends "store/base.html" %}
 
 {% block title %}
 	Store | Tetris Clothing Store
 {% endblock %}
-
+{% load static %}
+{% block extra_css %}
+  <style type="text/css">
+  </style>
+{% endblock %}
 
 {% block content %}
-<div class="main">
-  <h2>I am the main</h2>
-  <a href="{% url 'store:index' %}">Go to the index</a>
-</div>
-    
+
+{% include 'store/header.html' %}
+<!-- <section class="hero is-medium">
+  <div class="hero-head">
+  </div>
+
+  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+    <div class="container has-text-centered text-white">
+      <p class="title">
+        Bold, Different, Spirited
+      </p>
+      <p class="subtitle">
+        The new look of simple
+      </p>
+      <a href="{% url 'store:store' %}">
+        Shop tetris
+      </a>
+    </div>
+  </div>
+</section> -->
+
+<section class="section is-medium">
+    <div class="container">
+      <h1 class="title has-text-centered is-danger">Latest Popular Releases</h1>
+      <h2 class="subtitle">
+      </h2>
+      {% load tetris %}
+      {% if popular_products %}
+      {% for product in popular_products %}
+      {% if forloop.counter|divisibleby:2 %}
+      {% else%}
+      <div class="tile is-ancestor">
+      {% endif %}
+        <div class="tile is-parent">
+          <article class="tile is-child box">
+            <figure class="image is-3by2">
+              <a href="{{ product.product_url }}"><img src="{{ MEDIA_URL }}{{ product.product_images.all.0.product_image_url }}"></a>
+            </figure>
+            <p class="title"><a href="{{ product.product_url }}">{{ product.name }}</a></p>
+            <p class="subtitle">
+              <span class="icon">
+                <i class="fa fa-user-circle"></i>
+              </span><a href="{{ product.brand.brand_url }}">{{ product.brand.name }}</a>
+              <span class="icon"
+              {% if user.is_authenticated %}
+                style="cursor: pointer; {% if product.id|product_wished:user %}color:red;{%endif%}"
+                onclick="add_to_wish_list({{ product.id }})"
+                id="add_to_wish_list_{{product.id}}"
+              {% endif %}>
+                <i class="fa fa-heart"></i>
+              </span>
+              <!-- {{ product.get_wishes.count }} -->
+              <span class="icon" style="cursor: pointer; {% if product.id|product_carted:user %}color:red;{%endif%}"
+                onclick="add_to_cart({{ product.id }})" id="add_to_cart_{{product.id}}">
+                <i class="fa fa-shopping-cart"></i>
+              </span>
+              <!-- {{ product.get_carts.count }}<br> -->
+              <span class="icon">
+                <i class="fa fa-dollar"></i>
+              </span>{{ product.price_per_unit }}
+              {% if product.quantity < 10 %}
+              <span class="icon" title="currently {{ product.quantity }}">
+                <i class="fa fa-arrow-down"></i>
+              </span> Low in stock
+              {% endif %}
+            </p>
+          </article>
+        </div>
+      {% if forloop.counter|divisibleby:2 %}
+        </div>
+      {% endif %}
+      {% endfor %}
+      {% else %}
+      <div class="tile is-ancestor">
+        <div class="tile is-parent">
+          <article class="tile is-child box">
+            <p class="title">Hello World</p>
+            <p class="subtitle">What is up?</p>
+          </article>
+        </div>
+        <div class="tile is-parent">
+          <article class="tile is-child box">
+            <p class="title">Foo</p>
+            <p class="subtitle">Bar</p>
+          </article>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+</section>
+
+<section class="section is-medium">
+    <div class="container">
+      <h1 class="title has-text-centered">Popular Brands</h1>
+      <h2 class="subtitle">
+      </h2>
+      {% if popular_brands %}
+      {% for brand in popular_brands %}
+      {% if forloop.counter|divisibleby:2 %}
+      {% else%}
+      <div class="tile is-ancestor">
+      {% endif %}
+        <div class="tile is-parent">
+          <article class="tile is-child box has-text-centered">
+            <figure class="image is-3by2">
+              <a href="{{ brand.brand_url }}"><img src="{{ MEDIA_URL }}{{ brand.brand_image_url }}"></a>
+            </figure>
+            <p class="title"><a href="{{ brand.brand_url }}">{{ brand.name }}</a></p>
+          </article>
+        </div>
+      {% if forloop.counter|divisibleby:2 %}
+        </div>
+      {% endif %}
+      {% endfor %}
+      {% else %}
+      <div class="tile is-ancestor">
+        <div class="tile is-parent">
+          <article class="tile is-child box">
+            <p class="title">Hello World</p>
+            <p class="subtitle">What is up?</p>
+          </article>
+        </div>
+        <div class="tile is-parent">
+          <article class="tile is-child box">
+            <p class="title">Foo</p>
+            <p class="subtitle">Bar</p>
+          </article>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+</section>
+
 {% endblock %}

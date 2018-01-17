@@ -55,6 +55,15 @@ class Brand(models.Model):
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date brand details were updated last' )
 
+    def get_carts(self):
+        return Cart.objects.filter(product__brand=self).order_by('-created_at')
+
+    def get_wishes(self):
+        return Wish.objects.filter(product__brand=self).order_by('-created_at')
+
+    def get_orders(self):
+        return OrderItem.objects.filter(product__brand=self).order_by('-created_at')
+
     # Override models save method:
     def save(self, *args, **kwargs):
         if not self.id:
@@ -235,7 +244,9 @@ class Cart(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.SET(get_sentinel_user),
         related_name='cart',
-        verbose_name ='User from the user table'
+        verbose_name ='User from the user table',
+        blank=True,
+        null=True
     )
     product = models.ForeignKey(
         Product,
@@ -263,7 +274,7 @@ class Cart(models.Model):
             super(Cart, self).save(*args, **kwargs)
 
     def __str__(self):
-        return 'x{0} {1} -> {2} (added {3})'.format(self.quantity, self.user.username, self.product.name, self.created_at)
+        return 'x{0} {1} -> {2} (added {3})'.format(self.quantity, self.user, self.product.name, self.created_at)
 
     class Meta:
         get_latest_by = 'created_at'
