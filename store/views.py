@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from .collections import Collections
-# from .serializers import *
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
 from .forms import *
 
@@ -34,10 +34,8 @@ class IndexView(ListView):
     model = Product
     template_name = 'store/pages/index.html'
 
-    # this retrieves data that'll be displayed in the index page
     def get_context_data(self, **kwargs):
-        context = super(IndexView, self).get_context_data(**kwargs)
-        context['popular_products'] = col.popular_products(6)
+        context = {'popular_products':col.popular_products(6)}
         context['popular_brands'] = col.popular_brands(4)
         context['cart'] = get_cart(self.request)
         if self.request.user.is_authenticated:
@@ -45,7 +43,7 @@ class IndexView(ListView):
         return context
 
 
-class CustomerCareView(IndexView):
+class CustomerCareView(ListView):
     template_name = 'store/pages/customer_care.html'
 
     def get_context_data(self, **kwargs):
@@ -138,6 +136,31 @@ class ProductDetailView(DetailView):
         return context
 
 
+class ProductsView(ListView):
+    model = Product
+    queryset = Product.objects.all()
+    template_name = 'store/pages/products.html'
+    success_url = '/store/'
+
+    def get_context_data(self, **kwargs):
+        product_list = Product.objects.all().order_by('-created_at')
+        paginator = Paginator(product_list, 10) # Show 25 contacts per page
+        page = self.request.GET.get('page')
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            products = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            products = paginator.page(paginator.num_pages)
+        context = {'products':products}
+        context['cart'] = get_cart(self.request)
+        if self.request.user.is_authenticated:
+            context['wish_list'] = self.request.user.wishes.all()
+        return context
+
+
 class BrandDetailView(DetailView):
     model = Brand
     template_name = 'store/pages/brand_detail.html'
@@ -166,7 +189,6 @@ class StoreView(ListView):
         context['cart'] = get_cart(self.request)
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.wishes.all()
-
         return context
 
 
@@ -178,8 +200,20 @@ class MenStoreView(ListView):
 
     def get_context_data(self, **kwargs):
         context = { 'popular_products': col.popular_men_products(6) }
+        product_list = Product.objects.filter(gender='male')
+        paginator = Paginator(product_list, 10) # Show 25 contacts per page
+        page = self.request.GET.get('page')
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            products = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            products = paginator.page(paginator.num_pages)
         context['categories'] = col.categories()
         context['cart'] = get_cart(self.request)
+        context['products'] = products
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.wishes.all()
         return context
@@ -193,8 +227,20 @@ class WomenStoreView(ListView):
 
     def get_context_data(self, **kwargs):
         context = { 'popular_products': col.popular_women_products(6) }
+        product_list = Product.objects.filter(gender='female')
+        paginator = Paginator(product_list, 10) # Show 25 contacts per page
+        page = self.request.GET.get('page')
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            products = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            products = paginator.page(paginator.num_pages)
         context['categories'] = col.categories()
         context['cart'] = get_cart(self.request)
+        context['products'] = products
         if self.request.user.is_authenticated:
             context['wish_list'] = self.request.user.wishes.all()
         return context
@@ -525,6 +571,10 @@ def make_purchase(request):
             order_item = OrderItem(product_id=item.product_id,
                 order=order, quantity=item.quantity, price_per_unit=item.product.price_per_unit
             )
+            # increase sales count of the product
+            product = Product.objects.get(pk=order_item.product_id)
+            product.sales_count += product.sales_count
+            product.save()
             order_item.save()
         # clear cart
         cart.delete()

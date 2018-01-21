@@ -31,7 +31,7 @@ class User(AbstractUser):
         return '{0} {1}'.format(self.first_name, self.last_name)
 
     def __str__(self):
-        return '{0} {1} (@{2}) admin({3})'.format(self.first_name, self.last_name, self.username, self.is_superuser)
+        return '{0} {1} (@{2})'.format(self.first_name, self.last_name, self.username)
 
 
 class Brand(models.Model):
@@ -75,7 +75,9 @@ class Brand(models.Model):
 class ShippingAddress(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET(get_sentinel_user),
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
         related_name='shipping_addresses',
         verbose_name ='User from the user table'
     )
@@ -90,12 +92,8 @@ class ShippingAddress(models.Model):
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date shipping address details were updated last' )
 
-    # def get_absolute_url(self):
-
-    #     return reverse('store:shipping_address', kwargs={'pk': self.pk})
-
     def __str__(self):
-        return '{0}, {1}, {2}. ({3})'.format(self.address, self.city, self.state, self.user.username)
+        return '{0}, {1}. ({2})'.format(self.city, self.state, self.user.username)
 
     class Meta:
         verbose_name_plural = 'Shipping Addresses'
@@ -131,39 +129,43 @@ class Product(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.SET(get_sentinel_user),
         related_name='products',
-        verbose_name ='Admin from the user table'
+        verbose_name ='Administrator'
     )
     brand = models.ForeignKey(
         Brand,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
         related_name='products',
-        verbose_name ='Brand of the Product'
+        verbose_name ='Brand'
     )
     category = models.ForeignKey(
         ProductCategory,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
         related_name='products',
-        verbose_name ='Category of the Product'
+        verbose_name ='Category'
     )
     GENDER = (
         ('male', 'Male'),
         ('female', 'Female'),
         ('unisex', 'Unisex')
     )
-    name = models.CharField(max_length=50, verbose_name='name of product')
-    desc = models.CharField(max_length=255, verbose_name='description of product')
-    gender = models.CharField(max_length=15, choices=GENDER, verbose_name='gender of product')
-    size = models.CharField(max_length=15, verbose_name='size of product')
-    colour = models.CharField(max_length=15, verbose_name='colour of product')
+    name = models.CharField(max_length=50, verbose_name='name')
+    desc = models.CharField(max_length=255, verbose_name='description')
+    gender = models.CharField(max_length=15, choices=GENDER, verbose_name='gender')
+    size = models.CharField(max_length=15, verbose_name='size')
+    colour = models.CharField(max_length=15, verbose_name='colour')
     price_per_unit = models.DecimalField(decimal_places=2, max_digits=17)
-    quantity = models.IntegerField(verbose_name='current quantity in store')
-    sales_count = models.IntegerField(verbose_name='number of sales of this product', default=0)
+    quantity = models.PositiveIntegerField(verbose_name='quantity left')
+    sales_count = models.PositiveIntegerField(verbose_name='number of sales', default=0)
     slug = AutoSlugField(populate_from='name',
         unique=True,
         sep='',
         )
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
-        verbose_name='date product was added to db'
+        verbose_name='date added'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date product details were updated last' )
 
@@ -171,7 +173,7 @@ class Product(models.Model):
         return reverse('store:product', kwargs={'slug': self.slug})
 
     def __str__(self):
-        return '{0} {1} [{2}, {3}] ({4})'.format(self.brand.name, self.name, self.gender, self.category.name, self.admin.username)
+        return '{0}'.format(self.name)
 
     class Meta:
         get_latest_by = 'created_at'
@@ -187,7 +189,9 @@ class Wish(models.Model):
     )
     product = models.ForeignKey(
         Product,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
         related_name='wishes',
         verbose_name ='Product'
     )
@@ -205,7 +209,7 @@ class Wish(models.Model):
             super(Wish, self).save(*args, **kwargs)
 
     def __str__(self):
-        return '{0} -> {1} (added {2})'.format(self.user.username, self.product.name, self.created_at)
+        return '{0} -> {1}'.format(self.user.username, self.product.name)
 
     class Meta:
         get_latest_by = 'created_at'
@@ -224,11 +228,13 @@ class Cart(models.Model):
     )
     product = models.ForeignKey(
         Product,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
         related_name='cart',
         verbose_name ='product in the cart'
     )
-    quantity = models.IntegerField(verbose_name='quantity of the product added')
+    quantity = models.PositiveIntegerField(verbose_name='quantity of the product added')
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
         verbose_name='date cart product was added to db'
     )
@@ -245,7 +251,7 @@ class Cart(models.Model):
         super(Cart, self).save(*args, **kwargs)
 
     def __str__(self):
-        return 'x{0} {1} -> {2} (added {3})'.format(self.quantity, self.user, self.product.name, self.created_at)
+        return 'x{0} {1} -> {2}'.format(self.quantity, self.user, self.product.name)
 
     class Meta:
         get_latest_by = 'created_at'
@@ -255,16 +261,19 @@ class Cart(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET(get_sentinel_user),
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
         related_name='orders',
-        verbose_name ='User from the user table'
+        verbose_name ='customer'
     )
     shipping_address = models.ForeignKey(
         ShippingAddress,
-        on_delete=models.CASCADE,
-        related_name='orders',
-        verbose_name ='shipping address order will arrive at',
+        on_delete=models.SET_NULL,
+        blank=True,
         null=True,
+        related_name='orders',
+        verbose_name ='shipping address',
     )
     ORDER_STATUS = (
         ('pending', 'Pending'),
@@ -272,24 +281,25 @@ class Order(models.Model):
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled')
     )
-    ref = models.CharField(verbose_name='reference of the order', max_length=100, null=True,
+    ref = models.CharField(verbose_name='reference', max_length=100, null=True,
         help_text='type anything in this field. it\'ll be generated automatically'
     )
-    reason_cancelled = models.CharField(verbose_name='if order cancelled, why?', max_length=100, null=True)
+    reason_cancelled = models.CharField(verbose_name='if cancelled, why?', max_length=100, null=True)
     canceller = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET(get_sentinel_user),
-        related_name='cancellers',
-        verbose_name ='the canceller of this order',
+        on_delete=models.SET_NULL,
+        blank=True,
         null=True,
+        related_name='cancellers',
+        verbose_name ='the canceller',
     )
     status = models.CharField(choices=ORDER_STATUS, default='pending', max_length=100,
-        verbose_name='status of the order e.g pending, processing, cancelled, delivered'
+        verbose_name='status'
     )
     deliver_date = models.DateTimeField(null=True, verbose_name='date order was delivered'
     )
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
-        verbose_name='date order was placed'
+        verbose_name='date ordered'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date order details were updated last' )
 
@@ -319,18 +329,20 @@ class OrderItem(models.Model):
         Order,
         on_delete=models.CASCADE,
         related_name='order_items',
-        verbose_name ='order product belongs to'
+        verbose_name ='order'
     )
     product = models.ForeignKey(
         Product,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
         related_name='order_items',
         verbose_name ='product ordered'
     )
-    quantity = models.IntegerField(verbose_name='quantity of the product ordered')
-    price_per_unit = models.DecimalField(decimal_places=2, max_digits=17, verbose_name='cost of one of the products ordered')
+    quantity = models.PositiveIntegerField(verbose_name='quantity ordered')
+    price_per_unit = models.DecimalField(decimal_places=2, max_digits=17)
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
-        verbose_name='date product was ordered'
+        verbose_name='date ordered'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date order details were updated last' )
 

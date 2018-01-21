@@ -1,6 +1,6 @@
 {% extends "store/base.html" %}
 {% block title %}
-Women | Tetris Clothing Store
+ All Products | Tetris Clothing Store
  {% endblock %}
  {% load static %}
  {% block extra_css %}
@@ -14,7 +14,7 @@ Women | Tetris Clothing Store
 
 <section class="section">
   <div class="container">
-  <h1 class="title has-text-centered">All Women's Products</h1>
+  <h1 class="title has-text-centered">All Products</h1>
   {% load tetris %}
   {% if products %}
   {% for product in products %} {% if forloop.counter|divisibleby:2 %} {% else%}

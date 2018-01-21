@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^orders/$', OrdersView.as_view(), name='orders'),
     url(r'^order/(?P<ref>[\w]+)/$', OrderDetailView.as_view(), name='order'),
     url(r'^profile/$', ProfileView.as_view(), name='profile'),
+    url(r'^products/$', ProductsView.as_view(), name='products'),
     url(r'^product/(?P<slug>[\w-]+)/$', ProductDetailView.as_view(), name='product'),
     url(r'^remove-from-cart', remove_from_cart, name ="remove_from_cart"),
     url(r'^remove-from-wish-list', remove_from_wish_list, name ="remove_from_wish_list"),
