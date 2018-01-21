@@ -1,0 +1,136 @@
+{% extends 'store/base.html' %}
+{% block title %}
+ {{ request.user.full_name }}'s Order ({{ order.ref }}) | Tetris Clothing Store
+ {% endblock %}
+ {% load static %}
+ {% block extra_css %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+{% block content %}
+
+<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
+    <div class="hero-head">
+        {% include 'store/header.html' %}
+    </div>
+
+    <div class="hero-body" style="font-family: LobsterTwo-Italic;" class="text-white">
+        <div class="container has-text-centered text-white">
+            <p class="title">
+                Tetris
+            </p>
+            <p class="subtitle">
+                The new look of simple
+            </p>
+            <a href="{% url 'store:store' %}">
+        Go back to shopping Tetris
+      </a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="columns">
+        <div class="column"></div>
+        <div class="column box center-box is-half">
+            <div class="tabs is-centered ">
+                <ul>
+                    <li><a href="{% url 'store:orders' %}">Orders</a></li>
+                    <li class="is-active"><a href="javascript:void(0);">Order- {{order.ref}}
+                        {% if order.status == 'pending' %}
+                        <span style="float: left" class="tag is-warning">
+                        Pending
+                        </span>
+                        {% endif %}
+                        {% if order.status == 'delivered' %}
+                        <span style="float: left" class="tag is-primary">
+                        Delivered
+                        </span>
+                        {% endif %}
+                        {% if order.status == 'processing' %}
+                        <span style="float: left" class="tag is-link">
+                        Processing
+                        </span>
+                        {% endif %}
+                        {% if order.status == 'cancelled' %}
+                        <span style="float: left" class="tag is-danger">
+                        Cancelled
+                        </span>
+                        {% endif %}
+                    </a></li>
+                </ul>
+            </div>
+            {% if order.order_items %}
+            {% for order_item in order.order_items.all %}
+            <div class="box item order_item_{{order_item.product.id}}">
+                <article class="media">
+                    <div class="media-left">
+                        <figure class="image is-64x64">
+                            <a href="{{ order_item.product.get_absolute_url}}"><img src="{{ MEDIA_URL }}{{ order_item.product.product_images.all.0.product_image_url }}" alt="{{ order_item.product.name }}">
+                            </a>
+                        </figure>
+                    </div>
+                    <div class="media-content">
+                        <div class="content">
+                            <strong><a href="{{ order_item.product.get_absolute_url}}">{{ order_item.product.name }}</a></strong>
+                            <p style="font-weight: bold; color: green; margin-bottom: 0px">
+                                N{{ order_item.product.price_per_unit }}
+                            </p>
+                            <p>x{{ order_item.quantity }}</p>
+                        </div>
+                    </div>
+                </article>
+            </div>
+            {% if forloop.last %}
+                {% if order.status == 'processing' or order.status == 'pending' %}
+                <div class="field is-grouped is-grouped-centered">
+                    <p class="control">
+                        <a class="button is-danger" id="cancel_order_{{order.id}}" onclick="cancel_order({{order.id}})">
+                          Cancel This Order
+                        </a>
+                    </p>
+                    <p class="control">
+                        <a class="button is-success" id="cancel_order_{{order.id}}" onclick="cancel_order({{order.id}})">
+                          Confirm Delivery
+                        </a>
+                    </p>
+                </div>
+                {% endif %}
+                {% if order.status == 'cancelled'%}
+                <div class="field is-grouped is-grouped-centered">
+                    <p class="control">
+                        <a class="button is-light">
+                          This order was cancelled by {{ order.canceller.full_name }}
+                        </a><br>
+                        Reason: <span style="font-weight: bold;">{{ order.reason_cancelled }}</span>
+                    </p>
+                </div>
+                {% endif %}
+                {% if order.status == 'delivered'%}
+                    <div class="field is-grouped is-grouped-centered">
+                    <p class="control">
+                        <a class="button is-primary">
+                            {% load humanize %} Delivered at
+                            {{ order.deliver_date | date:"D d M Y"}}  {{order.deliver_date | time:"g:i A"}}
+                        </a>
+                    </p>
+                </div>
+                {% endif %}
+
+            {% endif %}
+            {% endfor %}
+            {% else %}
+            <div class="field is-grouped is-grouped-centered">
+                <p class="control">
+                    <a class="button is-light">
+				      this order has no items purchased, something is wrong
+				    </a>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        <div class="column"></div>
+    </div>
+</section>
+{% endblock %}

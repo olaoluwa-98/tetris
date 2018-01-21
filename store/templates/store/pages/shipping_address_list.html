@@ -1,0 +1,67 @@
+{% extends 'store/base.html' %} {% block title %} Shipping Addresses | Tetris Clothing Store {% endblock %} {% load static %} {% block extra_css %}
+<style type="text/css">
+
+</style>
+{% endblock %} {% block content %}
+
+<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
+    <div class="hero-head">
+        {% include 'store/header.html' %}
+    </div>
+
+    <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+        <div class="container has-text-centered text-white">
+            <p class="title" style="color: white;">
+                Tetris
+            </p>
+            <p class="subtitle">
+                The new look of simple
+            </p>
+            <a href="{% url 'store:store' %}">
+        Go back to shopping Tetris
+      </a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="columns">
+        <div class="column"></div>
+        <div class="column box center-box is-half">
+            <div class="tabs is-centered">
+                <ul>
+                    <li><a href="{% url 'store:checkout' %}">Checkout</a></li>
+                    <li><a href="{% url 'store:new_shipping_address' %}">New Shipping Address</a></li>
+                    <li><a href="javascript:void(0);">Shipping Addresses</a></li>
+                </ul>
+            </div>
+            {% if shipping_addresses %} {% for shipping_address in shipping_addresses %}
+            <div class="box item shipping_address_{{shipping_address.id}}">
+                <article class="media">
+                    <div class="media-content">
+                        <div class="content">
+                            {{forloop.counter}}. <span>St. Address: </span><strong><a href="{% url 'store:shipping_address' forloop.counter %}">{{ shipping_address.address }}</a></strong>
+                            <br><span>Zip Code: </span><small>{{ shipping_address.zip_code }}</small>
+                            <br><span>City: </span><small style="font-weight: bold">{{ shipping_address.city }}</small>
+                            <br><span>State: </span><small style="font-weight: bold">{{ shipping_address.state }}</small>
+                        </div>
+                    </div>
+                    <div class="media-right">
+                    <button id="remove_shipping_address_{{shipping_address.id}}" onclick="remove_shipping_address({{shipping_address.id}})" title="remove this item" class="delete"></button>
+                    </div>
+                </article>
+            </div>
+           {% endfor %} {% else %}
+            <div class="field is-grouped is-grouped-centered">
+                <p class="control">
+                    <a class="button is-light" href="{% url 'store:new_shipping_address'%}">
+				      You Have No Shipping Address, Please add here
+				    </a>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        <div class="column"></div>
+    </div>
+</section>
+{% endblock %}

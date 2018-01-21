@@ -1,59 +1,113 @@
-
-<!-- index page -->
-{% extends "store/base.html" %}
+{% extends 'store/base.html' %}
 
 {% block title %}
-	Tetris Clothing Store
+ Checkout {{ cart | length }} items | Tetris Clothing Store
 {% endblock %}
 
-{% block extra_css %}
-	
+ {% load static %}
+
+ {% block extra_css %}
+<style type="text/css">
+</style>
 {% endblock %}
-
-
 {% block content %}
-<div class="main">
-  <h2>I am the main</h2>
-  <a href="{% url 'store:about' %}">Go to the about page</a>
-  {% if products %}
 
-	  {% for product in products %}
-		  {{ product }}
-	  {% endfor %}
+<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
+    <div class="hero-head">
+        {% include 'store/header.html' %}
+    </div>
 
-  {% else %}
-    
-    No products o
+    <div class="hero-body" style="font-family: LobsterTwo-Italic;" class="text-white">
+        <div class="container has-text-centered text-white">
+            <p class="title">
+                Tetris
+            </p>
+            <p class="subtitle">
+                The new look of simple
+            </p>
+            <a href="{% url 'store:store' %}">
+        Go back to shopping Tetris
+      </a>
+        </div>
+    </div>
+</section>
 
-  {% endif %}
-
-  {% if cart %}
-    {{ cart }}
-  {% else %}
-    Nothing o
-  {% endif %}
-
-  {% if wish_list %}
-    {{ wish_list }}
-  {% else %}
-    Nothing o
-  {% endif %}
-</div>
-
-<div class="featured">
-	<div class="featured-item1"></div>
-	<div class="featured-item"></div>
-	<div class="featured-item"></div>
-</div>
-<div class="latest-releases">
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-	<div class="latest-releases-item"></div>
-</div>
-
-    
+<section class="section">
+    <div class="columns">
+        <div class="column"></div>
+        <div class="column box center-box is-half">
+            <div class="tabs is-centered ">
+                <ul>
+                    <li><a href="{% url 'store:cart' %}">Cart</a></li>
+                    <li class="is-active"><a href="javascript:void(0);">Checkout</a></li>
+                </ul>
+            </div>
+            {% if cart %} {% for cart_item in cart %}
+            <div class="box item cart_item_{{cart_item.product.id}}">
+                <article class="media">
+                    <div class="media-left">
+                        <figure class="image is-64x64">
+                            <a href="{{ cart_item.product.get_absolute_url}}"><img src="{{ MEDIA_URL }}{{ cart_item.product.product_images.all.0.product_image_url }}" alt="{{ cart_item.product.name }}">
+                            </a>
+                        </figure>
+                    </div>
+                    <div class="media-content">
+                        <div class="content">
+                            <strong><a href="{{ cart_item.product.get_absolute_url}}">{{ cart_item.product.name }}</a></strong>
+                            <p style="font-weight: bold; color: green; margin-bottom: 0px">
+                                N{{ cart_item.product.price_per_unit }}
+                            </p>
+                            <nav class="level is-mobile">
+                                <div class="level-left">
+                                    <div class="field has-addons has-addons-right">
+                                        <p class="control">
+                                            <input class="input is-small" type="number" style="width: 75px"
+                                            placeholder="Qty" value="{{ cart_item.quantity }}" id="qty_{{ cart_item.product.id }}">
+                                        </p>
+                                        <p class="control">
+                                        <a class="button is-small is-danger"
+                                            onclick="change_qty({{ cart_item.product.id }}, {{ cart_item.quantity }} )" id="qty_btn_{{ cart_item.id }}">Qty
+                                        </a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                    <div class="media-right">
+                    <button id="remove_from_cart_{{cart_item.productid}}" onclick="remove_from_cart({{cart_item.product.id}})" title="remove this item" class="delete"></button>
+                    </div>
+                </article>
+            </div>
+            {% if forloop.last %}
+            <div class="field is-grouped is-grouped-centered">
+                <p class="control">
+                    <a class="button is-danger" id="purchase_btn" onclick="purchase()">
+              Purchase Now
+            </a>
+                </p>
+                <p class="control">
+                    <a class="button is-light" href="{% url 'store:shipping_addresses' %}">
+              Change Default Shipping Address
+            </a>
+                </p>
+                <p class="control">
+                    <a class="button is-light" href="{% url 'store:cart' %}">
+              Cancel
+            </a>
+                </p>
+            </div>
+            {% endif %} {% endfor %} {% else %}
+            <div class="field is-grouped is-grouped-centered">
+                <p class="control">
+                    <a class="button is-light">
+              Your cart is empty
+            </a>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        <div class="column"></div>
+    </div>
+</section>
 {% endblock %}

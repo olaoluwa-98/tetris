@@ -4,6 +4,7 @@ from django.forms import ModelForm
 from django.contrib.auth import get_user_model, authenticate
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
+from .addresses import STATES
 from .models import *
 
 class LoginForm(forms.Form):
@@ -110,3 +111,13 @@ class ProfileForm(forms.Form):
     class Meta:
         model = get_user_model()
         fields = ('username', 'email', 'first_name', 'last_name', 'phone', )
+
+
+class ShippingAddressForm(forms.Form):
+    zip_code = forms.CharField(label='Zip Code', max_length=10, strip=True)
+    address = forms.CharField(label='Address', max_length=30, strip=True)
+    city = forms.CharField(label='City', max_length=30, strip=True)
+    state = forms.CharField(label='State')
+    class Meta:
+        model = ShippingAddress
+        fields = ('is_default', 'zip_code', 'address', 'city', 'state', )

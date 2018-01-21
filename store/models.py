@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.urls import reverse
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.auth import get_user_model
@@ -28,14 +27,8 @@ class User(AbstractUser):
     # USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['email', 'is_verified', 'phone']
 
-    def get_orders(self):
-        return Order.objects.filter(user=self).order_by('-created_at')
-
-    def get_wish(self):
-        return Wish.objects.filter(user=self).order_by('-created_at')
-
-    def get_cart(self):
-        return Cart.objects.filter(user=self).order_by('-created_at')
+    def full_name(self):
+        return '{0} {1}'.format(self.first_name, self.last_name)
 
     def __str__(self):
         return '{0} {1} (@{2}) admin({3})'.format(self.first_name, self.last_name, self.username, self.is_superuser)
@@ -62,7 +55,7 @@ class Brand(models.Model):
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date brand details were updated last' )
 
     def get_absolute_url(self):
-        return '/brand/{0}/'.format(self.slug)
+        return reverse('store:brand', kwargs={'slug': self.slug})
 
     def get_carts(self):
         return Cart.objects.filter(product__brand=self).order_by('-created_at')
@@ -86,6 +79,7 @@ class ShippingAddress(models.Model):
         related_name='shipping_addresses',
         verbose_name ='User from the user table'
     )
+    is_default = models.BooleanField(default=False)
     zip_code = models.CharField( max_length=10, verbose_name='zip code' )
     address = models.CharField( max_length=60, verbose_name='address' )
     city = models.CharField( max_length=30, verbose_name='city' )
@@ -95,6 +89,10 @@ class ShippingAddress(models.Model):
         verbose_name='date shipping address was added to db'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date shipping address details were updated last' )
+
+    # def get_absolute_url(self):
+
+    #     return reverse('store:shipping_address', kwargs={'pk': self.pk})
 
     def __str__(self):
         return '{0}, {1}, {2}. ({3})'.format(self.address, self.city, self.state, self.user.username)
@@ -117,7 +115,7 @@ class ProductCategory(models.Model):
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
         verbose_name='date product category was added to db'
     )
-    updated_at = models.DateTimeField( auto_now=True, verbose_name='date product category details were updated last' )
+    updated_at = models.DateTimeField( auto_now=True, verbose_name='date product category details were updated last')
 
     def __str__(self):
         return '{0} ({1})'.format(self.name, self.cat_type)
@@ -169,15 +167,6 @@ class Product(models.Model):
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date product details were updated last' )
 
-    def get_carts(self):
-        return Cart.objects.filter(product=self).order_by('-created_at')
-
-    def get_wishes(self):
-        return Wish.objects.filter(product=self).order_by('-created_at')
-
-    def get_orders(self):
-        return OrderItem.objects.filter(product=self).order_by('-created_at')
-
     def get_absolute_url(self):
         return reverse('store:product', kwargs={'slug': self.slug})
 
@@ -192,7 +181,6 @@ class Product(models.Model):
 class Wish(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        # on_delete=models.SET(get_sentinel_user),
         on_delete=models.CASCADE,
         related_name='wishes',
         verbose_name ='User from the user table'
@@ -228,7 +216,7 @@ class Wish(models.Model):
 class Cart(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET(get_sentinel_user),
+        on_delete=models.CASCADE,
         related_name='cart',
         verbose_name ='User from the user table',
         blank=True,
@@ -249,15 +237,12 @@ class Cart(models.Model):
     # Override models save method:
     def save(self, *args, **kwargs):
         # check if cart product already exists, add more quantity to it
-        cart = Cart.objects.filter(user_id=self.user_id, product_id=self.product_id)
-        if len(cart) == 1:
-            cart[0].quantity += int(self.quantity)
-            if cart[0].quantity < 1:
-                super(Cart, cart[0]).delete(*args, **kwargs)
-            else:
-                super(Cart, cart[0]).save(*args, **kwargs)
-        else:
-            super(Cart, self).save(*args, **kwargs)
+        if not self.id:
+            cart = Cart.objects.filter(user=self.user, product=self.product).first()
+            if cart:
+                cart.quantity += int(self.quantity)
+                super(Cart, cart).save(*args, **kwargs)
+        super(Cart, self).save(*args, **kwargs)
 
     def __str__(self):
         return 'x{0} {1} -> {2} (added {3})'.format(self.quantity, self.user, self.product.name, self.created_at)
@@ -274,21 +259,42 @@ class Order(models.Model):
         related_name='orders',
         verbose_name ='User from the user table'
     )
+    shipping_address = models.ForeignKey(
+        ShippingAddress,
+        on_delete=models.CASCADE,
+        related_name='orders',
+        verbose_name ='shipping address order will arrive at',
+        null=True,
+    )
     ORDER_STATUS = (
         ('pending', 'Pending'),
         ('processing', 'Processing'),
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled')
     )
-    ref = models.CharField(verbose_name='reference of the order', max_length=100, null=True, help_text='type anything in this field. it\'ll be generated automatically')
-    status = models.CharField(choices=ORDER_STATUS, default='pending', max_length=100, verbose_name='status of the order e.g pending, processing, cancelled, delivered')
+    ref = models.CharField(verbose_name='reference of the order', max_length=100, null=True,
+        help_text='type anything in this field. it\'ll be generated automatically'
+    )
+    reason_cancelled = models.CharField(verbose_name='if order cancelled, why?', max_length=100, null=True)
+    canceller = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET(get_sentinel_user),
+        related_name='cancellers',
+        verbose_name ='the canceller of this order',
+        null=True,
+    )
+    status = models.CharField(choices=ORDER_STATUS, default='pending', max_length=100,
+        verbose_name='status of the order e.g pending, processing, cancelled, delivered'
+    )
+    deliver_date = models.DateTimeField(null=True, verbose_name='date order was delivered'
+    )
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
         verbose_name='date order was placed'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date order details were updated last' )
 
-    def get_order_items(self):
-        return OrderItem.objects.filter(order=self).order_by('-created_at')
+    def get_absolute_url(self):
+        return reverse('store:order', kwargs={'ref': self.ref})
 
     # Override models save method:
     def save(self, *args, **kwargs):

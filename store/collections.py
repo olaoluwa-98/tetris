@@ -10,12 +10,14 @@ class Collections:
     def popular_brands(self, limit):
         # threshold of 30 days
         post_time_threshold = datetime.now() - timedelta(days=30)
-        brands = Brand.objects.all()
+        brands = Brand.objects.filter(created_at__gte=post_time_threshold)
         popular_brands = sorted(
             brands,
-            key=lambda b: (86400 * b.get_wishes().count() * 86400 * b.get_orders().count() * 86400 * b.get_carts().count())
-                + calendar.timegm(b.created_at.utctimetuple()),
-            # reverse=True
+            key=lambda b: (86400 * b.get_wishes().count() \
+            + 86400 * b.get_orders().count()\
+            + 86400 * b.get_carts().count())
+            + calendar.timegm(b.created_at.utctimetuple()),
+            reverse=True
         )
         return popular_brands[:limit]
 
@@ -24,12 +26,13 @@ class Collections:
         post_time_threshold = datetime.now() - timedelta(days=30)
 
         # select products available in stock
-        products = Product.objects.filter(quantity__gte=1)
-        products = products.filter(created_at__gte=post_time_threshold)
+        products = Product.objects.filter(quantity__gte=1, created_at__gte=post_time_threshold)
         popular_products = sorted(
             products,
-            key=lambda p: (86400 * p.get_wishes().count() * 86400 * p.get_orders().count() * 86400 * p.get_carts().count())
-                + calendar.timegm(p.created_at.utctimetuple()),
+            key=lambda p: (86400 * p.wishes.count() \
+            + 86400 * p.order_items.count() \
+            + 86400 * p.cart.count()) \
+            + calendar.timegm(p.created_at.utctimetuple()),
             reverse=True
         )
         return popular_products[:limit]
@@ -37,9 +40,16 @@ class Collections:
     def latest_products(self, limit):
         # threshold of 7 days
         post_time_threshold = datetime.now() - timedelta(days=7)
-
         # select products available in stock
         latest_products = Product.objects.filter(quantity__gte=1, created_at__gte=post_time_threshold).order_by('created_at')
+        latest_products = sorted(
+            latest_products,
+            key=lambda p: (86400 * p.wishes.count() \
+            + 86400 * p.order_items.count() \
+            + 86400 * p.cart.count()) \
+            + calendar.timegm(p.created_at.utctimetuple()),
+            reverse=True
+        )
         return latest_products[:limit]
 
     def categories(self, limit = 5):
@@ -52,10 +62,76 @@ class Collections:
             gender=product.gender
         ).exclude(pk=product.pk)
 
-        # sort by wish and datetime
-        # related_products = sorted(
-        #     related_products,
-        #     key=lambda p: (86400 * p.get_orders().count()) + calendar.timegm(p.created_at.utctimetuple()),
+        related_products = sorted(
+            related_products,
+            key=lambda p: (86400 * p.wishes.count() \
+            + 86400 * p.order_items.count() \
+            + 86400 * p.cart.count()) \
+            + calendar.timegm(p.created_at.utctimetuple()),
+            reverse=True
+        )
+        return related_products[:limit]
+
+    def popular_brand_products(self, brand, limit):
+        # threshold of 30 days
+        post_time_threshold = datetime.now() - timedelta(days=30)
+
+        # select products available in stock
+        products = Product.objects.filter(quantity__gte=1, brand=brand, created_at__gte=post_time_threshold)
+        popular_products = sorted(
+            products,
+            key=lambda p: (86400 * p.wishes.count() \
+            + 86400 * p.order_items.count() \
+            + 86400 * p.cart.count()) \
+            + calendar.timegm(p.created_at.utctimetuple()),
+            reverse=True
+        )
+        return popular_products[:limit]
+
+    def latest_brand_products(self, brand, limit):
+        # threshold of 30 days
+        post_time_threshold = datetime.now() - timedelta(days=7)
+
+        # select products available in stock
+        latest_products = Product.objects.filter(quantity__gte=1, brand=brand, created_at__gte=post_time_threshold)
+        # latest_products = sorted(
+        #     products,
+        #     key=lambda p: (86400 * p.wishes.count() \
+        #     + 86400 * p.order_items.count() \
+        #     + 86400 * p.cart.count()) \
+        #     + calendar.timegm(p.created_at.utctimetuple()),
         #     reverse=True
         # )
-        return related_products[:limit]
+        return latest_products[:limit]
+
+    def popular_men_products(self, limit):
+        # threshold of 30 days
+        post_time_threshold = datetime.now() - timedelta(days=30)
+
+        # select products available in stock
+        products = Product.objects.filter(quantity__gte=1, gender='male', created_at__gte=post_time_threshold)
+        popular_products = sorted(
+            products,
+            key=lambda p: (86400 * p.wishes.count() \
+            + 86400 * p.order_items.count() \
+            + 86400 * p.cart.count()) \
+            + calendar.timegm(p.created_at.utctimetuple()),
+            reverse=True
+        )
+        return popular_products[:limit]
+
+    def popular_women_products(self, limit):
+        # threshold of 30 days
+        post_time_threshold = datetime.now() - timedelta(days=30)
+
+        # select products available in stock
+        products = Product.objects.filter(quantity__gte=1, gender='female', created_at__gte=post_time_threshold)
+        popular_products = sorted(
+            products,
+            key=lambda p: (86400 * p.wishes.count() \
+            + 86400 * p.order_items.count() \
+            + 86400 * p.cart.count()) \
+            + calendar.timegm(p.created_at.utctimetuple()),
+            reverse=True
+        )
+        return popular_products[:limit]

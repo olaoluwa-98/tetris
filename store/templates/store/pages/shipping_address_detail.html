@@ -1,0 +1,149 @@
+{% extends 'store/base.html' %}
+
+{% block title %}
+    Shipping Address | Tetris Clothing Store
+{% endblock %}
+
+{% load static %}
+{% block extra_css %}
+  <style type="text/css">
+  </style>
+{% endblock %}
+
+{% block content %}
+
+<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
+  <div class="hero-head">
+    {% include 'store/header.html' %}
+  </div>
+
+  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+    <div class="container has-text-centered text-white">
+      <p class="title">
+        Tetris
+      </p>
+      <p class="subtitle">
+        The new look of simple
+      </p>
+      <a href="{% url 'store:store' %}">
+        Go back to shopping Tetris
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+	<div class="columns">
+		<div class="column"></div>
+		<div class="column box center-box is-half">
+			<div class="tabs is-centered">
+			  <ul>
+			  	<li><a href="{% url 'store:checkout' %}">Checkout</a></li>
+			    <li><a href="{% url 'store:shipping_addresses' %}">Shipping Addresses</a></li>
+			    <li class="is-active"><a href="javascript:void(0);">Shipping Address {{shipping_address_num}}</a></li>
+			  </ul>
+			  </div>
+			  {% if shipping_address %}
+			  <form action="{% url 'store:shipping_address' shipping_address_num %}" method="post">
+			  	{% csrf_token %}
+			  	<div class="field is-horizontal">
+			  	<div class="field-body">
+		  	    <div class="field">
+		  	    	<label class="label">Zip Code</label>
+		  	      <p class="control is-expanded has-icons-left">
+		  	        <input class="input {% if form.zip_code.errors %}is-danger{% endif %}" type="text" name="zip_code" placeholder="Zip Code"
+		  	        value="{% if form.zip_code.value %}{{ form.zip_code.value }}{% else %} {{shipping_address.zip_code}}{% endif %}">
+		  	        <span class="icon is-small is-left">
+		  	          <i class="fa fa-map-marker"></i>
+		  	        </span>
+		  	      </p>
+  			    <p class="help is-danger">
+            	{{ form.zip_code.errors }}
+          	</p>
+			</div>
+		  	<div class="field">
+		  	   <label class="label">Default</label>
+		  	   	<input type="checkbox" name="is_default">
+                Make this your default address
+              	{{ form.is_default.errors }}
+		  	    </div>
+		  	  </div>
+		  	</div>
+
+	    	<div class="field is-horizontal">
+	    	  <div class="field-body">
+	    	    <div class="field is-expanded">
+	    	    	<div class="label">Address</div>
+	    	      <div class="field">
+	    	        <p class="control is-expanded has-icons-left">
+	    	          <input class="input {% if form.address.errors %}is-danger{% endif %}" type="tel" name="address" placeholder="your address"
+	    	          value="{% if form.address.value %}{{ form.address.value }}{% else %}{{shipping_address.address}}{% endif %}" >
+	    	        <span class="icon is-small is-left">
+    			        <i class="fa fa-map-marker"></i>
+			      </span>
+	    	        </p>
+	    	      </div>
+	    	      <p class="help is-danger">
+              	{{ form.address.errors }}
+            	</p>
+	    	    </div>
+	    	  </div>
+	    	</div>
+
+		  	<div class="field is-horizontal">
+	  	  	<div class="field-body">
+	    	    <div class="field">
+    			    <label class="label">City</label>
+    			    <div class="control has-icons-left has-icons-right">
+    			      <input class="input {% if form.city.errors %}is-danger{% endif %}" type="text" name="city" placeholder="city"
+    			      value="{% if form.city.value %}{{ form.city.value }}{% else %} {{shipping_address.city}}{% endif %}">
+    			      <span class="icon is-small is-left">
+    			        <i class="fa fa-map-marker"></i>
+    			      </span>
+    			    </div>
+			    <p class="help is-danger">
+              	{{ form.city.errors }}
+            	</p>
+    			  </div>
+
+	    	    <div class="field">
+    			    <label class="label">State</label>
+    			    <div class="control has-icons-left has-icons-right">
+    			      <input class="input {% if form.state.errors %}is-danger{% endif %}" type="state" name="state" placeholder="your state"
+    			      value="{% if form.state.value %}{{ form.state.value }}{% else %} {{shipping_address.state}}{% endif %}" >
+    			      <span class="icon is-small is-left">
+    			        <i class="fa fa-map-marker"></i>
+    			      </span>
+    			      <p class="help is-danger">
+		              	{{ form.city.errors }}
+	            	  </p>
+    			    </div>
+    			  </div>
+	    	  </div>
+	    	</div>
+	    	<p class="help is-danger">
+	    	    {{ form.non_field_errors }}
+	    	</p>
+	    	<div class="field is-grouped is-grouped-centered">
+	    	  <p class="control">
+	    	    <input type="submit" class="button is-danger" value="Update Shipping Address">
+	    	  </p>
+	    	</div>
+  	    <p style="font-size: 1.2em;" class="help is-success field is-grouped is-grouped-centered">
+          	{{ success }}
+      	</p>
+			</form>
+			{% else %}
+			<div class="field is-grouped is-grouped-centered">
+                <p class="control">
+                    <a class="button is-light" href="{% url 'store:shipping_addresses'%}">
+              Shipping Address Not Found, Please check the list again
+            </a>
+                </p>
+            </div>
+			{% endif %}
+		</div>
+		<div class="column"></div>
+	</div>
+</section>
+{% endblock %}

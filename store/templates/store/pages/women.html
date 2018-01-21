@@ -1,44 +1,57 @@
-<!-- index page -->
-{% extends "store/base.html" %} {% block title %} Tetris Clothing Store {% endblock %}
-
-<!-- extra styling -->
-{% block extra_css %}
+{% extends "store/base.html" %}
+{% block title %} Women | Tetris Clothing Store {% endblock %} {% load static %} {% block extra_css %}
 <style type="text/css">
 
 </style>
-{% endblock %} {% block content %}
-<div class="main">
-    <h2>I am the main</h2>
-    <p style="text-decoration: underline;">LATEST</p>
-    {% if products %} {% for product in products %} {{ forloop.counter }}. <a href="{{ product.get_absolute_url }}">{{ product.name }}</a><br> {% endfor %} {% else %} No products {% endif %}
-    <br>
-    <p style="text-decoration: underline;">CART</p>
-    {% if cart %} {% for cart_item in cart %} {{ forloop.counter }}. <a href="{{ cart_item.product.get_absolute_url }}">{{ cart_item.product.name }}</a><br> {% endfor %} {% else %} Empty cart {% endif %}
+{% endblock %}
+{% block content %}
 
-    <br>
-    <p style="text-decoration: underline;">WISH LIST</p>
+ {% include 'store/header.html' %}
 
-    {% if wish_list %} {% for wish_item in wish_list %} {{ forloop.counter }}. <a href="{{ wish_item.product.get_absolute_url }}">{{ wish_item.product.name }}</a><br> {% endfor %} {% else %} Empty wish list {% endif %}
-</div>
+<section class="section">
+  <div class="columns">
+    <div class="column">
 
-<!-- featured products -->
-<div class="featured">
-    <div class="featured-item1"></div>
-    <div class="featured-item"></div>
-    <div class="featured-item"></div>
-</div>
+    </div>
 
+    <div class="column box">
+        {{ popular_products }}
+    </div>
 
-<!-- latest products -->
-<div class="latest-releases">
-    <div class="latest-releases-item"></div>
-    <div class="latest-releases-item"></div>
-    <div class="latest-releases-item"></div>
+    <div class="column">
 
-    <div class="latest-releases-item"></div>
-    <div class="latest-releases-item"></div>
-    <div class="latest-releases-item"></div>
-</div>
+    </div>
+  </div>
+</section>
 
 
+<section class="section">
+  <div class="columns">
+    <div class="column"></div>
+    <div class="column box">
+        {{popular_brands}}
+    </div>
+    <div class="column"></div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="columns">
+    <div class="column"></div>
+    <div class="column box">
+        {{categories}}
+    </div>
+    <div class="column"></div>
+  </div>
+</section>
+<section class="section">
+  <div class="columns">
+    <div class="column"></div>
+    <div class="column box">
+      {{latest_products}}
+    </div>
+    <div class="column"></div>
+  </div>
+</section>
 {% endblock %}

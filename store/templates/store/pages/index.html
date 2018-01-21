@@ -29,9 +29,9 @@
     </div>
 </section>
 
-<section class="section is-medium">
+<section class="section">
     <div class="container">
-        <h1 class="title has-text-centered is-danger">Latest Popular Releases</h1>
+        <h1 class="title has-text-centered" style="color: white">Latest Popular Releases</h1>
         <h2 class="subtitle">
         </h2>
         {% load tetris %} {% if popular_products %} {% for product in popular_products %} {% if forloop.counter|divisibleby:2 %} {% else%}
@@ -46,22 +46,38 @@
                     <p class="subtitle">
                         <span class="icon">
                 <i class="fa fa-user-circle"></i>
-              </span><a href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a>
-                        <span class="icon" {% if user.is_authenticated %} style="cursor: pointer; {% if product.id|product_wished:user %}color:red;{%endif%}" onclick="add_to_wish_list({{ product.id }})" id="add_to_wish_list_{{product.id}}" {% endif %}>
+              </span><a href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a><br>
+              {% if request.user.is_authenticated %}
+              {% if product.id|product_wished:user %}
+                <span class="icon" style="cursor: pointer; color:red;" onclick="remove_from_wish_list({{ product.id }})" id="remove_from_wish_list_{{product.id}}">
                 <i class="fa fa-heart"></i>
-              </span>
-                        <!-- {{ product.get_wishes.count }} -->
-                        <span class="icon" style="cursor: pointer; {% if product.id|product_carted:request %}color:red;{%endif%}" onclick="add_to_cart({{ product.id }})" id="add_to_cart_{{product.id}}">
-                <i class="fa fa-shopping-cart"></i>
-              </span>
-                        <!-- {{ product.get_carts.count }}<br> -->
-                        <span class="icon">
+                </span>
+              {% else %}
+              <span class="icon" style="cursor: pointer;" onclick="add_to_wish_list({{ product.id }})" id="add_to_wish_list_{{product.id}}">
+                <i class="fa fa-heart"></i>
+               </span>
+               {% endif %}
+              {% else %}
+
+              {% endif %}
+            <!-- {{ product.wishes.count }} -->
+            {% if product.id|product_carted:request %}
+            <span class="icon" style="cursor: pointer; color:red;" onclick="remove_from_cart({{ product.id }})" id="remove_from_cart_{{product.id}}">
+            <i class="fa fa-shopping-cart"></i>
+          </span>
+            {% else %}
+            <span class="icon" style="cursor: pointer;" onclick="add_to_cart({{ product.id }})" id="add_to_cart_{{product.id}}">
+            <i class="fa fa-shopping-cart"></i>
+          </span>
+            {% endif %}
+            <!-- {{ product.cart.count }}<br> -->
+            <span class="icon">
                 <i class="fa fa-dollar"></i>
               </span>{{ product.price_per_unit }}
               {% if product.quantity < 10 %} <span class="icon" title="currently {{ product.quantity }}">
-                            <i class="fa fa-arrow-down"></i>
-                            </span> Low in stock {% endif %}
-                    </p>
+                <i class="fa fa-arrow-down"></i>
+                </span> Low in stock
+                {% endif %}
                 </article>
             </div>
             {% if forloop.counter|divisibleby:2 %}
@@ -85,7 +101,7 @@
     </div>
 </section>
 
-<section class="section is-medium">
+<section class="section">
     <div class="container">
         <h1 class="title has-text-centered">Popular Brands</h1>
         <h2 class="subtitle">

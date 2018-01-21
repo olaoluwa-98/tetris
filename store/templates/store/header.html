@@ -46,8 +46,11 @@
             <a class="navbar-item" href="{% url 'store:wish_list' %}">
               Wish List ({{ wish_list | length }})
             </a>
-            <a class="navbar-item" href="{% url 'store:cart' %}">
+            <a class="navbar-item" href="{% url 'store:orders' %}">
               Orders
+            </a>
+            <a class="navbar-item" href="{% url 'store:shipping_addresses' %}">
+            Addresses
             </a>
             <a class="navbar-item" href="{% url 'store:password_change' %}">
             Settings

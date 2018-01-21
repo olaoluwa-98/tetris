@@ -1,7 +1,7 @@
 {% extends 'store/base.html' %}
 
 {% block title %}
-    {{ product.name }}} | Tetris Clothing Store
+    {{ product.name }} | Tetris Clothing Store
 {% endblock %}
 
 {% load static %}
@@ -50,7 +50,7 @@
             </div>
           </div>
           <div class="card-image">
-            {% if  product.product_images %}
+            {% if product.product_images.all %}
             <!-- Slideshow container -->
             <div class="slideshow-container">
               <!-- Full-width images with number and caption text -->
@@ -73,8 +73,8 @@
               {% endfor %}
             </div>
             {% else %}
-              <figure class="image is-4by3">
-                 <img src="{{ MEDIA_URL }}{{ product.brand.brand_image_url }}" alt="{{ product.name }}">
+              <figure class="image is-4by3">{% load static%}
+                 <img src="{% static 'store/img/default-product-img.jpg' %}" alt="{{ product.name }}">
               </figure>
             {% endif %}
 
@@ -98,18 +98,44 @@
           <footer class="card-footer">
           <p class="card-footer-item">Quantity Left in store: <span style="font-weight: bold"> &nbsp;{{ product.quantity }}</span></p>
           </footer>
+          {% load tetris %}
           <footer class="card-footer">
-          <p class="card-footer-item" style="color: green">Price per item: <span style="font-weight: bold"> &nbsp;N{{ product.price_per_unit }}</span></p>
-          </footer>
-          <footer class="card-footer">
-            <a href="javascript:void(0);" class="card-footer-item">
-              <p class="button is-danger is-small"
-              onclick="add_to_wish_list({{ product.id }})" id="add_to_wish_list_{{product.id}}">
-              Add to Wish List</p></a>
-            <a href="javascript:void(0);" class="card-footer-item">
-            <p class="button is-light is-small"
-              onclick="add_to_cart({{ product.id }})" id="add_to_cart_{{product.id}}">
-              Add to Cart</p></a>
+              {% if request.user.is_authenticated %}
+                {% if product.id|product_wished:user %}
+                <p class="card-footer-item">
+                <span class="button is-light is-small"
+                onclick="remove_from_wish_list({{ product.id }})" id="remove_from_wish_list_{{product.id}}">
+                Remove from Wish List</span>
+                </p>
+                {% else %}
+                <p class="card-footer-item">
+                <span class="button is-danger is-small"
+                onclick="add_to_wish_list({{ product.id }})" id="add_to_wish_list_{{product.id}}">
+                Add to Wish List</span>
+                </p>
+                {% endif %}
+              {% else %}
+              <p class="card-footer-item">
+              <a href="{% url 'store:login' %}" class="button is-light is-small">
+              Login to Add to Wish List
+              </a>
+              </p>
+              {% endif %}
+                {% if product.id|product_carted:request %}
+                <p class="card-footer-item">
+                <span class="button is-light is-small"
+                  onclick="remove_from_cart({{ product.id }})" id="remove_from_cart_{{product.id}}" >
+                  Remove from Cart
+                </span>
+                </p>
+                  {% else %}
+                <p class="card-footer-item">
+                <span class="button is-danger is-small"
+                  onclick="add_to_cart({{ product.id }})" id="add_to_cart_{{product.id}}">
+                  Add to Cart</span>
+              </p>
+              {% endif %}
+            </p>
           </footer>
         </div>
 
@@ -119,4 +145,36 @@
     </div>
   </div>
 </section>
+{% if product.product_images.all %}
+<script type="text/javascript">
+  var slideIndex = 1;
+showSlides(slideIndex);
+
+// Next/previous controls
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+// Thumbnail image controls
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  var i;
+  var slides = document.getElementsByClassName("mySlides");
+  var dots = document.getElementsByClassName("dot");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";
+  }
+  for (i = 0; i < dots.length; i++) {
+      dots[i].className = dots[i].className.replace(" active", "");
+  }
+  slides[slideIndex-1].style.display = "block";
+  dots[slideIndex-1].className += " active";
+}
+</script>
+{% endif %}
 {% endblock %}

@@ -33,9 +33,9 @@
                     {% if user.is_authenticated %}
                     <li><a href="{% url 'store:profile' %}">Profile</a></li>
                     <li class="is-active"><a href="javascript:void(0);">Cart</a></li>
-                    <li><a href="{% url 'store:index' %}">Orders</a></li>
+                    <li><a href="{% url 'store:orders' %}">Orders</a></li>
                     <li><a href="{% url 'store:wish_list' %}">Wishlist</a></li>
-                    <li><a href="{% url 'store:index' %}">Settings</a></li>
+                    <li><a href="{% url 'store:password_change' %}">Settings</a></li>
                     {% else %}
                     <li class="is-active"><a href="javascript:void(0);">Cart</a></li>
                     {% endif %}
@@ -81,7 +81,7 @@
             {% if forloop.last %}
             <div class="field is-grouped is-grouped-centered">
                 <p class="control">
-                    <a class="button is-danger" id="checkout_btn">
+                    <a class="button is-danger" href="{% url 'store:checkout'%}" id="checkout_btn">
 				      Checkout
 				    </a>
                 </p>
