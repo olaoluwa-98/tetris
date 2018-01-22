@@ -294,7 +294,7 @@ class NewShippingAddressView(LoginRequiredMixin, ListView):
     success_url = '/store/'
 
     def post(self, request, *args, **kwargs):
-        form = ShippingAddressForm(request.POST or None, request.user)
+        form = ShippingAddressForm(request.POST or None)
         context = {'form': form}
         context['cart'] = get_cart(self.request)
         if form.is_valid():
@@ -328,7 +328,7 @@ class ShippingAddressDetailView(LoginRequiredMixin, ListView):
     success_url = '/store/'
 
     def post(self, request, *args, **kwargs):
-        form = ShippingAddressForm(request.POST or None, request.user)
+        form = ShippingAddressForm(request.POST or None)
         context = {'form': form}
         context['cart'] = get_cart(self.request)
         if form.is_valid():

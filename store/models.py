@@ -79,7 +79,7 @@ class ShippingAddress(models.Model):
         blank=True,
         null=True,
         related_name='shipping_addresses',
-        verbose_name ='User from the user table'
+        verbose_name ='Customer'
     )
     is_default = models.BooleanField(default=False)
     zip_code = models.CharField( max_length=10, verbose_name='zip code' )
@@ -88,7 +88,7 @@ class ShippingAddress(models.Model):
     state = models.CharField( max_length=15, verbose_name='state', choices=STATES )
     country = models.CharField( max_length=30, default='Nigeria', verbose_name='country' )
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
-        verbose_name='date shipping address was added to db'
+        verbose_name='date added'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date shipping address details were updated last' )
 

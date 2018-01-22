@@ -48,6 +48,12 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name', 'gender', 'size', 'colour', 'category__name', 'brand__name')
     ordering = ('created_at', )
 
+class ShippingAddressAdmin(admin.ModelAdmin):
+    list_display = ('address', 'user', 'zip_code', 'city', 'state', 'created_at')
+    list_filter = ('state', )
+    search_fields = ('zip_code', 'address', 'city', 'state', 'user__username', 'user__email')
+    ordering = ('created_at', )
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Product, ProductAdmin)
@@ -58,4 +64,4 @@ admin.site.register(Wish)
 admin.site.register(Cart)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
-admin.site.register(ShippingAddress)
+admin.site.register(ShippingAddress, ShippingAddressAdmin)

@@ -2,7 +2,7 @@ STATES = (
 	("Abia", "Abia"),
 	("Abuja", "Abuja"),
 	("Adamawa", "Adamawa"),
-	("Ibom", "Ibom"),
+	("Akwa Ibom", "Akwa Ibom"),
 	("Anambra", "Anambra"),
 	("Bauchi", "Bauchi"),
 	("Bayelsa", "Bayelsa"),
