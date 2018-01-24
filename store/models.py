@@ -153,11 +153,11 @@ class Product(models.Model):
         ('unisex', 'Unisex')
     )
     name = models.CharField(max_length=50, verbose_name='name')
-    desc = models.CharField(max_length=255, verbose_name='description')
+    desc = models.CharField(max_length=255, verbose_name='description', blank=True, null=True)
     gender = models.CharField(max_length=15, choices=GENDER, verbose_name='gender')
     size = models.CharField(max_length=15, verbose_name='size')
     colour = models.CharField(max_length=15, verbose_name='colour')
-    price_per_unit = models.DecimalField(decimal_places=2, max_digits=17)
+    price_per_unit = models.DecimalField(decimal_places=2, max_digits=17, verbose_name='price in Naira')
     quantity = models.PositiveIntegerField(verbose_name='quantity left')
     sales_count = models.PositiveIntegerField(verbose_name='number of sales', default=0)
     slug = AutoSlugField(populate_from='name',
