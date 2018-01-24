@@ -44,8 +44,9 @@
 			  </ul>
 			  </div>
 			  {% if shipping_address %}
-			  <form action="{% url 'store:shipping_address' shipping_address_num %}" method="post">
+			  <form action="{% url 'store:shipping_address_update' %}" method="post">
 			  	{% csrf_token %}
+			  	<input type="hidden" name="shipping_id" value="{{ shipping_address.id}}">
 			  	<div class="field is-horizontal">
 			  	<div class="field-body">
 		  	    <div class="field">
@@ -63,7 +64,8 @@
 			</div>
 		  	<div class="field">
 		  	   <label class="label">Default</label>
-		  	   	<input type="checkbox" name="is_default">
+		  	   	<input type="checkbox" name="is_default"
+		  	   	{% if shipping_address.is_default == True %}checked{% endif %}>
                 Make this your default address
               	{{ form.is_default.errors }}
 		  	    </div>

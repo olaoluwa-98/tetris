@@ -21,6 +21,7 @@ class User(AbstractUser):
     phone = models.CharField(
         max_length=15, verbose_name='phone number of the user',
         help_text='Please use the following format: <em>+234 XXX XXX XXXX</em>.',
+        blank=True, null=True
         # validators=[]
     )
     profile_pic_path = models.ImageField(upload_to=get_profile_pic_path, max_length=255)
@@ -42,8 +43,8 @@ class Brand(models.Model):
     	help_text='Please use the following format: <em>+234 XXX XXX XXXX</em>.',
     	# validators=[]
     )
-    desc = models.CharField(max_length=255, verbose_name='description of brand')
-    brand_image_url = models.ImageField(upload_to='img/brands/', max_length=255, blank=True)
+    desc = models.CharField(max_length=255, verbose_name='description of brand', blank=True, null=True)
+    brand_image_url = models.ImageField(upload_to='img/brands/', max_length=255, blank=True, null=True)
     slug = AutoSlugField(populate_from='name',
         unique=True,
         sep='',
@@ -105,11 +106,13 @@ class ProductCategory(models.Model):
     CAT_TYPES = (
         ('top', 'Top'),
         ('bottom', 'Bottom'),
+        ('accessory', 'Accessory'),
+        ('foot', 'Footwear'),
         ('other', 'Other')
     )
     cat_type = models.CharField(max_length=10, choices=CAT_TYPES, verbose_name='type of category')
-    desc = models.CharField(max_length=255, verbose_name='description of product category')
-    cat_image_url = models.ImageField(upload_to='img/product_categories/', max_length=255, blank=True)
+    desc = models.CharField(max_length=255, verbose_name='description of product category', blank=True, null=True)
+    cat_image_url = models.ImageField(upload_to='img/product_categories/', max_length=255, blank=True, null=True)
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
         verbose_name='date product category was added to db'
     )
@@ -129,7 +132,9 @@ class Product(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.SET(get_sentinel_user),
         related_name='products',
-        verbose_name ='Administrator'
+        verbose_name ='Administrator',
+        blank=True,
+        null=True
     )
     brand = models.ForeignKey(
         Brand,
@@ -157,9 +162,10 @@ class Product(models.Model):
     gender = models.CharField(max_length=15, choices=GENDER, verbose_name='gender')
     size = models.CharField(max_length=15, verbose_name='size')
     colour = models.CharField(max_length=15, verbose_name='colour')
-    price_per_unit = models.DecimalField(decimal_places=2, max_digits=17, verbose_name='price in Naira')
+    price_per_unit = models.DecimalField(decimal_places=2, max_digits=17, verbose_name='price in ₦')
     quantity = models.PositiveIntegerField(verbose_name='quantity left')
-    sales_count = models.PositiveIntegerField(verbose_name='number of sales', default=0)
+    num_deliveries = models.PositiveIntegerField(verbose_name='number of deliveries', default=0)
+    orders_count = models.PositiveIntegerField(verbose_name='number of order', default=0)
     slug = AutoSlugField(populate_from='name',
         unique=True,
         sep='',

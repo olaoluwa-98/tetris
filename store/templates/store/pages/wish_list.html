@@ -37,6 +37,7 @@
                     <li><a href="{% url 'store:password_change' %}">Settings</a></li>
                 </ul>
             </div>
+            {% load humanize %}
             {% if wish_list %} {% for wish_item in wish_list %}
             <div class="box item wish_item_{{wish_item.product.id}}">
                 <article class="media">
@@ -47,11 +48,10 @@
                     </div>
                     <div class="media-content">
                         <div class="content">
-                            <p>
-                                <strong><a href="{{ wish_item.product.get_absolute_url}}">{{ wish_item.product.name }}</a></strong> <small>@<a href="{{ wish_item.product.brand.get_absolute_url}}">{{ wish_item.product.brand.name }}</a></small>
-                                <small style="font-weight: bold">₦{{ wish_item.product.price_per_unit }}</small>
-                                <br>
-                            </p>
+                        <strong><a href="{{ wish_item.product.get_absolute_url}}">{{ wish_item.product.name }}</a></strong>
+                        <p style="font-weight: bold; color: green; margin-bottom: 0px">
+                        ₦{{ wish_item.product.price_per_unit | intcomma }}
+                        </p>
                         </div>
                     </div>
                     <div class="media-right">

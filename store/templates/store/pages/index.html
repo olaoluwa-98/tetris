@@ -34,7 +34,7 @@
         <h1 class="title has-text-centered" style="color: white">Latest Popular Releases</h1>
         <h2 class="subtitle">
         </h2>
-        {% load tetris %} {% if popular_products %} {% for product in popular_products %} {% if forloop.counter|divisibleby:2 %} {% else%}
+        {% load tetris %} {% load humanize %}{% if popular_products %} {% for product in popular_products %} {% if forloop.counter|divisibleby:2 %} {% else %}
         <div class="tile is-ancestor">
             {% endif %}
             <div class="tile is-parent">
@@ -71,7 +71,7 @@
           </span>
             {% endif %}
             <!-- {{ product.cart.count }}<br> -->
-            ₦{{ product.price_per_unit }}
+            ₦{{ product.price_per_unit | intcomma }
               {% if product.quantity < 10 %} <span class="icon" title="currently {{ product.quantity }}">
                 <i class="fa fa-arrow-down"></i>
                 </span> Low in stock

@@ -40,7 +40,6 @@
           <div class="media">
             <div class="media-left">
               <figure class="image is-48x48">
-                <!-- <img src="{{ MEDIA_URL }}{{ product.product_images.all.0.product_image_url }}" alt="{{ product.name }}"> -->
                 <img src="{{ MEDIA_URL }}{{ product.brand.brand_image_url }}" alt="{{ product.name }}">
               </figure>
             </div>
@@ -73,7 +72,7 @@
               {% endfor %}
             </div>
             {% else %}
-              <figure class="image is-4by3">{% load static%}
+              <figure class="image is-4by3">
                  <img src="{% static 'store/img/default-product-img.jpg' %}" alt="{{ product.name }}">
               </figure>
             {% endif %}
@@ -83,8 +82,9 @@
             {{ product.desc }}
           </div>
           <footer class="card-footer">
+          {% load humanize %}
           <p class="card-footer-item" style="color: green">Price per item:
-          <span style="font-weight: bold"> &nbsp;₦{{ product.price_per_unit }}</span></p>
+          <span style="font-weight: bold"> &nbsp;₦{{ product.price_per_unit | intcomma }}</span></p>
           </footer>
           <footer class="card-footer">
           <p class="card-footer-item">Gender:<span style="font-weight: bold"> &nbsp;{{ product.gender }}</span></p>

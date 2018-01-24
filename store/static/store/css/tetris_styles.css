@@ -84,6 +84,12 @@ div.text-white p, div.text-white a{
 }
 
 
+.box {
+  border-radius: 0px;
+}
+
+
+
 
 /* Slideshow container */
 .slideshow-container {

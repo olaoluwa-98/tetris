@@ -41,6 +41,11 @@
                     <div class="media-content">
                         <div class="content">
                             {{forloop.counter}}. <span>St. Address: </span><strong><a href="{% url 'store:shipping_address' forloop.counter %}">{{ shipping_address.address }}</a></strong>
+                            {% if shipping_address.is_default == True %}
+                            <span style="float: right" class="tag is-warning">
+                                Default
+                            </span>
+                            {% endif %}
                             <br><span>Zip Code: </span><small>{{ shipping_address.zip_code }}</small>
                             <br><span>City: </span><small style="font-weight: bold">{{ shipping_address.city }}</small>
                             <br><span>State: </span><small style="font-weight: bold">{{ shipping_address.state }}</small>

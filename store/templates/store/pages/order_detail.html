@@ -61,7 +61,9 @@
                     </a></li>
                 </ul>
             </div>
+            {% if order %}
             {% if order.order_items %}
+            {% load humanize %}
             {% for order_item in order.order_items.all %}
             <div class="box item order_item_{{order_item.product.id}}">
                 <article class="media">
@@ -75,7 +77,7 @@
                         <div class="content">
                             <strong><a href="{{ order_item.product.get_absolute_url}}">{{ order_item.product.name }}</a></strong>
                             <p style="font-weight: bold; color: green; margin-bottom: 0px">
-                                ₦{{ order_item.product.price_per_unit }}
+                                ₦{{ order_item.product.price_per_unit | intcomma}}
                             </p>
                             <p>x{{ order_item.quantity }}</p>
                         </div>
@@ -126,6 +128,15 @@
                     <a class="button is-light">
 				      this order has no items purchased, something is wrong
 				    </a>
+                </p>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="field is-grouped is-grouped-centered">
+                <p class="control">
+                    <a class="button is-light">
+                      this order does not exist
+                    </a>
                 </p>
             </div>
             {% endif %}

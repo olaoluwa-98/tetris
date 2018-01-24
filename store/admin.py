@@ -43,7 +43,7 @@ class OrderItemAdmin(admin.ModelAdmin):
     exclude = ('created_at', 'updated_at',)
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'admin', 'gender', 'size', 'colour', 'sales_count', 'quantity', 'price_per_unit', 'created_at')
+    list_display = ('name', 'admin', 'gender', 'size', 'colour', 'orders_count', 'num_deliveries', 'quantity', 'price_per_unit', 'created_at')
     list_filter = ('gender', 'size')
     search_fields = ('name', 'gender', 'size', 'colour', 'category__name', 'brand__name')
     ordering = ('created_at', )

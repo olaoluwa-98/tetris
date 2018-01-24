@@ -40,6 +40,7 @@ urlpatterns = [
     url(r'^store/men/$', MenStoreView.as_view(), name='men'),
     url(r'^store/women/$', WomenStoreView.as_view(), name='women'),
     url(r'^shipping-address/(?P<num>[0-9]+)/$', ShippingAddressDetailView.as_view(), name='shipping_address'),
+    url(r'^shipping-address-update/$', ShippingAddressUpdateView.as_view(), name='shipping_address_update'),
     url(r'^shipping-addresses/$', ShippingAddressesView.as_view(), name='shipping_addresses'),
     url(r'^wish-list/$', WishListView.as_view(), name='wish_list'),
 

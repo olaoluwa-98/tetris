@@ -29,6 +29,19 @@ def get_cart(request):
     elif request.user.is_authenticated:
         return request.user.cart.all()
 
+# Pagination function.
+def paginate(input_list, page, results_per_page=10):
+    paginator = Paginator(input_list, results_per_page)
+    try:
+        output_list = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver 1st page.
+        output_list = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), return last page.
+        output_list = paginator.page(paginator.num_pages)
+    return output_list
+
 
 class IndexView(ListView):
     model = Product
@@ -37,9 +50,9 @@ class IndexView(ListView):
     def get_context_data(self, **kwargs):
         context = {'popular_products':col.popular_products(6)}
         context['popular_brands'] = col.popular_brands(4)
-        context['cart'] = get_cart(self.request)
+        context['cart_count'] = get_cart(self.request).count()
         if self.request.user.is_authenticated:
-            context['wish_list'] = self.request.user.wishes.all()
+            context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -48,9 +61,9 @@ class CustomerCareView(ListView):
 
     def get_context_data(self, **kwargs):
         context = {}
-        context['cart'] = get_cart(self.request)
+        context['cart_count'] = get_cart(self.request).count()
         if self.request.user.is_authenticated:
-            context['wish_list'] = self.request.user.wishes.all()
+            context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -59,9 +72,9 @@ class AboutView(IndexView):
 
     def get_context_data(self, **kwargs):
         context = {}
-        context['cart'] = get_cart(self.request)
+        context['cart_count'] = get_cart(self.request).count()
         if self.request.user.is_authenticated:
-            context['wish_list'] = self.request.user.wishes.all()
+            context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -71,9 +84,13 @@ class CartView(ListView):
 
     def get_context_data(self, **kwargs):
         context = {}
-        context['cart'] = get_cart(self.request)
+        page = self.request.GET.get('page')
+        cart = get_cart(self.request)
+        cart_list = paginate(cart, page, 5)
+        context['cart_list'] = cart_list
+        context['cart_count'] = get_cart(self.request).count()
         if self.request.user.is_authenticated:
-            context['wish_list'] = self.request.user.wishes.all()
+            context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -85,7 +102,8 @@ class CheckoutView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = {}
         context['cart'] = get_cart(self.request)
-        context['wish_list'] = self.request.user.wishes.all()
+        context['cart_count'] = get_cart(self.request).count()
+        context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -96,8 +114,9 @@ class WishListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {}
-        context['cart'] = get_cart(self.request)
+        context['cart_count'] = get_cart(self.request).count()
         context['wish_list'] = self.request.user.wishes.all()
+        context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -108,19 +127,22 @@ class OrdersView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {'orders': self.request.user.orders.all()}
-        context['cart'] = get_cart(self.request)
-        context['wish_list'] = self.request.user.wishes.all()
+        context['cart_count'] = get_cart(self.request).count()
+        context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
-class OrderDetailView(ListView):
+class OrderDetailView(LoginRequiredMixin, ListView):
     model = Order
     template_name = 'store/pages/order_detail.html'
     def get_context_data(self, **kwargs):
-        order = Order.objects.get(ref=self.kwargs['ref'])
+        orders = Order.objects.filter(user= self.request.user, ref=self.kwargs['ref'])
+        order = None
+        if orders.exists():
+            order = orders.first()
         context = { 'order': order}
-        context['cart'] = get_cart(self.request)
+        context['cart_count'] = get_cart(self.request).count()
         if self.request.user.is_authenticated:
-            context['wish_list'] = self.request.user.wishes.all()
+            context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 class ProductDetailView(DetailView):
@@ -130,9 +152,9 @@ class ProductDetailView(DetailView):
         product = Product.objects.get(slug=self.kwargs['slug'])
         context = { 'product': product}
         context['related_products'] = col.related_products(product, 4)
-        context['cart'] = get_cart(self.request)
+        context['cart_count'] = get_cart(self.request).count()
         if self.request.user.is_authenticated:
-            context['wish_list'] = self.request.user.wishes.all()
+            context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -144,20 +166,12 @@ class ProductsView(ListView):
 
     def get_context_data(self, **kwargs):
         product_list = Product.objects.all().order_by('-created_at')
-        paginator = Paginator(product_list, 10) # Show 25 contacts per page
         page = self.request.GET.get('page')
-        try:
-            products = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            products = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            products = paginator.page(paginator.num_pages)
+        products = paginate(product_list, page, 10)
         context = {'products':products}
-        context['cart'] = get_cart(self.request)
+        context['cart_count'] = get_cart(self.request).count()
         if self.request.user.is_authenticated:
-            context['wish_list'] = self.request.user.wishes.all()
+            context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -169,9 +183,9 @@ class BrandDetailView(DetailView):
         context = { 'brand': brand }
         context['popular_brand_products'] = col.popular_brand_products(brand, 6)
         context['latest_brand_products'] = col.latest_brand_products(brand, 8)
-        context['cart'] = get_cart(self.request)
+        context['cart_count'] = get_cart(self.request).count()
         if self.request.user.is_authenticated:
-            context['wish_list'] = self.request.user.wishes.all()
+            context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -186,9 +200,9 @@ class StoreView(ListView):
         context['popular_brands'] = col.popular_brands(4)
         context['latest_products'] = col.latest_products(6)
         context['categories'] = col.categories(4)
-        context['cart'] = get_cart(self.request)
+        context['cart_count'] = get_cart(self.request).count()
         if self.request.user.is_authenticated:
-            context['wish_list'] = self.request.user.wishes.all()
+            context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -201,21 +215,13 @@ class MenStoreView(ListView):
     def get_context_data(self, **kwargs):
         context = { 'popular_products': col.popular_men_products(6) }
         product_list = Product.objects.filter(gender='male')
-        paginator = Paginator(product_list, 10) # Show 25 contacts per page
         page = self.request.GET.get('page')
-        try:
-            products = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            products = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            products = paginator.page(paginator.num_pages)
+        products = paginate(product_list, page, 10)
         context['categories'] = col.categories()
-        context['cart'] = get_cart(self.request)
+        context['cart_count'] = get_cart(self.request).count()
         context['products'] = products
         if self.request.user.is_authenticated:
-            context['wish_list'] = self.request.user.wishes.all()
+            context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -228,21 +234,13 @@ class WomenStoreView(ListView):
     def get_context_data(self, **kwargs):
         context = { 'popular_products': col.popular_women_products(6) }
         product_list = Product.objects.filter(gender='female')
-        paginator = Paginator(product_list, 10) # Show 25 contacts per page
         page = self.request.GET.get('page')
-        try:
-            products = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            products = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            products = paginator.page(paginator.num_pages)
+        products = paginate(product_list, page, 10)
         context['categories'] = col.categories()
-        context['cart'] = get_cart(self.request)
+        context['cart_count'] = get_cart(self.request).count()
         context['products'] = products
         if self.request.user.is_authenticated:
-            context['wish_list'] = self.request.user.wishes.all()
+            context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -255,7 +253,7 @@ class ProfileView(LoginRequiredMixin, ListView):
         form = ProfileForm(request.POST or None, request.user)
         context = {'form': form}
 
-        context['cart'] = get_cart(self.request)
+        context['cart_count'] = get_cart(self.request).count()
         if form.is_valid():
             user = request.user
             user.first_name = form.cleaned_data['first_name']
@@ -270,8 +268,8 @@ class ProfileView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {}
-        context['cart'] = get_cart(self.request)
-        context['wish_list'] = self.request.user.wishes.all()
+        context['cart_count'] = get_cart(self.request).count()
+        context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -283,8 +281,8 @@ class ShippingAddressesView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         shipping_addresses = ShippingAddress.objects.filter(user = self.request.user)
         context = {'shipping_addresses':shipping_addresses}
-        context['cart'] = get_cart(self.request)
-        context['wish_list'] = self.request.user.wishes.all()
+        context['cart_count'] = get_cart(self.request).count()
+        context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -295,8 +293,9 @@ class NewShippingAddressView(LoginRequiredMixin, ListView):
 
     def post(self, request, *args, **kwargs):
         form = ShippingAddressForm(request.POST or None)
-        context = {'form': form}
-        context['cart'] = get_cart(self.request)
+        context = {}
+        context['cart_count'] = get_cart(self.request).count()
+        context['wish_list_count'] = self.request.user.wishes.count()
         if form.is_valid():
             shipping_address = ShippingAddress()
             shipping_address.user = request.user
@@ -313,12 +312,13 @@ class NewShippingAddressView(LoginRequiredMixin, ListView):
             shipping_address.save()
             context['success'] = 'Your shipping address has been uploaded'
             return render(request, 'store/pages/new_shipping_address.html', context)
+        context['form'] = form
         return render(request, 'store/pages/new_shipping_address.html', context)
 
     def get_context_data(self, **kwargs):
         context = {}
-        context['cart'] = get_cart(self.request)
-        context['wish_list'] = self.request.user.wishes.all()
+        context['cart_count'] = get_cart(self.request).count()
+        context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
@@ -329,8 +329,9 @@ class ShippingAddressDetailView(LoginRequiredMixin, ListView):
 
     def post(self, request, *args, **kwargs):
         form = ShippingAddressForm(request.POST or None)
-        context = {'form': form}
-        context['cart'] = get_cart(self.request)
+        context = {}
+        context['cart_count'] = get_cart(self.request).count()
+        context['wish_list_count'] = self.request.user.wishes.count()
         if form.is_valid():
             num = int(self.kwargs['num'])
             shippings = ShippingAddress.objects.filter(user=request.user, is_default=True)
@@ -346,6 +347,7 @@ class ShippingAddressDetailView(LoginRequiredMixin, ListView):
             context['shipping_address'] = shipping_address
             context['success'] = 'Your shipping address has been updated'
             return render(request, 'store/pages/shipping_address_detail.html', context)
+        context['form'] = form
         return render(request, 'store/pages/shipping_address_detail.html', context)
 
     def get_context_data(self, **kwargs):
@@ -357,9 +359,54 @@ class ShippingAddressDetailView(LoginRequiredMixin, ListView):
             shipping_address = None
         context = {'shipping_address':shipping_address}
         context['shipping_address_num'] = num
-        context['cart'] = get_cart(self.request)
-        context['wish_list'] = self.request.user.wishes.all()
+        context['cart_count'] = get_cart(self.request).count()
+        context['wish_list_count'] = self.request.user.wishes.count()
         return context
+
+
+
+class ShippingAddressUpdateView(LoginRequiredMixin, ListView):
+    model = ShippingAddress
+    template_name = 'store/pages/shipping_address_detail.html'
+    success_url = '/store/'
+
+    def post(self, request, *args, **kwargs):
+        form = ShippingAddressForm(request.POST or None)
+        context = {}
+        context['cart_count'] = get_cart(self.request).count()
+        context['wish_list_count'] = self.request.user.wishes.count()
+        if form.is_valid():
+            shippings = ShippingAddress.objects.filter(user=request.user, is_default=True, )
+            shipping_address = ShippingAddress.objects.filter(
+                user=request.user, pk=self.request.POST['shipping_id']
+            ).first()
+            if request.POST.get('is_default') and shippings.exists():
+                shippings.update(is_default=False)
+                shipping_address.is_default = True
+            shipping_address.zip_code = form.cleaned_data['zip_code']
+            shipping_address.address = form.cleaned_data['address']
+            shipping_address.city = form.cleaned_data['city']
+            shipping_address.state = form.cleaned_data['state']
+            shipping_address.save()
+            context['shipping_address'] = shipping_address
+            context['success'] = 'Your shipping address has been updated'
+            return render(request, 'store/pages/shipping_address_detail.html', context)
+        context['form'] = form
+        return render(request, 'store/pages/shipping_address_detail.html', context)
+
+    # def get_context_data(self, **kwargs):
+    #     num = int(self.kwargs['num'])
+    #     shipping_addresses = ShippingAddress.objects.filter(user=self.request.user)
+    #     if shipping_addresses.count() >= num:
+    #         shipping_address = shipping_addresses[num - 1]
+    #     else:
+    #         shipping_address = None
+    #     context = {'shipping_address':shipping_address}
+    #     context['shipping_address_num'] = num
+    #     context['cart_count'] = get_cart(self.request).count()
+    #     context['wish_list_count'] = self.request.user.wishes.count()
+    #     return context
+
 
 def handle_login(request):
     if request.user.is_authenticated:
@@ -376,7 +423,7 @@ def handle_login(request):
                     cart_item.save()
             return HttpResponseRedirect(request.POST['redirect_url'])
     context = {'form': form}
-    context['cart'] = get_cart(request)
+    context['cart_count'] = get_cart(request).count()
     return render(request, 'registration/login.html', context)
 
 
@@ -401,7 +448,7 @@ def handle_register(request):
                     cart_item.save()
             return HttpResponseRedirect(request.POST['redirect_url'])
     context = {'form': form}
-    context['cart'] = get_cart(request)
+    context['cart_count'] = get_cart(request).count()
     return render(request, 'registration/register.html', context)
 
 
@@ -572,8 +619,8 @@ def make_purchase(request):
                 order=order, quantity=item.quantity, price_per_unit=item.product.price_per_unit
             )
             # increase sales count of the product
-            product = Product.objects.get(pk=order_item.product_id)
-            product.sales_count += product.sales_count
+            product = Product.objects.get(pk=item.product_id)
+            product.orders_count += 1
             product.save()
             order_item.save()
         # clear cart

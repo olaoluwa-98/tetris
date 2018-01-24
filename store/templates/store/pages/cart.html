@@ -41,7 +41,8 @@
                     {% endif %}
                 </ul>
             </div>
-            {% if cart %} {% for cart_item in cart %}
+            {% load humanize %}
+            {% if cart_list %} {% for cart_item in cart_list %}
             <div class="box item cart_item_{{cart_item.product.id}}">
                 <article class="media">
                     <div class="media-left">
@@ -54,7 +55,7 @@
                         <div class="content">
                             <strong><a href="{{ cart_item.product.get_absolute_url}}">{{ cart_item.product.name }}</a></strong>
                             <p style="font-weight: bold; color: green; margin-bottom: 0px">
-                                ₦{{ cart_item.product.price_per_unit }}
+                                ₦{{ cart_item.product.price_per_unit | intcomma}}
                             </p>
                             <nav class="level is-mobile">
                                 <div class="level-left">
@@ -79,6 +80,26 @@
                 </article>
             </div>
             {% if forloop.last %}
+            <nav class="pagination is-centered" role="navigation" aria-label="pagination" style="margin: 10px">
+                {% if cart_list.has_previous %}
+                  <a class="pagination-previous" href="?page={{ cart_list.previous_page_number }}">Previous</a>
+                {% endif %}
+                {% if cart_list.has_next %}
+                  <a class="pagination-next" href="?page={{ cart_list.next_page_number }}">Next page</a>
+
+                {%  endif %}
+              <ul class="pagination-list">
+                <li><a class="pagination-link" aria-label="Goto page 1" href="?page=1">First Page</a></li>
+
+                <li><span class="pagination-ellipsis">&hellip;</span></li>
+                <li>
+                    <a class="pagination-link is-current" aria-label="Page 46" aria-current="page">{{ cart_list.number }}</a>
+                </li>
+                <li><span class="pagination-ellipsis">&hellip;</span></li>
+
+                <li><a class="pagination-link" aria-label="Goto page 86" href="?page={{ cart_list.paginator.num_pages }}">Last Page</a></li>
+              </ul>
+            </nav>
             <div class="field is-grouped is-grouped-centered">
                 <p class="control">
                     <a class="button is-danger" href="{% url 'store:checkout'%}" id="checkout_btn">
