@@ -50,9 +50,7 @@
     </span>
       {% endif %}
       <!-- {{ product.cart.count }}<br> -->
-      <span class="icon">
-          <i class="fa fa-dollar"></i>
-        </span>{{ product.price_per_unit }}
+      ₦{{ product.price_per_unit }}
         {% if product.quantity < 10 %} <span class="icon" title="currently {{ product.quantity }}">
           <i class="fa fa-arrow-down"></i>
           </span> Low in stock
@@ -198,9 +196,7 @@
     </span>
       {% endif %}
       <!-- {{ product.cart.count }}<br> -->
-      <span class="icon">
-          <i class="fa fa-dollar"></i>
-        </span>{{ product.price_per_unit }}
+      ₦{{ product.price_per_unit }}
         {% if product.quantity < 10 %} <span class="icon" title="currently {{ product.quantity }}">
           <i class="fa fa-arrow-down"></i>
           </span> Low in stock
