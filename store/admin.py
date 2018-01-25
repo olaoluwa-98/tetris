@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import *
 
-admin.site.disable_action('delete_selected')
+# admin.site.disable_action('delete_selected')
 
 # register the models so the admin can manipulate them
 class OrderAdmin(admin.ModelAdmin):

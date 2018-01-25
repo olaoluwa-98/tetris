@@ -9,3 +9,10 @@ Pillow==5.0.0
 
 # django-autoslug 1.9.3
 django-autoslug==1.9.3
+
+#development
+django-debug-toolbar==1.9.1
+
+#django-test-plus==1.0.20
+#factory-boy==2.9.2
+pdbpp

@@ -3,8 +3,6 @@ from store.models import *
 
 class Command(BaseCommand):
     help = "Populate database with basic clothing categories, brands etc"
-    admin.site.register(ProductImage)
-
 
     def _populate(self):
         brand1 = Brand(name='Nike',
