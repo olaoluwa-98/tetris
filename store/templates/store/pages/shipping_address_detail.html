@@ -47,27 +47,35 @@
 			  <form action="{% url 'store:shipping_address_update' %}" method="post">
 			  	{% csrf_token %}
 			  	<input type="hidden" name="shipping_id" value="{{ shipping_address.id}}">
+			  	<input type="hidden" name="shipping_address_num" value="{{ shipping_address_num }}">
 			  	<div class="field is-horizontal">
 			  	<div class="field-body">
 		  	    <div class="field">
 		  	    	<label class="label">Zip Code</label>
-		  	      <p class="control is-expanded has-icons-left">
+		  	      <p class="control is-expanded">
 		  	        <input class="input {% if form.zip_code.errors %}is-danger{% endif %}" type="text" name="zip_code" placeholder="Zip Code"
 		  	        value="{% if form.zip_code.value %}{{ form.zip_code.value }}{% else %} {{shipping_address.zip_code}}{% endif %}">
-		  	        <span class="icon is-small is-left">
-		  	          <i class="fa fa-map-marker"></i>
-		  	        </span>
 		  	      </p>
-  			    <p class="help is-danger">
-            	{{ form.zip_code.errors }}
-          	</p>
+  			    {% if form.zip_code.errors %}
+    			    <p class="help is-danger">
+			      {% for error in form.zip_code.errors %}
+                  {{ error }}
+			      {% endfor %}
+                	</p>
+  			  	{% endif %}
 			</div>
 		  	<div class="field">
 		  	   <label class="label">Default</label>
 		  	   	<input type="checkbox" name="is_default"
 		  	   	{% if shipping_address.is_default == True %}checked{% endif %}>
                 Make this your default address
-              	{{ form.is_default.errors }}
+              	{% if form.is_default.errors %}
+	  			    <p class="help is-danger">
+			      {% for error in form.is_default.errors %}
+	                {{ error }}
+			      {% endfor %}
+	              	</p>
+			  	{% endif %}
 		  	    </div>
 		  	  </div>
 		  	</div>
@@ -85,9 +93,13 @@
 			      </span>
 	    	        </p>
 	    	      </div>
-	    	      <p class="help is-danger">
-              	{{ form.address.errors }}
-            	</p>
+	    	      {% if form.address.errors %}
+	  			    <p class="help is-danger">
+			      {% for error in form.address.errors %}
+	                {{ error }}
+			      {% endfor %}
+	              	</p>
+			  	{% endif %}
 	    	    </div>
 	    	  </div>
 	    	</div>
@@ -103,29 +115,49 @@
     			        <i class="fa fa-map-marker"></i>
     			      </span>
     			    </div>
-			    <p class="help is-danger">
-              	{{ form.city.errors }}
-            	</p>
+			      {% if form.city.errors %}
+          			<p class="help is-danger">
+    			    {% for error in form.city.errors %}
+            	    {{ error }}
+    			    {% endfor %}
+                    </p>
+    			  {% endif %}
     			  </div>
 
-	    	    <div class="field">
-    			    <label class="label">State</label>
-    			    <div class="control has-icons-left has-icons-right">
-    			      <input class="input {% if form.state.errors %}is-danger{% endif %}" type="state" name="state" placeholder="your state"
-    			      value="{% if form.state.value %}{{ form.state.value }}{% else %} {{shipping_address.state}}{% endif %}" >
-    			      <span class="icon is-small is-left">
-    			        <i class="fa fa-map-marker"></i>
-    			      </span>
-    			      <p class="help is-danger">
-		              	{{ form.city.errors }}
-	            	  </p>
-    			    </div>
-    			  </div>
+    			 <div class="field">
+    			   <label class="label">State</label>
+    			   <div class="control">
+    			     <div class="select">
+    			       <select class="{% if form.state.errors %}is-danger{% endif %}" name="state">
+    			         <option>State</option>
+    			         {% for state in states %}
+    			         <option value="{{ state.0 }}"
+    			         {% if state.0 == form.state.value or state.0 == shipping_address.state %}
+    			         	selected
+    			         {% endif %}
+    			         >
+    			     	{{ state.1 }}</option>
+    			         {% endfor %}
+    			       </select>
+    			     </div>
+    			   </div>
+   			      {% if form.state.errors %}
+     	  			    <p class="help is-danger">
+     			      {% for error in form.state.errors %}
+     	                {{ error }}
+     			      {% endfor %}
+     	              	</p>
+ 			  	  {% endif %}
+    			 </div>
 	    	  </div>
 	    	</div>
-	    	<p class="help is-danger">
-	    	    {{ form.non_field_errors }}
-	    	</p>
+	    	{% if form.non_field_errors %}
+  			    <p class="help is-danger">
+		      {% for error in form.non_field_errors %}
+                {{ error }}
+		      {% endfor %}
+              	</p>
+		  	{% endif %}
 	    	<div class="field is-grouped is-grouped-centered">
 	    	  <p class="control">
 	    	    <input type="submit" class="button is-danger" value="Update Shipping Address">

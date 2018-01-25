@@ -132,7 +132,7 @@ class Product(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.SET(get_sentinel_user),
         related_name='products',
-        verbose_name ='Administrator',
+        verbose_name ='Staff',
         blank=True,
         null=True
     )
@@ -157,11 +157,31 @@ class Product(models.Model):
         ('female', 'Female'),
         ('unisex', 'Unisex')
     )
+    COLOURS = (
+        ('blue', 'Blue'),
+        ('red', 'Red'),
+        ('white', 'White'),
+        ('black', 'Black'),
+        ('green', 'Green'),
+        ('purple', 'Purple'),
+        ('yellow', 'Yellow'),
+        ('gray', 'Gray'),
+        ('khaki', 'Khaki'),
+        ('brown', 'Brown'),
+        ('orange', 'Orange'),
+        ('navy blue', 'Navy Blue'),
+        ('transparent', 'Transparent'),
+        ('gold', 'Gold'),
+        ('silver', 'Silver'),
+    )
+    SIZES = (
+        ('EUR-39', 'EUR 39'),
+    )
     name = models.CharField(max_length=50, verbose_name='name')
     desc = models.CharField(max_length=255, verbose_name='description', blank=True, null=True)
     gender = models.CharField(max_length=15, choices=GENDER, verbose_name='gender')
     size = models.CharField(max_length=15, verbose_name='size')
-    colour = models.CharField(max_length=15, verbose_name='colour')
+    colour = models.CharField(max_length=15, verbose_name='colour', choices=COLOURS)
     price_per_unit = models.DecimalField(decimal_places=2, max_digits=17, verbose_name='price in ₦')
     quantity = models.PositiveIntegerField(verbose_name='quantity left')
     num_deliveries = models.PositiveIntegerField(verbose_name='number of deliveries', default=0)

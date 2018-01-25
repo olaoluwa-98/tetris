@@ -117,7 +117,7 @@ class ShippingAddressForm(forms.Form):
     zip_code = forms.CharField(label='Zip Code', max_length=10, strip=True)
     address = forms.CharField(label='Address', max_length=30, strip=True)
     city = forms.CharField(label='City', max_length=30, strip=True)
-    state = forms.CharField(label='State')
+    state = forms.ChoiceField(label='State', choices=STATES)
     class Meta:
         model = ShippingAddress
         fields = ('is_default', 'zip_code', 'address', 'city', 'state', )

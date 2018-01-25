@@ -54,9 +54,13 @@
           </span>
           {% endif %}
         </div>
-        <p class="help is-danger">
-          {{ form.username.errors }}
-        </p>
+        {% if form.username.errors %}
+            <p class="help is-danger">
+          {% for error in form.username.errors %}
+                {{ error }}
+          {% endfor %}
+                </p>
+        {% endif %}
       </div>
 
       <div class="field">
@@ -73,9 +77,13 @@
           </span>
           {% endif %}
         </div>
-        <p class="help is-danger">
-          {{ form.email.errors }}
-        </p>
+        {% if form.email.errors %}
+            <p class="help is-danger">
+          {% for error in form.email.errors %}
+                {{ error }}
+          {% endfor %}
+                </p>
+        {% endif %}
         </div>
 
           <div class="field">
@@ -86,13 +94,21 @@
                 <i class="fa fa-lock"></i>
               </span>
             </p>
+            {% if form.password.errors %}
             <p class="help is-danger">
-              {{ form.password.errors }}
-            </p>
+          {% for error in form.password.errors %}
+                {{ error }}
+          {% endfor %}
+                </p>
+        {% endif %}
           </div>
-          <p class="help is-danger">
-              {{ form.non_field_errors }}
-          </p>
+          {% if form.non_field_errors %}
+            <p class="help is-danger">
+            {% for error in form.non_field_errors %}
+                  {{ error }}
+            {% endfor %}
+                  </p>
+          {% endif %}
 
           <!-- <div class="field is-grouped is-grouped-centered">
             <div class="control">

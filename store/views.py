@@ -1,15 +1,17 @@
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.base import RedirectView
+# from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.views.decorators.csrf import csrf_exempt#, csrf_protect
 from .collections import Collections
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
 from .forms import *
+from .addresses import STATES
 
 col = Collections()
 
@@ -304,6 +306,7 @@ class NewShippingAddressView(LoginRequiredMixin, ListView):
         context = {}
         context['cart_count'] = len(get_cart(self.request))
         context['wish_list_count'] = self.request.user.wishes.count()
+        context['states'] = STATES
         if form.is_valid():
             shipping_address = ShippingAddress()
             shipping_address.user = request.user
@@ -325,6 +328,9 @@ class NewShippingAddressView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {}
+        form = ShippingAddressForm(None)
+        context['form'] = form
+        context['states'] = STATES
         context['cart_count'] = len(get_cart(self.request))
         context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -340,6 +346,7 @@ class ShippingAddressDetailView(LoginRequiredMixin, ListView):
         context = {}
         context['cart_count'] = len(get_cart(self.request))
         context['wish_list_count'] = self.request.user.wishes.count()
+        context['states'] = STATES
         if form.is_valid():
             num = int(self.kwargs['num'])
             shippings = ShippingAddress.objects.filter(user=request.user, is_default=True)
@@ -366,59 +373,42 @@ class ShippingAddressDetailView(LoginRequiredMixin, ListView):
         else:
             shipping_address = None
         context = {'shipping_address':shipping_address}
+        form = ShippingAddressForm(None)
+        context['form'] = form
         context['shipping_address_num'] = num
+        context['states'] = STATES
+        if self.request.GET.get('msg'):
+            context['success'] = self.request.GET.get('msg')
         context['cart_count'] = len(get_cart(self.request))
         context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
-
-
-class ShippingAddressUpdateView(LoginRequiredMixin, ListView):
-    model = ShippingAddress
-    template_name = 'store/pages/shipping_address_detail.html'
-    success_url = '/store/'
-
-    def post(self, request, *args, **kwargs):
-        form = ShippingAddressForm(request.POST or None)
-        context = {}
-        context['cart_count'] = len(get_cart(self.request))
-        context['wish_list_count'] = self.request.user.wishes.count()
-        if form.is_valid():
-            shippings = ShippingAddress.objects.filter(user=request.user, is_default=True, )
-            shipping_address = ShippingAddress.objects.filter(
-                user=request.user, pk=self.request.POST['shipping_id']
-            ).first()
-            if request.POST.get('is_default') and shippings.exists():
-                shippings.update(is_default=False)
-                shipping_address.is_default = True
-            shipping_address.zip_code = form.cleaned_data['zip_code']
-            shipping_address.address = form.cleaned_data['address']
-            shipping_address.city = form.cleaned_data['city']
-            shipping_address.state = form.cleaned_data['state']
-            shipping_address.save()
-            context['shipping_address'] = shipping_address
-            context['success'] = 'Your shipping address has been updated'
-            return render(request, 'store/pages/shipping_address_detail.html', context)
-        context['form'] = form
-        return render(request, 'store/pages/shipping_address_detail.html', context)
-
-    # def get_context_data(self, **kwargs):
-    #     num = int(self.kwargs['num'])
-    #     shipping_addresses = ShippingAddress.objects.filter(user=self.request.user)
-    #     if shipping_addresses.count() >= num:
-    #         shipping_address = shipping_addresses[num - 1]
-    #     else:
-    #         shipping_address = None
-    #     context = {'shipping_address':shipping_address}
-    #     context['shipping_address_num'] = num
-    #     context['cart_count'] = len(get_cart(self.request))
-    #     context['wish_list_count'] = self.request.user.wishes.count()
-    #     return context
+@login_required(login_url='/login/')
+def update_shipping_address(request):
+    form = ShippingAddressForm(request.POST or None)
+    if form.is_valid():
+        shippings = ShippingAddress.objects.filter(user=request.user, is_default=True, )
+        shipping_address = ShippingAddress.objects.filter(
+            user=request.user, pk=request.POST['shipping_id']
+        ).first()
+        import pdb; pdb.set_trace()
+        if request.POST.get('is_default') and shippings.exists():
+            shippings.update(is_default=False)
+            shipping_address.is_default = True
+        shipping_address.zip_code = form.cleaned_data['zip_code']
+        shipping_address.address = form.cleaned_data['address']
+        shipping_address.city = form.cleaned_data['city']
+        shipping_address.state = form.cleaned_data['state']
+        shipping_address.save()
+        msg = 'Your shipping address has been updated'
+        return redirect('/shipping-address/{0}/?msg={1}'.format(request.POST['shipping_address_num'], msg))
+    msg = 'some information you provided is incorrect'
+    return redirect('/shipping-address/{0}/?msg={1}'.format(request.POST['shipping_address_num'], msg))
 
 
 def handle_login(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect('/')
+        return redirect('/')
     form = LoginForm(request.POST or None)
     if form.is_valid():
         user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
@@ -429,7 +419,7 @@ def handle_login(request):
                 for x in range(0, len(cart) - 1):
                     cart_item = Cart(user=user, product_id= int(cart[x][0])  , quantity= int(cart[x][2]))
                     cart_item.save()
-            return HttpResponseRedirect(request.POST['redirect_url'])
+            return redirect(request.POST['redirect_url'])
     context = {'form': form}
     context['cart_count'] = len(get_cart(request))
     return render(request, 'registration/login.html', context)
@@ -437,7 +427,7 @@ def handle_login(request):
 
 def handle_register(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect('/')
+        return redirect('/')
     form = RegisterForm(request.POST or None)
     if form.is_valid():
         username = form.cleaned_data['username'].lower()
@@ -454,7 +444,7 @@ def handle_register(request):
                 for x in range(0, len(cart) - 1):
                     cart_item = Cart(user=user, product_id= int(cart[x][0])  , quantity= int(cart[x][2]))
                     cart_item.save()
-            return HttpResponseRedirect(request.POST['redirect_url'])
+            return redirect(request.POST['redirect_url'])
     context = {'form': form}
     context['cart_count'] = len(get_cart(request))
     return render(request, 'registration/register.html', context)
@@ -463,7 +453,7 @@ def handle_register(request):
 @login_required(login_url='/login/')
 def handle_logout(request):
     logout(request)
-    return HttpResponseRedirect('/login')
+    return redirect('/login')
 
 
 @csrf_exempt
