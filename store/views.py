@@ -115,8 +115,10 @@ class WishListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {}
+        page = self.request.GET.get('page')
+        wishes = paginate(self.request.user.wishes.all(), page, 5)
         context['cart_count'] = len(get_cart(self.request))
-        context['wish_list'] = self.request.user.wishes.all()
+        context['wish_list'] = wishes
         context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
@@ -127,7 +129,9 @@ class OrdersView(LoginRequiredMixin, ListView):
     success_url = '/store/'
 
     def get_context_data(self, **kwargs):
-        context = {'orders': self.request.user.orders.all()}
+        page = self.request.GET.get('page')
+        orders = paginate(self.request.user.orders.all(), page, 5)
+        context = {'orders': orders}
         context['cart_count'] = len(get_cart(self.request))
         context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -141,6 +145,9 @@ class OrderDetailView(LoginRequiredMixin, ListView):
         if orders.exists():
             order = orders.first()
         context = { 'order': order}
+        page = self.request.GET.get('page')
+        order_items = paginate(order.order_items.all(), page, 5)
+        context['order_items'] = order_items
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
@@ -215,7 +222,7 @@ class MenStoreView(ListView):
 
     def get_context_data(self, **kwargs):
         context = { 'popular_products': col.popular_men_products(6) }
-        product_list = Product.objects.filter(gender='male')
+        product_list = Product.objects.filter(gender__in=['male', 'unisex'])
         page = self.request.GET.get('page')
         products = paginate(product_list, page, 10)
         context['categories'] = col.categories()
@@ -234,7 +241,7 @@ class WomenStoreView(ListView):
 
     def get_context_data(self, **kwargs):
         context = { 'popular_products': col.popular_women_products(6) }
-        product_list = Product.objects.filter(gender='female')
+        product_list = Product.objects.filter(gender__in=['female', 'unisex'])
         page = self.request.GET.get('page')
         products = paginate(product_list, page, 10)
         context['categories'] = col.categories()

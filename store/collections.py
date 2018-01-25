@@ -109,7 +109,9 @@ class Collections:
         post_time_threshold = datetime.now() - timedelta(days=30)
 
         # select products available in stock
-        products = Product.objects.filter(quantity__gte=1, gender='male', created_at__gte=post_time_threshold)
+        products = Product.objects.filter(quantity__gte=1,
+            gender__in=['male', 'unisex'], created_at__gte=post_time_threshold
+        )
         popular_products = sorted(
             products,
             key=lambda p: (86400 * p.wishes.count() \
@@ -125,7 +127,9 @@ class Collections:
         post_time_threshold = datetime.now() - timedelta(days=30)
 
         # select products available in stock
-        products = Product.objects.filter(quantity__gte=1, gender='female', created_at__gte=post_time_threshold)
+        products = Product.objects.filter(quantity__gte=1,
+            gender__in=['female', 'unisex'], created_at__gte=post_time_threshold
+        )
         popular_products = sorted(
             products,
             key=lambda p: (86400 * p.wishes.count() \

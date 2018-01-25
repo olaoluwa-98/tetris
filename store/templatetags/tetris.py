@@ -10,7 +10,9 @@ data = {}
 # return correct format of phone number
 @register.filter(name='phone_num')
 def phone_num(string):
-	return string[1:]
+	if string:
+		return string[1:]
+	return ''
 
 # return true if user has the product wished
 @register.filter(name='product_wished')

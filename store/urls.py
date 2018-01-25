@@ -1,6 +1,5 @@
 from django.conf.urls import url
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib.auth.views import (
         PasswordChangeView,
         PasswordChangeDoneView,
@@ -57,6 +56,3 @@ urlpatterns = [
     url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     url(r'^reset/done/$', PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 ]
-
-if settings.DEBUG is True:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
