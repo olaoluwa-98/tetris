@@ -113,6 +113,10 @@ class ProductCategory(models.Model):
     cat_type = models.CharField(max_length=10, choices=CAT_TYPES, verbose_name='type of category')
     desc = models.CharField(max_length=255, verbose_name='description of product category', blank=True, null=True)
     cat_image_url = models.ImageField(upload_to='img/product_categories/', max_length=255, blank=True, null=True)
+    slug = AutoSlugField(populate_from='name',
+        unique=True,
+        sep='',
+    )
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
         verbose_name='date product category was added to db'
     )
@@ -189,7 +193,7 @@ class Product(models.Model):
     slug = AutoSlugField(populate_from='name',
         unique=True,
         sep='',
-        )
+    )
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
         verbose_name='date added'
     )
