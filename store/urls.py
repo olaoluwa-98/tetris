@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^add-to-wish-list', add_to_wish_list, name ="add_to_wish_list"),
     url(r'^brand/(?P<slug>[\w-]+)/$', BrandDetailView.as_view(), name='brand'),
     url(r'^cart/$', CartView.as_view(), name='cart'),
+    url(r'^category/(?P<slug>[\w-]+)/$', CategoryView.as_view(), name='category'),
     url(r'^checkout/$', CheckoutView.as_view(), name='checkout'),
     url(r'^customer-care/$', CustomerCareView.as_view(), name='customer_care'),
     url(r'^change-cart-item-qty', change_cart_item_qty, name ="change_cart_item_qty"),

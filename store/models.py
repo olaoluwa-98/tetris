@@ -122,6 +122,9 @@ class ProductCategory(models.Model):
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date product category details were updated last')
 
+    def get_absolute_url(self):
+        return reverse('store:category', kwargs={'slug': self.slug})
+
     def __str__(self):
         return '{0} ({1})'.format(self.name, self.cat_type)
 

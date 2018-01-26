@@ -283,6 +283,23 @@ class ProfileView(LoginRequiredMixin, ListView):
         return context
 
 
+class CategoryView(ListView):
+    model = Product
+    queryset = Product.objects.all()
+    template_name = 'store/pages/category.html'
+    success_url = '/store/'
+
+    def get_context_data(self, **kwargs):
+        context = {'popular_products':col.popular_products(6) }
+        context['popular_brands'] = col.popular_brands(4)
+        context['latest_products'] = col.latest_products(6)
+        context['categories'] = col.categories(4)
+        context['cart_count'] = len(get_cart(self.request))
+        if self.request.user.is_authenticated:
+            context['wish_list_count'] = self.request.user.wishes.count()
+        return context
+
+
 class ShippingAddressesView(LoginRequiredMixin, ListView):
     model = ShippingAddress
     template_name = 'store/pages/shipping_address_list.html'
