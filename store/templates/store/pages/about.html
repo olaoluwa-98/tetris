@@ -1,5 +1,3 @@
-
-<!-- about page -->
 {% extends "store/base.html" %}
 
 {% block title %}
@@ -8,8 +6,20 @@
 
 
 {% block content %}
-<div class="main">
-  <h2>I am the main</h2>
-  <a href="{% url 'store:index' %}">Go to the index</a>
-</div>    
+
+<div class="tile is-ancestor">
+  <div class="tile is-4 is-vertical is-parent">
+    <div class="tile is-child box">
+      <p class="title">One</p>
+    </div>
+    <div class="tile is-child box">
+      <p class="title">Two</p>
+    </div>
+  </div>
+  <div class="tile is-parent">
+    <div class="tile is-child box">
+      <p class="title">Three</p>
+    </div>
+  </div>
+</div>
 {% endblock %}
