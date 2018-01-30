@@ -67,6 +67,10 @@ class Brand(models.Model):
     def get_orders(self):
         return OrderItem.objects.filter(product__brand=self).order_by('-created_at')
 
+    def random_product_images(self):
+        products = list(self.products.all())
+        return ProductImage.objects.filter(product__in=products[:3])
+
     def __str__(self):
         return '{0} ({1})'.format(self.name, self.email)
 

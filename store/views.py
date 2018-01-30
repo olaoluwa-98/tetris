@@ -530,14 +530,14 @@ def change_cart_item_qty(request):
 
 @csrf_exempt
 def remove_from_cart(request):
-    if request.session.get('cart_item_ids'):
+    if request.session.get('cart_item_ids') and request.POST.get('product_id'):
         product = request.POST['product_id'] + 'x'
         cart = request.session.get('cart_item_ids')
         index = cart.find(product)
         if index != -1:
             index_stop = cart.find('-', index)
             request.session['cart_item_ids'] = cart.replace(cart[index:index_stop+1], '')
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and request.POST.get('product_id'):
         cart_item = Cart.objects.filter(user=request.user, product_id=request.POST['product_id'])
         if cart_item.exists():
             cart_item.delete()
