@@ -7,19 +7,28 @@
 
 {% block content %}
 
-<div class="tile is-ancestor">
-  <div class="tile is-4 is-vertical is-parent">
-    <div class="tile is-child box">
-      <p class="title">One</p>
-    </div>
-    <div class="tile is-child box">
-      <p class="title">Two</p>
-    </div>
-  </div>
+<section class="section">
+  <div class="container">
+    {% load tetris %} {% load humanize %}
+    {% if popular_products %}
+      {% for product in popular_products %}
+          {% if forloop.counter|divisibleby:4 %}
+          {% else %}
+          <div class="tile is-ancestor">
+          {% endif %}
+          {% include 'store/partials/product.html' %}
+          {% if forloop.counter|divisibleby:4 %}
+          {% else %}
+          </div>
+          {% endif %}
+      {% endfor %}
+    {% else %}
   <div class="tile is-parent">
     <div class="tile is-child box">
-      <p class="title">Three</p>
+      <p class="title">Unfortunately, there's no product in stock </p>
     </div>
   </div>
-</div>
+  {% endif %}
+  </div>
+</section>
 {% endblock %}

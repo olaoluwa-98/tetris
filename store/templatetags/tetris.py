@@ -26,7 +26,6 @@ def product_wished(product_id, user):
 def product_carted(product_id, request):
 	if request.user.is_authenticated:
 		return Cart.objects.filter(product_id=product_id, user=request.user).exists()
-	else:
-		if request.session.get('cart_item_ids'):
-			return str(product_id)+'x' in request.session['cart_item_ids']
+	if request.session.get('cart_item_ids'):
+		return str(product_id)+'x' in request.session['cart_item_ids']
 	return False

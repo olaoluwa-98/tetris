@@ -25,7 +25,7 @@
       <p class="subtitle">
         The new look of simple
       </p>
-      <a href="{% url 'store:store' %}">
+      <a class="shop-tetris-text" href="{% url 'store:store' %}">
         Shop tetris
       </a>
     </div>
@@ -44,7 +44,7 @@
       <div class="field">
         <label class="label">Username</label>
         <div class="control has-icons-left has-icons-right">
-          <input class="input {% if form.username.errors %}is-danger{% endif %} is-medium" type="text" name="username" placeholder="username"
+          <input class="input {% if form.username.errors %}is-dark{% endif %} is-medium" type="text" name="username" placeholder="username"
           required value="{% if form.username.value %}{{ form.username.value }}{% endif %}">
           <span class="icon is-small is-left">
             <i class="fa fa-user"></i>
@@ -56,7 +56,7 @@
           {% endif %}
         </div>
       {% if form.username.errors %}
-            <p class="help is-danger">
+            <p class="help is-dark">
           {% for error in form.username.errors %}
                 {{ error }}
           {% endfor %}
@@ -67,13 +67,13 @@
           <div class="field">
               <label class="label">Password</label>
             <p class="control has-icons-left">
-              <input class="input {% if form.password.errors %}is-danger{% endif %} is-medium" type="password" name="password" placeholder="Password">
+              <input class="input {% if form.password.errors %}is-dark{% endif %} is-medium" type="password" name="password" placeholder="Password">
               <span class="icon is-small is-left">
                 <i class="fa fa-lock"></i>
               </span>
             </p>
             {% if form.password.errors %}
-              <p class="help is-danger">
+              <p class="help is-dark">
             {% for error in form.password.errors %}
                   {{ error }}
             {% endfor %}
@@ -81,7 +81,7 @@
           {% endif %}
           </div>
           {% if form.non_field_errors %}
-            <p class="help is-danger">
+            <p class="help is-dark">
           {% for error in form.non_field_errors %}
                 {{ error }}
           {% endfor %}
@@ -105,7 +105,7 @@
           </div>
           <div class="field is-grouped is-grouped-centered">
             <p class="control">
-              <button class="button is-danger">
+              <button class="button is-dark">
                 Login
               </button>
             </p>

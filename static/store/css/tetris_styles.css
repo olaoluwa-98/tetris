@@ -89,6 +89,12 @@ div.text-white p, div.text-white a{
 }
 
 
+a {
+  text-decoration: none;
+  color: black;
+}
+
+
 
 
 /* Slideshow container */

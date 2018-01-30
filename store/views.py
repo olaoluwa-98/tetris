@@ -3,8 +3,8 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.views.generic import ListView, DetailView
-from django.views.generic.base import RedirectView
-# from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.base import RedirectView, TemplateView
+from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_exempt#, csrf_protect
 from .collections import Collections
@@ -19,16 +19,19 @@ def get_cart(request):
     # request.session['cart_item_ids'] = ''
     # import pdb; pdb.set_trace()
     if request.session.get('cart_item_ids'):
+        product_ids = []
         cart = request.session['cart_item_ids'].split('-')[1:]
         real_cart = []
         for x in range(0, len(cart)):
-            real_cart.append(Cart(product_id=int(cart[x][0]),quantity=int(cart[x][2])) )
+            product_id = cart[x][0]
+            qty = cart[x][2:]
+            real_cart.append(Cart(product_id=product_id,quantity=qty))
+            product_ids.append(product_id)
         if request.user.is_authenticated:
-            cart_from_db_ids = [x.product_id for x in request.user.cart.all()]
-            real_cart = [ x for x in real_cart if x.product_id not in cart_from_db_ids]
-            real_cart += list(request.user.cart.all())
+            remaining_cart = request.user.cart.exclude(product_id__in=product_ids)
+            real_cart += list(remaining_cart)
         return real_cart
-    elif request.user.is_authenticated:
+    if request.user.is_authenticated:
         return request.user.cart.all()
     return []
 
@@ -59,7 +62,7 @@ class IndexView(ListView):
         return context
 
 
-class CustomerCareView(ListView):
+class CustomerCareView(TemplateView):
     template_name = 'store/pages/customer_care.html'
 
     def get_context_data(self, **kwargs):
@@ -70,11 +73,12 @@ class CustomerCareView(ListView):
         return context
 
 
-class AboutView(IndexView):
+class AboutView(TemplateView):
     template_name = 'store/pages/about.html'
 
     def get_context_data(self, **kwargs):
-        context = {}
+        # context = {}
+        context = {'popular_products': Product.objects.all()}
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
@@ -91,7 +95,7 @@ class CartView(ListView):
         cart = get_cart(self.request)
         cart_list = paginate(cart, page, 5)
         context['cart_list'] = cart_list
-        context['cart_count'] = len(get_cart(self.request))
+        context['cart_count'] = len(cart)
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -408,7 +412,6 @@ def update_shipping_address(request):
         shipping_address = ShippingAddress.objects.filter(
             user=request.user, pk=request.POST['shipping_id']
         ).first()
-        import pdb; pdb.set_trace()
         if request.POST.get('is_default') and shippings.exists():
             shippings.update(is_default=False)
             shipping_address.is_default = True
@@ -433,9 +436,12 @@ def handle_login(request):
             login(request, user)
             if request.session.get('cart_item_ids'):
                 cart = request.session['cart_item_ids'].split('-')[1:]
-                for x in range(0, len(cart) - 1):
-                    cart_item = Cart(user=user, product_id= int(cart[x][0])  , quantity= int(cart[x][2]))
+                for x in range(0, len(cart)):
+                    product_id = cart[x][0]
+                    qty = cart[x][2:]
+                    cart_item = Cart(user=user, product_id=product_id,quantity=qty)
                     cart_item.save()
+            request.session['cart_item_ids'] = ''
             return redirect(request.POST['redirect_url'])
     context = {'form': form}
     context['cart_count'] = len(get_cart(request))
@@ -458,9 +464,12 @@ def handle_register(request):
             login(request, user)
             if request.session.get('cart_item_ids'):
                 cart = request.session['cart_item_ids'].split('-')[1:]
-                for x in range(0, len(cart) - 1):
-                    cart_item = Cart(user=user, product_id= int(cart[x][0])  , quantity= int(cart[x][2]))
+                for x in range(0, len(cart)):
+                    product_id = cart[x][0]
+                    qty = cart[x][2:]
+                    cart_item = Cart(user=user, product_id=product_id,quantity=qty)
                     cart_item.save()
+            request.session['cart_item_ids'] = ''
             return redirect(request.POST['redirect_url'])
     context = {'form': form}
     context['cart_count'] = len(get_cart(request))
@@ -476,28 +485,24 @@ def handle_logout(request):
 @csrf_exempt
 def add_to_cart(request):
     if request.session.get('cart_item_ids'):
-        # if request.POST['product_id'] + 'x' in request.session.get('cart_item_ids'):
-        #     product = request.POST['product_id'] + 'x'
-        #     cart = request.session.get('cart_item_ids')
-        #     index = cart.find(product)
-        #     new_qty = int(cart[ index + 2]) + int(request.POST['quantity'])
-        #     request.session['cart_item_ids'] = cart.replace(product + cart[ index + 2], \
-        #         product + str(new_qty))
-        # else:
-        request.session['cart_item_ids'] += '-{0}x{1}'.format(request.POST['product_id'], request.POST['quantity'])
+        if request.POST['product_id'] + 'x' in request.session.get('cart_item_ids'):
+            product = request.POST['product_id'] + 'x'
+            cart = request.session.get('cart_item_ids')
+            index = cart.find(product)
+            new_qty = int(cart[index + 2]) + int(request.POST['quantity'])
+            request.session['cart_item_ids'] = cart.replace(product + cart[ index + 2], \
+                product + str(new_qty))
+        else:
+            request.session['cart_item_ids'] += '-{0}x{1}'.format(request.POST['product_id'], request.POST['quantity'])
     else:
         request.session['cart_item_ids'] = '-{0}x{1}'.format(request.POST['product_id'], request.POST['quantity'])
     if request.user.is_authenticated:
-        cart_item = Cart(user_id=request.user.id, product_id=request.POST['product_id'], quantity=request.POST['quantity'])
-        if cart_item:
-            cart_item.save()
-            response = JsonResponse({'status' : 'success', 'msg': 'added successfully' })
-            response.status_code = 200
-            return response
-
-        response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
-        response.status_code = 402
+        cart_item = Cart(user=request.user, product_id=request.POST['product_id'], quantity=request.POST['quantity'])
+        cart_item.save()
+        response = JsonResponse({'status' : 'success', 'msg': 'added successfully' })
+        response.status_code = 200
         return response
+
     response = JsonResponse({'status' : 'success', 'msg': 'added successfully' })
     response.status_code = 200
     return response
@@ -509,44 +514,44 @@ def change_cart_item_qty(request):
         response.status_code = 402
         return response
 
-    if request.session.get('cart_item_ids'):
-        if request.POST['product_id'] + 'x' in request.session.get('cart_item_ids'):
-            product = request.POST['product_id'] + 'x'
-            cart = request.session.get('cart_item_ids')
-            index = cart.find(product)
-            request.session['cart_item_ids'] = cart.replace(product + cart[ index + 2], \
-                product + request.POST['new_quantity'])
+    if request.session.get('cart_item_ids') and request.POST['product_id'] \
+        + 'x' in request.session.get('cart_item_ids'):
 
-            response = JsonResponse({'status' : 'success', 'msg': 'quantity changed successfully' })
-            response.status_code = 200
-            return response
-        else:
-            response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
-            response.status_code = 402
-            return response
+        product = request.POST['product_id'] + 'x'
+        cart = request.session.get('cart_item_ids')
+        index = cart.find(product)
+        index_stop = cart.find('-', index)
+        request.session['cart_item_ids'] = cart.replace(cart[index:index_stop], \
+            product + request.POST['new_quantity'])
+
     if request.user.is_authenticated:
-        cart_item = Cart.objects.filter(user=request.user, product_id=request.POST['product_id']).first()
-        if cart_item:
+        cart = Cart.objects.filter(user=request.user, product_id=request.POST['product_id'])
+        if cart.exists():
+            cart_item = cart.first()
             cart_item.quantity = request.POST['new_quantity']
             cart_item.save()
             response = JsonResponse({'status' : 'success', 'msg': 'quantity changed successfully' })
             response.status_code = 200
             return response
-    response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
-    response.status_code = 402
+        else:
+            cart_item = Cart(user=request.user, product_id=request.POST['product_id'], quantity=request.POST['new_quantity'])
+            cart_item.save()
+
+    response = JsonResponse({'status' : 'success', 'msg': 'quantity changed successfully' })
+    response.status_code = 200
     return response
 
 @csrf_exempt
 def remove_from_cart(request):
     if request.session.get('cart_item_ids'):
-        product = '-' + request.POST['product_id'] + 'x'
+        product = request.POST['product_id'] + 'x'
         cart = request.session.get('cart_item_ids')
-
         index = cart.find(product)
-        request.session['cart_item_ids'] = cart.replace(product + cart[ index + 3], '')
-        print (request.session['cart_item_ids'])
+        index_stop = cart.find('-', index)
+        request.session['cart_item_ids'] = cart.replace(cart[index:index_stop], '')
+
     if request.user.is_authenticated:
-        cart_item = Cart.objects.filter(user = request.user, product_id = request.POST['product_id'])
+        cart_item = Cart.objects.filter(user=request.user, product_id=request.POST['product_id'])
         if cart_item.exists():
             cart_item.delete()
             response = JsonResponse({'status' : 'success', 'msg': 'removed successfully' })
@@ -563,7 +568,7 @@ def remove_from_cart(request):
 @csrf_exempt
 @login_required(login_url='/login/')
 def add_to_wish_list(request):
-    wish_item = Wish(user_id=request.user.id, product_id=request.POST['product_id'])
+    wish_item = Wish(user=request.user, product_id=request.POST['product_id'])
     if wish_item:
         wish_item.save()
         response = JsonResponse({'status' : 'success', 'msg': 'added successfully' })
@@ -577,8 +582,8 @@ def add_to_wish_list(request):
 @csrf_exempt
 @login_required(login_url='/login/')
 def remove_from_wish_list(request):
-    wish_item = Wish.objects.filter(user = request.user, product_id = request.POST['product_id'])
-    if wish_item:
+    wish_item = Wish.objects.filter(user=request.user, product_id=request.POST['product_id'])
+    if wish_item.exists():
         wish_item.delete()
         response = JsonResponse({'status' : 'success', 'msg': 'removed successfully' })
         response.status_code = 200
@@ -593,22 +598,20 @@ def empty_cart(request):
     if request.session.get('cart_item_ids'):
         request.session['cart_item_ids'] = ''
     if request.user.is_authenticated:
-        carts = Cart.objects.filter(user_id=request.user.id)
-        for cart in carts:
-            cart.delete()
-        if request.session.get('cart'):
-            request.session['cart'] = ''
+        carts = Cart.objects.filter(user=request.user)
+        if cart.exists():
+            carts.delete()
         response = JsonResponse({'status' : 'success', 'msg': 'cart emptied' })
         response.status_code = 200
         return response
-    response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
-    response.status_code = 402
+    response = JsonResponse({'status' : 'success', 'msg': 'cart emptied' })
+    response.status_code = 200
     return response
 
 @csrf_exempt
 @login_required(login_url='/login/')
 def empty_wish_list(request):
-        wishes = Wish.objects.filter(user_id=request.user.id)
+        wishes = Wish.objects.filter(user=request.user)
         for wish in wishes:
             wish.delete()
         response = JsonResponse({'status' : 'success', 'msg': 'wish list emptied' })

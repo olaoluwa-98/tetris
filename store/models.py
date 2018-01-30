@@ -276,12 +276,16 @@ class Cart(models.Model):
     # Override models save method:
     def save(self, *args, **kwargs):
         # check if cart product already exists, add more quantity to it
-        if not self.id:
-            cart = Cart.objects.filter(user=self.user, product=self.product).first()
-            if cart:
-                cart.quantity += int(self.quantity)
-                super(Cart, cart).save(*args, **kwargs)
-        super(Cart, self).save(*args, **kwargs)
+        if not self.pk:
+            cart = Cart.objects.filter(user=self.user, product_id=self.product_id)
+            if cart.exists():
+                cart_item = cart.first()
+                cart_item.quantity += int(self.quantity)
+                super(Cart, cart_item).save(*args, **kwargs)
+            else:
+                super(Cart, self).save(*args, **kwargs)
+        else:
+            super(Cart, self).save(*args, **kwargs)
 
     def __str__(self):
         return 'x{0} {1} -> {2}'.format(self.quantity, self.user, self.product.name)
@@ -341,7 +345,7 @@ class Order(models.Model):
 
     # Override models save method:
     def save(self, *args, **kwargs):
-        if not self.id:
+        if not self.pk:
             # generate reference for the order
             # order reference must be unique
             self.ref = get_random_string(length=16)

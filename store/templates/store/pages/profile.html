@@ -25,7 +25,7 @@
       <p class="subtitle">
         The new look of simple
       </p>
-      <a href="{% url 'store:store' %}">
+      <a class="shop-tetris-text" href="{% url 'store:store' %}">
         Go back to shopping Tetris
       </a>
     </div>
@@ -52,26 +52,26 @@
 		  	    <div class="field">
 		  	    	<label class="label">First name</label>
 		  	      <p class="control is-expanded has-icons-left">
-		  	        <input class="input {% if form.first_name.errors %}is-danger{% endif %}" type="text" name="first_name" placeholder="First Name"
+		  	        <input class="input {% if form.first_name.errors %}is-dark{% endif %}" type="text" name="first_name" placeholder="First Name"
 		  	        value="{% if form.first_name.value %}{{ form.first_name.value }}{% else %}{{ user.first_name}}{% endif %}">
 		  	        <span class="icon is-small is-left">
 		  	          <i class="fa fa-user"></i>
 		  	        </span>
 		  	      </p>
-  			    <p class="help is-danger">
+  			    <p class="help is-dark">
             	{{ form.first_name.errors }}
           	</p>
 		  	    </div>
 		  	    <div class="field">
 		  	    	<label class="label">Last name</label>
 		  	      <p class="control is-expanded has-icons-left">
-		  	        <input class="input {% if form.last_name.errors %}is-danger{% endif %}" type="text" name="last_name" placeholder="Last name"
+		  	        <input class="input {% if form.last_name.errors %}is-dark{% endif %}" type="text" name="last_name" placeholder="Last name"
 		  	        value="{% if form.last_name.value %}{{ form.last_name.value }}{% else %}{{ user.last_name}}{% endif %}">
 		  	        <span class="icon is-small is-left">
 		  	          <i class="fa fa-user"></i>
 		  	        </span>
 		  	      </p>
-		  	    <p class="help is-danger">
+		  	    <p class="help is-dark">
               	{{ form.last_name.errors }}
           	</p>
 		  	    </div>
@@ -83,7 +83,7 @@
 	    	    <div class="field">
     			    <label class="label">Username</label>
     			    <div class="control has-icons-left has-icons-right">
-    			      <input class="input {% if form.username.errors %}is-danger{% endif %}" type="text" name="username" placeholder="Username"
+    			      <input class="input {% if form.username.errors %}is-dark{% endif %}" type="text" name="username" placeholder="Username"
     			      value="{% if form.username.value %}{{ form.username.value }}{% else %}{{ user.username}}{% endif %}">
     			      <span class="icon is-small is-left">
     			        <i class="fa fa-user"></i>
@@ -93,7 +93,7 @@
     			      </span> -->
     			    </div>
     			    <!-- <p class="help is-success">This username is available</p> -->
-    			    <p class="help is-danger">
+    			    <p class="help is-dark">
               	{{ form.username.errors }}
             	</p>
     			  </div>
@@ -101,7 +101,7 @@
 	    	    <div class="field">
     			    <label class="label">Email</label>
     			    <div class="control has-icons-left has-icons-right">
-    			      <input class="input {% if form.email.errors %}is-danger{% endif %}" type="email" name="email" placeholder="Email input"
+    			      <input class="input {% if form.email.errors %}is-dark{% endif %}" type="email" name="email" placeholder="Email input"
     			      value="{% if form.email.value %}{{ form.email.value }}{% else %}{{ user.email}}{% endif %}" >
     			      <span class="icon is-small is-left">
     			        <i class="fa fa-envelope"></i>
@@ -112,7 +112,7 @@
     			      </span>
     			      {% endif %}
     			    </div>
-    			    <!-- <p class="help is-danger">This email is invalid</p> -->
+    			    <!-- <p class="help is-dark">This email is invalid</p> -->
     			  </div>
 	    	  </div>
 	    	</div>
@@ -130,23 +130,23 @@
 	    	        </p>
 	    	        {% load tetris %}
 	    	        <p class="control is-expanded">
-	    	          <input class="input {% if form.phone.errors %}is-danger{% endif %}" type="tel" name="phone" placeholder="Your phone number"
+	    	          <input class="input {% if form.phone.errors %}is-dark{% endif %}" type="tel" name="phone" placeholder="Your phone number"
 	    	          value="{% if form.phone.value %}{{ form.phone.value }}{% else %}{{ user.phone | phone_num}}{% endif %}" >
 	    	        </p>
 	    	      </div>
 	    	      <p class="help">Do not enter the first zero</p>
-	    	      <p class="help is-danger">
+	    	      <p class="help is-dark">
               	{{ form.phone.errors }}
             	</p>
 	    	    </div>
 	    	  </div>
 	    	</div>
-	    	<p class="help is-danger">
+	    	<p class="help is-dark">
 	    	    {{ form.non_field_errors }}
 	    	</p>
 	    	<div class="field is-grouped is-grouped-centered">
 	    	  <p class="control">
-	    	    <input type="submit" class="button is-danger" value="Update Profile">
+	    	    <input type="submit" class="button is-dark" value="Update Profile">
 	    	  </p>
 	    	</div>
   	    <p style="font-size: 1.2em;" class="help is-success field is-grouped is-grouped-centered">

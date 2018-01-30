@@ -79,7 +79,7 @@
 }
 /*END OF CENTER BOX STYLING*/
 
-div.text-white p, div.text-white a{
+div.text-white p{
   color: white;
 }
 
@@ -88,6 +88,23 @@ div.text-white p, div.text-white a{
   border-radius: 0px;
 }
 
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+a:hover {
+  color: grey;
+}
+
+.shop-tetris-text {
+  background-color: white;
+  border-radius: 5px;
+  padding: 5px;
+  color: black;
+  font-size: 2em;
+}
 
 
 

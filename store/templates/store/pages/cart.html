@@ -17,7 +17,7 @@
             <p class="subtitle">
                 The new look of simple
             </p>
-            <a href="{% url 'store:store' %}">
+            <a class="shop-tetris-text" href="{% url 'store:store' %}">
         Go back to shopping Tetris
       </a>
         </div>
@@ -65,7 +65,7 @@
                                             placeholder="Qty" value="{{ cart_item.quantity }}" id="qty_{{ cart_item.product.id }}">
                                         </p>
                                         <p class="control">
-                                        <a class="button is-small is-danger"
+                                        <a class="button is-small is-dark"
                                             onclick="change_qty({{ cart_item.product.id }}, {{ cart_item.quantity }} )" id="qty_btn_{{ cart_item.id }}">Qty
                                         </a>
                                         </p>
@@ -93,7 +93,7 @@
 
                 <li><span class="pagination-ellipsis">&hellip;</span></li>
                 <li>
-                    <a class="pagination-link is-current" aria-label="Page 46" aria-current="page">{{ cart_list.number }}</a>
+                    <a class="pagination-link is-dark" aria-label="Page 46" aria-current="page">{{ cart_list.number }}</a>
                 </li>
                 <li><span class="pagination-ellipsis">&hellip;</span></li>
 
@@ -102,7 +102,7 @@
             </nav>
             <div class="field is-grouped is-grouped-centered">
                 <p class="control">
-                    <a class="button is-danger" href="{% url 'store:checkout'%}" id="checkout_btn">
+                    <a class="button is-dark" href="{% url 'store:checkout'%}" id="checkout_btn">
 				      Checkout
 				    </a>
                 </p>
