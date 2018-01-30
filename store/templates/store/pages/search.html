@@ -1,16 +1,34 @@
-
-<!-- store page -->
-{% extends "store/base.html" %}
+{% extends 'store/base.html' %}
 
 {% block title %}
-	Search | Tetris Clothing Store
+    Search | Tetris Clothing Store
 {% endblock %}
 
+{% load static %}
+{% block extra_css %}
+  <style type="text/css">
+  </style>
+{% endblock %}
 
 {% block content %}
-<div class="main">
-  <h2>I am the main</h2>
-  <a href="{% url 'store:index' %}">Go to the index</a>
-</div>
-    
+
+<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
+  <div class="hero-head">
+    {% include 'store/header.html' %}
+  </div>
+
+  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+    <div class="container has-text-centered text-white">
+      <p class="title">
+        Login to Shop the New Look
+      </p>
+      <p class="subtitle">
+        The new look of simple
+      </p>
+      <a class="shop-tetris-text" href="{% url 'store:store' %}">
+        Shop tetris
+      </a>
+    </div>
+  </div>
+</section>
 {% endblock %}

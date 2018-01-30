@@ -103,39 +103,3 @@ class Collections:
         #     reverse=True
         # )
         return latest_products[:limit]
-
-    def popular_men_products(self, limit):
-        # threshold of 30 days
-        post_time_threshold = datetime.now() - timedelta(days=30)
-
-        # select products available in stock
-        products = Product.objects.filter(quantity__gte=1,
-            gender__in=['male', 'unisex'], created_at__gte=post_time_threshold
-        )
-        popular_products = sorted(
-            products,
-            key=lambda p: (86400 * p.wishes.count() \
-            + 86400 * p.order_items.count() \
-            + 86400 * p.cart.count()) \
-            + calendar.timegm(p.created_at.utctimetuple()),
-            reverse=True
-        )
-        return popular_products[:limit]
-
-    def popular_women_products(self, limit):
-        # threshold of 30 days
-        post_time_threshold = datetime.now() - timedelta(days=30)
-
-        # select products available in stock
-        products = Product.objects.filter(quantity__gte=1,
-            gender__in=['female', 'unisex'], created_at__gte=post_time_threshold
-        )
-        popular_products = sorted(
-            products,
-            key=lambda p: (86400 * p.wishes.count() \
-            + 86400 * p.order_items.count() \
-            + 86400 * p.cart.count()) \
-            + calendar.timegm(p.created_at.utctimetuple()),
-            reverse=True
-        )
-        return popular_products[:limit]

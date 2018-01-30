@@ -2,9 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout
-from django.views.generic import ListView, DetailView
-from django.views.generic.base import RedirectView, TemplateView
-from django.views import View
+from django.views.generic.base import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_exempt#, csrf_protect
 from .collections import Collections
@@ -57,12 +55,11 @@ def paginate(input_list, page, results_per_page=10):
     return output_list
 
 
-class IndexView(ListView):
-    model = Product
+class IndexView(TemplateView):
     template_name = 'store/pages/index.html'
 
     def get_context_data(self, **kwargs):
-        context = {'popular_products':col.popular_products(6)}
+        context = {'popular_products':col.popular_products(8)}
         context['popular_brands'] = col.popular_brands(4)
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
@@ -85,15 +82,14 @@ class AboutView(TemplateView):
     template_name = 'store/pages/about.html'
 
     def get_context_data(self, **kwargs):
-        # context = {}
-        context = {'popular_products': Product.objects.all()}
+        context = {}
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
-class CartView(ListView):
+class CartView(TemplateView):
     model = Cart
     template_name = 'store/pages/cart.html'
 
@@ -109,8 +105,7 @@ class CartView(ListView):
         return context
 
 
-class CheckoutView(LoginRequiredMixin, ListView):
-    model = Cart
+class CheckoutView(LoginRequiredMixin, TemplateView):
     template_name = 'store/pages/checkout.html'
     success_url = '/store/'
 
@@ -122,8 +117,7 @@ class CheckoutView(LoginRequiredMixin, ListView):
         return context
 
 
-class WishListView(LoginRequiredMixin, ListView):
-    model = Wish
+class WishListView(LoginRequiredMixin, TemplateView):
     template_name = 'store/pages/wish_list.html'
     success_url = '/store/'
 
@@ -137,8 +131,7 @@ class WishListView(LoginRequiredMixin, ListView):
         return context
 
 
-class OrdersView(LoginRequiredMixin, ListView):
-    model = Order
+class OrdersView(LoginRequiredMixin, TemplateView):
     template_name = 'store/pages/orders.html'
     success_url = '/store/'
 
@@ -150,9 +143,9 @@ class OrdersView(LoginRequiredMixin, ListView):
         context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
-class OrderDetailView(LoginRequiredMixin, ListView):
-    model = Order
+class OrderDetailView(LoginRequiredMixin, TemplateView):
     template_name = 'store/pages/order_detail.html'
+    success_url = '/store/'
     def get_context_data(self, **kwargs):
         orders = Order.objects.filter(user= self.request.user, ref=self.kwargs['ref'])
         order = None
@@ -167,8 +160,7 @@ class OrderDetailView(LoginRequiredMixin, ListView):
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
-class ProductDetailView(DetailView):
-    model = Product
+class ProductDetailView(TemplateView):
     template_name = 'store/pages/product_detail.html'
     def get_context_data(self, **kwargs):
         product = Product.objects.get(slug=self.kwargs['slug'])
@@ -180,16 +172,13 @@ class ProductDetailView(DetailView):
         return context
 
 
-class ProductsView(ListView):
-    model = Product
-    queryset = Product.objects.all()
+class ProductsView(TemplateView):
     template_name = 'store/pages/products.html'
-    success_url = '/store/'
 
     def get_context_data(self, **kwargs):
         product_list = Product.objects.all().order_by('-created_at')
         page = self.request.GET.get('page')
-        products = paginate(product_list, page, 10)
+        products = paginate(product_list, page, 8)
         context = {'products':products}
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
@@ -197,30 +186,29 @@ class ProductsView(ListView):
         return context
 
 
-class BrandDetailView(DetailView):
-    model = Brand
+class BrandDetailView(TemplateView):
     template_name = 'store/pages/brand_detail.html'
     def get_context_data(self, **kwargs):
         brand = Brand.objects.get(slug=self.kwargs['slug'])
         context = { 'brand': brand }
-        context['popular_brand_products'] = col.popular_brand_products(brand, 6)
-        context['latest_brand_products'] = col.latest_brand_products(brand, 8)
+        # context['popular_brand_products'] = col.popular_brand_products(brand, 8)
+        page = self.request.GET.get('page')
+        brand_products = paginate(brand.products.all().order_by('-created_at'), page, 12)
+        context['brand_products'] = brand_products
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
 
-class StoreView(ListView):
-    model = Product
-    queryset = Product.objects.all()
+class StoreView(TemplateView):
     template_name = 'store/pages/store.html'
     success_url = '/store/'
 
     def get_context_data(self, **kwargs):
-        context = {'popular_products':col.popular_products(6) }
+        context = {}
         context['popular_brands'] = col.popular_brands(4)
-        context['latest_products'] = col.latest_products(6)
+        context['latest_products'] = col.latest_products(8)
         context['categories'] = col.categories(4)
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
@@ -228,17 +216,14 @@ class StoreView(ListView):
         return context
 
 
-class MenStoreView(ListView):
-    model = Product
-    queryset = Product.objects.all()
+class MenStoreView(TemplateView):
     template_name = 'store/pages/men.html'
-    success_url = '/store/'
 
     def get_context_data(self, **kwargs):
-        context = { 'popular_products': col.popular_men_products(6) }
+        context = {}
         product_list = Product.objects.filter(gender__in=['male', 'unisex'])
         page = self.request.GET.get('page')
-        products = paginate(product_list, page, 10)
+        products = paginate(product_list, page, 8)
         context['categories'] = col.categories()
         context['cart_count'] = len(get_cart(self.request))
         context['products'] = products
@@ -247,17 +232,14 @@ class MenStoreView(ListView):
         return context
 
 
-class WomenStoreView(ListView):
-    model = Product
-    queryset = Product.objects.all()
+class WomenStoreView(TemplateView):
     template_name = 'store/pages/women.html'
-    success_url = '/store/'
 
     def get_context_data(self, **kwargs):
-        context = { 'popular_products': col.popular_women_products(6) }
+        context = {}
         product_list = Product.objects.filter(gender__in=['female', 'unisex'])
         page = self.request.GET.get('page')
-        products = paginate(product_list, page, 10)
+        products = paginate(product_list, page, 8)
         context['categories'] = col.categories()
         context['cart_count'] = len(get_cart(self.request))
         context['products'] = products
@@ -266,8 +248,7 @@ class WomenStoreView(ListView):
         return context
 
 
-class ProfileView(LoginRequiredMixin, ListView):
-    model = get_user_model()
+class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'store/pages/profile.html'
     success_url = '/store/'
 
@@ -295,16 +276,13 @@ class ProfileView(LoginRequiredMixin, ListView):
         return context
 
 
-class CategoryView(ListView):
-    model = Product
-    queryset = Product.objects.all()
+class CategoryView(TemplateView):
     template_name = 'store/pages/category.html'
     success_url = '/store/'
 
     def get_context_data(self, **kwargs):
-        context = {'popular_products':col.popular_products(6) }
-        context['popular_brands'] = col.popular_brands(4)
-        context['latest_products'] = col.latest_products(6)
+        context = {'popular_products':col.popular_products(8) }
+        context['latest_products'] = col.latest_products(8)
         context['categories'] = col.categories(4)
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
@@ -312,8 +290,7 @@ class CategoryView(ListView):
         return context
 
 
-class ShippingAddressesView(LoginRequiredMixin, ListView):
-    model = ShippingAddress
+class ShippingAddressesView(LoginRequiredMixin, TemplateView):
     template_name = 'store/pages/shipping_address_list.html'
     success_url = '/store/'
 
@@ -325,8 +302,7 @@ class ShippingAddressesView(LoginRequiredMixin, ListView):
         return context
 
 
-class NewShippingAddressView(LoginRequiredMixin, ListView):
-    model = ShippingAddress
+class NewShippingAddressView(LoginRequiredMixin, TemplateView):
     template_name = 'store/pages/new_shipping_address.html'
     success_url = '/store/'
 
@@ -365,8 +341,7 @@ class NewShippingAddressView(LoginRequiredMixin, ListView):
         return context
 
 
-class ShippingAddressDetailView(LoginRequiredMixin, ListView):
-    model = ShippingAddress
+class ShippingAddressDetailView(LoginRequiredMixin, TemplateView):
     template_name = 'store/pages/shipping_address_detail.html'
     success_url = '/store/'
 

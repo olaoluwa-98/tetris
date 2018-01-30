@@ -83,11 +83,21 @@ div.text-white p{
   color: white;
 }
 
-
 .box {
   border-radius: 0px;
 }
 
+.product-box {
+  /*background-color: red;*/
+}
+
+.product-box:hover {
+  box-shadow: -1px 1px 15px 0px #a59c9c;
+}
+
+.image {
+  border: solid 1px #e2cfcf
+}
 
 a {
   text-decoration: none;

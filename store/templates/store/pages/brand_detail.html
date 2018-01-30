@@ -36,143 +36,51 @@
             </div>
           </article>
       </div>
-</div>
+  </div>
     <div class="column">
       <section class="section">
-        <h1 class="title has-text-centered">Popular Products from {{brand.name}}</h1>
-        {% load tetris %}
-        {% load humanize %}
-        {% if popular_brand_products %}
-        {% for product in popular_brand_products %} {% if forloop.counter|divisibleby:2 %} {% else%}
-                <div class="tile is-ancestor">
-                    {% endif %}
-                    <div class="tile is-parent">
-                        <article class="tile is-child box">
-                            <figure class="image is-3by2">
-                                <a href="{{ product.get_absolute_url }}"><img src="{{ MEDIA_URL }}{{ product.product_images.all.0.product_image_url }}"></a>
-                            </figure>
-                            <p class="title"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></p>
-                            <p class="subtitle">
-                                <span class="icon">
-                        <i class="fa fa-user-circle"></i>
-                      </span><a href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a><br>
-                      {% if request.user.is_authenticated %}
-                      {% if product.id|product_wished:user %}
-                        <span class="icon" style="cursor: pointer; color:red;" onclick="remove_from_wish_list({{ product.id }})" id="remove_from_wish_list_{{product.id}}">
-                        <i class="fa fa-heart"></i>
-                        </span>
-                      {% else %}
-                      <span class="icon" style="cursor: pointer;" onclick="add_to_wish_list({{ product.id }})" id="add_to_wish_list_{{product.id}}">
-                        <i class="fa fa-heart"></i>
-                       </span>
-                       {% endif %}
-                      {% else %}
-
-                      {% endif %}
-                    <!-- {{ product.wishes.count }} -->
-                    {% if product.id|product_carted:request %}
-                    <span class="icon" style="cursor: pointer; color:red;" onclick="remove_from_cart({{ product.id }})" id="remove_from_cart_{{product.id}}">
-                    <i class="fa fa-shopping-cart"></i>
-                  </span>
-                    {% else %}
-                    <span class="icon" style="cursor: pointer;" onclick="add_to_cart({{ product.id }})" id="add_to_cart_{{product.id}}">
-                    <i class="fa fa-shopping-cart"></i>
-                  </span>
-                    {% endif %}
-                    <!-- {{ product.cart.count }}<br> -->
-                    ₦{{ product.price_per_unit | intcomma}}
-                      {% if product.quantity < 10 %} <span class="icon" title="currently {{ product.quantity }}">
-                        <i class="fa fa-arrow-down"></i>
-                        </span> Low in stock
-                        {% endif %}
-                        </article>
-                    </div>
-                    {% if forloop.counter|divisibleby:2 %}
-                </div>
-                {% endif %} {% endfor %} {% else %}
-                <div class="tile is-ancestor">
-                    <div class="tile is-parent">
-                        <article class="tile is-child box">
-                            <p class="title">Hello World</p>
-                            <p class="subtitle">What is up?</p>
-                        </article>
-                    </div>
-                    <div class="tile is-parent">
-                        <article class="tile is-child box">
-                            <p class="title">Foo</p>
-                            <p class="subtitle">Bar</p>
-                        </article>
-                    </div>
-                </div>
-                {% endif %}
-      </section>
-
-      <section class="section">
-          <h1 class="title has-text-centered">Latest Products from {{brand.name}}</h1>
-          {% if latest_brand_products %}
-          {% for product in latest_brand_products %} {% if forloop.counter|divisibleby:2 %} {% else%}
-                  <div class="tile is-ancestor">
-                      {% endif %}
-                      <div class="tile is-parent">
-                          <article class="tile is-child box">
-                              <figure class="image is-3by2">
-                                  <a href="{{ product.get_absolute_url }}"><img src="{{ MEDIA_URL }}{{ product.product_images.all.0.product_image_url }}"></a>
-                              </figure>
-                              <p class="title"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></p>
-                              <p class="subtitle">
-                                  <span class="icon">
-                          <i class="fa fa-user-circle"></i>
-                        </span><a href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a><br>
-                        {% if request.user.is_authenticated %}
-                        {% if product.id|product_wished:user %}
-                          <span class="icon" style="cursor: pointer; color:red;" onclick="remove_from_wish_list({{ product.id }})" id="remove_from_wish_list_{{product.id}}">
-                          <i class="fa fa-heart"></i>
-                          </span>
-                        {% else %}
-                        <span class="icon" style="cursor: pointer;" onclick="add_to_wish_list({{ product.id }})" id="add_to_wish_list_{{product.id}}">
-                          <i class="fa fa-heart"></i>
-                         </span>
-                         {% endif %}
-                        {% else %}
-
-                        {% endif %}
-                      <!-- {{ product.wishes.count }} -->
-                      {% if product.id|product_carted:request %}
-                      <span class="icon" style="cursor: pointer; color:red;" onclick="remove_from_cart({{ product.id }})" id="remove_from_cart_{{product.id}}">
-                      <i class="fa fa-shopping-cart"></i>
-                    </span>
-                      {% else %}
-                      <span class="icon" style="cursor: pointer;" onclick="add_to_cart({{ product.id }})" id="add_to_cart_{{product.id}}">
-                      <i class="fa fa-shopping-cart"></i>
-                    </span>
-                      {% endif %}
-                      <!-- {{ product.cart.count }}<br> -->
-                      ₦{{ product.price_per_unit | intcomma }}
-                        {% if product.quantity < 10 %} <span class="icon" title="currently {{ product.quantity }}">
-                          <i class="fa fa-arrow-down"></i>
-                          </span> Low in stock
-                          {% endif %}
-                          </article>
-                      </div>
-                      {% if forloop.counter|divisibleby:2 %}
-                  </div>
-                  {% endif %} {% endfor %} {% else %}
-                  <div class="tile is-ancestor">
-                      <div class="tile is-parent">
-                          <article class="tile is-child box">
-                              <p class="title">Hello World</p>
-                              <p class="subtitle">What is up?</p>
-                          </article>
-                      </div>
-                      <div class="tile is-parent">
-                          <article class="tile is-child box">
-                              <p class="title">Foo</p>
-                              <p class="subtitle">Bar</p>
-                          </article>
-                      </div>
-                  </div>
+        <div class="container">
+        <h1 class="title has-text-centered">Products from {{brand.name}}</h1>
+        {% load tetris %} {% load humanize %}
+        {% if brand_products %}
+              {% for product in brand_products %}
+                  {% if forloop.counter|add:-1|divisibleby:4 %}
+                    <div class="tile is-ancestor">
                   {% endif %}
-        </section>
+                    {% include 'store/partials/product.html' %}
+                  {% if forloop.counter|divisibleby:4 %}
+                    </div>
+                  {% endif %}
+              {% endfor %}
+        {% else %}
+          <div class="tile is-parent">
+            <div class="tile is-child box">
+              <p class="title has-text-centered" >Unfortunately, there's no product in stock </p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <nav class="pagination is-centered" role="navigation" aria-label="pagination" style="margin: 10px">
+          {% if products.has_previous %}
+            <a class="pagination-previous" href="?page={{ products.previous_page_number }}">Previous</a>
+          {% endif %}
+          {% if products.has_next %}
+            <a class="pagination-next" href="?page={{ products.next_page_number }}">Next page</a>
+
+          {%  endif %}
+        <ul class="pagination-list">
+          <li><a class="pagination-link" aria-label="Goto page 1" href="?page=1">First Page</a></li>
+
+          <li><span class="pagination-ellipsis">&hellip;</span></li>
+          <li>
+              <a class="pagination-link is-dark" aria-label="Page 46" aria-current="page">{{ products.number }}</a>
+          </li>
+          <li><span class="pagination-ellipsis">&hellip;</span></li>
+
+          <li><a class="pagination-link" aria-label="Goto page 86" href="?page={{ products.paginator.num_pages }}">Last Page</a></li>
+        </ul>
+      </nav>
       </section>
     </div>
   </div>
