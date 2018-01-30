@@ -16,17 +16,25 @@ from .addresses import STATES
 col = Collections()
 
 def get_cart(request):
-    # request.session['cart_item_ids'] = ''
     # import pdb; pdb.set_trace()
+    # request.session['cart_item_ids'] = ''
     if request.session.get('cart_item_ids'):
         product_ids = []
-        cart = request.session['cart_item_ids'].split('-')[1:]
         real_cart = []
-        for x in range(0, len(cart)):
-            product_id = cart[x][0]
-            qty = cart[x][2:]
-            real_cart.append(Cart(product_id=product_id,quantity=qty))
-            product_ids.append(product_id)
+        try:
+            cart = request.session['cart_item_ids'].split('-')[:-1]
+            for x in range(0, len(cart)):
+                product_id_index = cart[x].find('x')
+                product_id = cart[x][0:product_id_index]
+                qty = cart[x][product_id_index+1:]
+                real_cart.append(Cart(product_id=product_id,quantity=qty))
+                product_ids.append(product_id)
+        # except Exception as e:
+        #     raise
+        except:
+            product_ids = []
+            request.session['cart_item_ids'] = ''
+            real_cart = []
         if request.user.is_authenticated:
             remaining_cart = request.user.cart.exclude(product_id__in=product_ids)
             real_cart += list(remaining_cart)
@@ -435,13 +443,13 @@ def handle_login(request):
         if user is not None:
             login(request, user)
             if request.session.get('cart_item_ids'):
-                cart = request.session['cart_item_ids'].split('-')[1:]
+                cart = request.session['cart_item_ids'].split('-')[:-1]
                 for x in range(0, len(cart)):
-                    product_id = cart[x][0]
-                    qty = cart[x][2:]
+                    product_id_index = cart[x].find('x')
+                    product_id = cart[x][0:product_id_index]
+                    qty = cart[x][product_id_index+1:]
                     cart_item = Cart(user=user, product_id=product_id,quantity=qty)
                     cart_item.save()
-            request.session['cart_item_ids'] = ''
             return redirect(request.POST['redirect_url'])
     context = {'form': form}
     context['cart_count'] = len(get_cart(request))
@@ -455,7 +463,6 @@ def handle_register(request):
     if form.is_valid():
         username = form.cleaned_data['username'].lower()
         email = form.cleaned_data['email'].lower()
-
         user = user = get_user_model()(username=username, email=email)
         user.set_password(form.cleaned_data['password'])
         user.save()
@@ -463,13 +470,13 @@ def handle_register(request):
         if user is not None:
             login(request, user)
             if request.session.get('cart_item_ids'):
-                cart = request.session['cart_item_ids'].split('-')[1:]
+                cart = request.session['cart_item_ids'].split('-')[:-1]
                 for x in range(0, len(cart)):
-                    product_id = cart[x][0]
-                    qty = cart[x][2:]
+                    product_id_index = cart[x].find('x')
+                    product_id = cart[x][0:product_id_index]
+                    qty = cart[x][product_id_index+1:]
                     cart_item = Cart(user=user, product_id=product_id,quantity=qty)
                     cart_item.save()
-            request.session['cart_item_ids'] = ''
             return redirect(request.POST['redirect_url'])
     context = {'form': form}
     context['cart_count'] = len(get_cart(request))
@@ -485,17 +492,22 @@ def handle_logout(request):
 @csrf_exempt
 def add_to_cart(request):
     if request.session.get('cart_item_ids'):
-        if request.POST['product_id'] + 'x' in request.session.get('cart_item_ids'):
-            product = request.POST['product_id'] + 'x'
-            cart = request.session.get('cart_item_ids')
-            index = cart.find(product)
-            new_qty = int(cart[index + 2]) + int(request.POST['quantity'])
-            request.session['cart_item_ids'] = cart.replace(product + cart[ index + 2], \
-                product + str(new_qty))
+        if request.POST['product_id'] + 'x' not in request.session.get('cart_item_ids'):
+            request.session['cart_item_ids'] += '{0}x{1}-'\
+                .format(request.POST['product_id'], request.POST['quantity'])
         else:
-            request.session['cart_item_ids'] += '-{0}x{1}'.format(request.POST['product_id'], request.POST['quantity'])
+            # product = request.POST['product_id'] + 'x'
+            # cart = request.session.get('cart_item_ids')
+            # index = cart.find(product)
+            # ind`
+            # index_stop = cart.find('-', index)
+            # qty = cart[x][product_id_index+1:]
+            # new_qty = int(cart[index + 2]) + int(request.POST['quantity'])
+            # request.session['cart_item_ids'] = cart.replace(cart[index:index_stop], \
+            #     product + str(new_qty))
+            pass
     else:
-        request.session['cart_item_ids'] = '-{0}x{1}'.format(request.POST['product_id'], request.POST['quantity'])
+        request.session['cart_item_ids'] = '{0}x{1}-'.format(request.POST['product_id'], request.POST['quantity'])
     if request.user.is_authenticated:
         cart_item = Cart(user=request.user, product_id=request.POST['product_id'], quantity=request.POST['quantity'])
         cart_item.save()
@@ -547,19 +559,15 @@ def remove_from_cart(request):
         product = request.POST['product_id'] + 'x'
         cart = request.session.get('cart_item_ids')
         index = cart.find(product)
-        index_stop = cart.find('-', index)
-        request.session['cart_item_ids'] = cart.replace(cart[index:index_stop], '')
-
+        if index != -1:
+            index_stop = cart.find('-', index)
+            request.session['cart_item_ids'] = cart.replace(cart[index:index_stop+1], '')
     if request.user.is_authenticated:
         cart_item = Cart.objects.filter(user=request.user, product_id=request.POST['product_id'])
         if cart_item.exists():
             cart_item.delete()
             response = JsonResponse({'status' : 'success', 'msg': 'removed successfully' })
             response.status_code = 200
-            return response
-        else:
-            response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
-            response.status_code = 402
             return response
     response = JsonResponse({'status' : 'success', 'msg': 'removed successfully' })
     response.status_code = 200
@@ -598,9 +606,9 @@ def empty_cart(request):
     if request.session.get('cart_item_ids'):
         request.session['cart_item_ids'] = ''
     if request.user.is_authenticated:
-        carts = Cart.objects.filter(user=request.user)
+        cart = Cart.objects.filter(user=request.user)
         if cart.exists():
-            carts.delete()
+            cart.delete()
         response = JsonResponse({'status' : 'success', 'msg': 'cart emptied' })
         response.status_code = 200
         return response

@@ -9,17 +9,15 @@
 
 <section class="section">
   <div class="container">
-    {% load tetris %} {% load humanize %}
     {% if popular_products %}
+    <div class="tile is-ancestor">
       {% for product in popular_products %}
-          {% if forloop.counter|divisibleby:4 %}
-          {% else %}
-          <div class="tile is-ancestor">
-          {% endif %}
-          {% include 'store/partials/product.html' %}
-          {% if forloop.counter|divisibleby:4 %}
-          {% else %}
+          {% if forloop.counter0|divisibleby:5 %}
           </div>
+          {% endif %}
+            {% include 'store/partials/product.html' %}
+          {% if forloop.counter0|divisibleby:5 %}
+          <div class="tile is-ancestor">
           {% endif %}
       {% endfor %}
     {% else %}
