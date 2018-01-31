@@ -7,6 +7,7 @@ from django.utils.crypto import get_random_string
 from .addresses import STATES
 from autoslug import AutoSlugField
 from django.urls import reverse
+from phonenumber_field.modelfields import PhoneNumberField
 
 # this is for when a user gets deleted from the db
 def get_sentinel_user():
@@ -14,34 +15,27 @@ def get_sentinel_user():
 
 # this returns the location of the uploaded profile picture
 def get_profile_pic_path(instance, filename):
-    return 'profile_pictures/{0}-{1}'.format(instance.user.username, filename)
+    return 'profile_pictures/{}-{}'.format(instance.user.username, filename)
 
 class User(AbstractUser):
+    email = models.EmailField( verbose_name='email address', unique=True)
     is_verified = models.BooleanField(default=False)
-    phone = models.CharField(
-        max_length=15, verbose_name='phone number of the user',
+    phone = PhoneNumberField(blank=True, null=True,
         help_text='Please use the following format: <em>+234 XXX XXX XXXX</em>.',
-        blank=True, null=True
-        # validators=[]
     )
     profile_pic_path = models.ImageField(upload_to=get_profile_pic_path, max_length=255)
-    # USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['email', 'is_verified', 'phone']
-
-    def full_name(self):
-        return '{0} {1}'.format(self.first_name, self.last_name)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
-        return '{0} {1} (@{2})'.format(self.first_name, self.last_name, self.username)
+        return '{} {} (@{})'.format(self.first_name, self.last_name, self.username)
 
 
 class Brand(models.Model):
-    name = models.CharField( max_length=40, unique=True, verbose_name='name of the brand' )
+    name = models.CharField(max_length=40, unique=True, verbose_name='name of the brand' )
     email = models.EmailField( max_length=50, verbose_name='email address of the brand')
-    phone = models.CharField(
-        max_length=15, verbose_name='phone number of the brand',
-    	help_text='Please use the following format: <em>+234 XXX XXX XXXX</em>.',
-    	# validators=[]
+    phone = PhoneNumberField(blank=True, null=True,
+        help_text='Please use the following format: <em>+234 XXX XXX XXXX</em>.',
     )
     desc = models.CharField(max_length=255, verbose_name='description of brand', blank=True, null=True)
     brand_image_url = models.ImageField(upload_to='img/brands/', max_length=255, blank=True, null=True)
@@ -72,7 +66,7 @@ class Brand(models.Model):
         return ProductImage.objects.filter(product__in=products[:3])
 
     def __str__(self):
-        return '{0} ({1})'.format(self.name, self.email)
+        return '{} ({})'.format(self.name, self.email)
 
     class Meta:
         get_latest_by = 'created_at'
@@ -98,7 +92,7 @@ class ShippingAddress(models.Model):
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date shipping address details were updated last' )
 
     def __str__(self):
-        return '{0}, {1}. ({2})'.format(self.city, self.state, self.user.username)
+        return '{}, {}. ({})'.format(self.city, self.state, self.user.username)
 
     class Meta:
         verbose_name_plural = 'Shipping Addresses'
@@ -106,7 +100,7 @@ class ShippingAddress(models.Model):
         ordering  = ['user_id',]
 
 class ProductCategory(models.Model):
-    name = models.CharField(max_length=30, verbose_name='name of category')
+    name = models.CharField(max_length=30, unique=True, verbose_name='name of category')
     CAT_TYPES = (
         ('top', 'Top'),
         ('bottom', 'Bottom'),
@@ -130,7 +124,7 @@ class ProductCategory(models.Model):
         return reverse('store:category', kwargs={'slug': self.slug})
 
     def __str__(self):
-        return '{0} ({1})'.format(self.name, self.cat_type)
+        return '{} ({})'.format(self.name, self.cat_type)
 
     class Meta:
         get_latest_by = 'created_at'
@@ -193,10 +187,10 @@ class Product(models.Model):
     gender = models.CharField(max_length=15, choices=GENDER, verbose_name='gender')
     size = models.CharField(max_length=15, verbose_name='size')
     colour = models.CharField(max_length=15, verbose_name='colour', choices=COLOURS)
-    price_per_unit = models.DecimalField(decimal_places=2, max_digits=17, verbose_name='price in ₦')
+    price_per_unit = models.DecimalField(decimal_places=2, max_digits=17, verbose_name='price (₦)')
     quantity = models.PositiveIntegerField(verbose_name='quantity left')
-    num_deliveries = models.PositiveIntegerField(verbose_name='number of deliveries', default=0)
-    orders_count = models.PositiveIntegerField(verbose_name='number of order', default=0)
+    num_deliveries = models.PositiveIntegerField(verbose_name='deliveries', default=0)
+    orders_count = models.PositiveIntegerField(verbose_name='orders', default=0)
     slug = AutoSlugField(populate_from='name',
         unique=True,
         sep='',
@@ -210,7 +204,7 @@ class Product(models.Model):
         return reverse('store:product', kwargs={'slug': self.slug})
 
     def __str__(self):
-        return '{0}'.format(self.name)
+        return '{}'.format(self.name)
 
     class Meta:
         get_latest_by = 'created_at'
@@ -246,7 +240,7 @@ class Wish(models.Model):
             super(Wish, self).save(*args, **kwargs)
 
     def __str__(self):
-        return '{0} -> {1}'.format(self.user.username, self.product.name)
+        return '{} -> {}'.format(self.user.username, self.product.name)
 
     class Meta:
         get_latest_by = 'created_at'
@@ -292,7 +286,7 @@ class Cart(models.Model):
             super(Cart, self).save(*args, **kwargs)
 
     def __str__(self):
-        return 'x{0} {1} -> {2}'.format(self.quantity, self.user, self.product.name)
+        return 'x{} {} -> {}'.format(self.quantity, self.user, self.product.name)
 
     class Meta:
         get_latest_by = 'created_at'
@@ -358,7 +352,7 @@ class Order(models.Model):
         super(Order, self).save(*args, **kwargs)
 
     def __str__(self):
-        return '{0} ordered {1} [{2}]'.format(self.user.username, self.ref, self.status)
+        return '{} ordered {} [{}]'.format(self.user.username, self.ref, self.status)
 
     class Meta:
         get_latest_by = 'created_at'
@@ -388,7 +382,7 @@ class OrderItem(models.Model):
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date order details were updated last' )
 
     def __str__(self):
-        return 'x{0} {1} [{2}]'.format(self.quantity, self.product.name, self.order.ref)
+        return 'x{} {} [{}]'.format(self.quantity, self.product.name, self.order.ref)
 
     class Meta:
         verbose_name_plural = 'Order Items'
@@ -410,7 +404,7 @@ class ProductImage(models.Model):
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date image was updated last' )
 
     def __str__(self):
-        return '{0}\'s image'.format(self.product.name)
+        return '{}\'s image'.format(self.product.name)
 
     class Meta:
         verbose_name_plural = 'Product Images'

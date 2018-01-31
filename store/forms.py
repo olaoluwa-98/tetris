@@ -8,15 +8,15 @@ from .addresses import STATES
 from .models import *
 
 class LoginForm(forms.Form):
-    username = forms.CharField(label='Username', max_length=30, strip=True)
+    email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
 
     def clean(self, *args, **kwargs):
         cleaned_data = super(LoginForm, self).clean()
-        username = cleaned_data.get('username')
+        email = cleaned_data.get('email')
         password = cleaned_data.get('password')
-        if username and password:
-            user = authenticate(username=username, password=password)
+        if email and password:
+            user = authenticate(username=email, password=password)
             if not user:
                 raise forms.ValidationError("This user does not exist")
             if not user.check_password(password):
@@ -26,7 +26,7 @@ class LoginForm(forms.Form):
         return cleaned_data
     class Meta:
         model = get_user_model()
-        fields = ('username', 'password', )
+        fields = ('email', 'password', )
 
 class RegisterForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -86,7 +86,7 @@ class ProfileForm(forms.Form):
     email = forms.EmailField(label='Email', max_length=60, required=False)
     first_name = forms.CharField(label='First Name', max_length=30, strip=True)
     last_name = forms.CharField(label='Last Name', max_length=30, strip=True)
-    phone = forms.CharField(label='Phone Number', max_length=13, min_length=10, strip=True)
+    phone = forms.CharField(label='Phone Number', strip=True)
 
     def clean(self, *args, **kwargs):
         cleaned_data = super(ProfileForm, self).clean()

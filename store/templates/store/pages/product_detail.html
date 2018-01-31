@@ -34,20 +34,12 @@
 
 <section class="section">
   <div class="columns">
+
     <div class="column"></div>
+
     <div class="column card center-box">
         <div class="card-content">
-          <div class="media">
-            <div class="media-left">
-              <figure class="image is-48x48">
-                <img src="{{ MEDIA_URL }}{{ product.brand.brand_image_url }}" alt="{{ product.name }}">
-              </figure>
-            </div>
-            <div class="media-content">
-              <p class="title is-4">{{ product.name }}</p>
-              <p class="subtitle is-6"><a href="{{ product.brand.get_absolute_url }}">@{{ product.brand.name }}</a></p>
-            </div>
-          </div>
+          <p class="title is-4 has-text-centered">{{ product.name }}</p>
           <div class="card-image">
             {% if product.product_images.all %}
             <!-- Slideshow container -->
@@ -78,13 +70,22 @@
             {% endif %}
 
           </div>
+
           <div class="content">
             {{ product.desc }}
           </div>
           <footer class="card-footer">
           {% load humanize %}
-          <p class="card-footer-item" style="color: green">Price per item:
-          <span style="font-weight: bold"> &nbsp;₦{{ product.price_per_unit | intcomma }}</span></p>
+          <p class="card-footer-item">Price per item:
+          <span style="font-weight: bold;color: green"> &nbsp;₦{{ product.price_per_unit | intcomma }}</span></p>
+          </footer>
+          <footer class="card-footer">
+          <p class="card-footer-item">Brand:<span style="font-weight: bold">
+            &nbsp;<a href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a></span></p>
+          </footer>
+          <footer class="card-footer">
+          <p class="card-footer-item">Category:<span style="font-weight: bold">
+            &nbsp;<a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></span></p>
           </footer>
           <footer class="card-footer">
           <p class="card-footer-item">Gender:<span style="font-weight: bold"> &nbsp;{{ product.gender }}</span></p>
@@ -135,16 +136,32 @@
                   Add to Cart</span>
               </p>
               {% endif %}
-            </p>
           </footer>
         </div>
-
       </div>
-      <!-- {{ related_products }} -->
-    <div class="column">
-    </div>
+
+    <div class="column"></div>
   </div>
 </section>
+
+{% if related_products %}
+<section class="section" style="margin-top: 0px">
+  <div class="container">
+  <h1 class="title has-text-centered">Related Products</h1>
+    {% for product in related_products %}
+        {% if forloop.counter|add:-1|divisibleby:4 %}
+          <div class="tile is-ancestor">
+        {% endif %}
+          {% include 'store/partials/product.html' %}
+        {% if forloop.counter|divisibleby:4 %}
+          </div>
+        {% endif %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+
 {% if product.product_images.all %}
 <script type="text/javascript">
   var slideIndex = 1;

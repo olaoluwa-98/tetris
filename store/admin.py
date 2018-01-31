@@ -14,7 +14,7 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'user__email', 'user__first_name', 'user__last_name']
     ordering = ('-created_at', )
     # date_hierarchy = 'created_at'
-    exclude = ('created_at', 'updated_at', 'ref')
+    readonly_fields = ('created_at', 'updated_at', 'ref')
     actions = ('change_order_status_to_processing', 'cancel_orders')
     inlines = [
         OrderItemInlineAdmin,
@@ -46,16 +46,17 @@ class OrderItemAdmin(admin.ModelAdmin):
     search_fields = ['order__status', 'order__user__email', 'order__user__first_name', 'order__user__last_name']
     ordering = ('-created_at', )
     # date_hierarchy = 'created_at'
-    exclude = ('created_at', 'updated_at',)
+    readonly_fields = ('created_at', 'updated_at',)
 
 
 class ProductImageInlineAdmin(admin.StackedInline):
     model = ProductImage
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'admin', 'gender', 'size', 'colour', 'orders_count', 'num_deliveries', 'quantity', 'price_per_unit', 'created_at')
+    list_display = ('name', 'admin', 'gender', 'brand', 'size', 'colour', 'orders_count', 'num_deliveries', 'quantity', 'price_per_unit', 'created_at')
     list_filter = ('gender', 'size', 'colour',)
     search_fields = ('name', 'gender', 'size', 'colour', 'category__name', 'brand__name')
+    readonly_fields = ('created_at', 'updated_at', 'orders_count', 'num_deliveries')
     ordering = ('-created_at', )
     inlines = [
         ProductImageInlineAdmin,
@@ -66,7 +67,6 @@ class ShippingAddressAdmin(admin.ModelAdmin):
     list_filter = ('state', )
     search_fields = ('zip_code', 'address', 'city', 'state', 'user__username', 'user__email')
     ordering = ('-created_at', )
-
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Product, ProductAdmin)

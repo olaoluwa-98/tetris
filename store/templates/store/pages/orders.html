@@ -80,8 +80,8 @@
                             	</span>
                             	{% endif %}
                                 {% if order.status == 'processing' or order.status == 'pending' %}
-                        		<a class="button is-small is-dark" style="float: right;" >cancel</a>
-                        		<a class="button is-small is-success" style="float: right;" >confirm delivery</a>
+                        		<a href="{{ order.get_absolute_url}}" class="button is-small is-dark" style="float: right;" >cancel</a>
+                        		<a href="{{ order.get_absolute_url}}" class="button is-small is-success" style="float: right;" >confirm delivery</a>
                                 {% endif %}
                                 {% if order.status == 'cancelled' %}
                                 <a class="button is-small is-success" href="{{ order.get_absolute_url}}"

@@ -109,10 +109,10 @@ a:hover {
 }
 
 .shop-tetris-text {
-  background-color: white;
+  background-color: black;
   border-radius: 5px;
   padding: 5px;
-  color: black;
+  color: white;
   font-size: 2em;
 }
 

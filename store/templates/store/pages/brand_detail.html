@@ -13,99 +13,92 @@
 {% block content %}
   {% include 'store/header.html' %}
 
-
-<section class="section">
-<div class="container">
+<section class="section" style="padding-top: 20px">
+  <p class="title has-text-centered">{{ brand.name }} brand</p>
 <!-- Slideshow container -->
   <div class="slideshow-container">
     <!-- Full-width images with number and caption text -->
-    jxfnj
     {% for img in brand.random_product_images %}
     <div class="mySlides fade">
       <div class="numbertext">{{ forloop.counter}} / {{ brand.random_product_images.count}}</div>
-      <a href="{{ img.product.get_absolute_url }}"><img src="{{ MEDIA_URL }}{{ img.product_image_url}}" style="width:100%"></a>
-      <div class="text">{{ brand.name }}</div>
+      <a href="{{ img.product.get_absolute_url }}">
+        <figure class="image is-2by1">
+        <img src="{{ MEDIA_URL }}{{ img.product_image_url}}" style="width:100%;height: 80%">
+        </figure>
+      </a>
+      <div class="text" style="font-size:2em;color: black">{{ img.product.name }}</div>
     </div>
     {% endfor %}
     <!-- Next and previous buttons -->
     <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
     <a class="next" onclick="plusSlides(1)">&#10095;</a>
   </div>
-</div>
+  <div class="box">
+    <article class="media">
+    <div class="media-content">
+      <div class="content has-text-centered">
+        <span>Email: </span><small>{{ brand.email }}</small>
+        <br><span>Phone: </span><small style="font-weight: bold">{{ brand.phone }}</small>
+        <br><span>About: </span><small style="font-weight: bold">{{ brand.desc }}</small>
+        <br><span class="icon">
+          <i class="fa fa-heart"></i>{{brand.get_wishes.count}}
+         </span>
+         <span class="icon">
+          <i class="fa fa-shopping-cart"></i>{{brand.get_carts.count}}
+         </span>
+         <span class="icon">
+          <i class="fa fa-ship"></i>{{brand.get_orders.count}}
+         </span>
+      </div>
+      </div>
+    </article>
+  </div>
 </section>
 
-
-<!-- <div class="columns" style="margin: 10px"> -->
-  <div class="column is-one-quarter">
-      <div class="box">
-          <article class="media">
-            <div class="media-content">
-                <div class="content">
-                    <p style="text-align: center;"><strong>{{ brand.name }}</strong></p>
-                    <span>Email: </span><small>{{ brand.email }}</small>
-                    <br><span>Phone: </span><small style="font-weight: bold">{{ brand.phone }}</small>
-                    <br><span>About: </span><small style="font-weight: bold">{{ brand.desc }}</small>
-                    <br><span class="icon">
-                      <i class="fa fa-heart"></i>{{brand.get_wishes.count}}
-                     </span>
-                     <span class="icon">
-                      <i class="fa fa-shopping-cart"></i>{{brand.get_carts.count}}
-                     </span>
-                     <span class="icon">
-                      <i class="fa fa-ship"></i>{{brand.get_orders.count}}
-                     </span>
-                </div>
-            </div>
-          </article>
+<section class="section">
+  <div class="container">
+  <h1 class="title has-text-centered">Products from {{brand.name}} brand</h1>
+  {% load tetris %} {% load humanize %}
+  {% if brand_products %}
+        {% for product in brand_products %}
+            {% if forloop.counter|add:-1|divisibleby:4 %}
+              <div class="tile is-ancestor">
+            {% endif %}
+              {% include 'store/partials/product.html' %}
+            {% if forloop.counter|divisibleby:4 %}
+              </div>
+            {% endif %}
+        {% endfor %}
+  {% else %}
+    <div class="tile is-parent">
+      <div class="tile is-child box">
+        <p class="title has-text-centered" >Unfortunately, there's no product in stock </p>
       </div>
-  </div>
-    <div class="column">
-      <section class="section">
-        <div class="container">
-        <h1 class="title has-text-centered">Products from {{brand.name}}</h1>
-        {% load tetris %} {% load humanize %}
-        {% if brand_products %}
-              {% for product in brand_products %}
-                  {% if forloop.counter|add:-1|divisibleby:4 %}
-                    <div class="tile is-ancestor">
-                  {% endif %}
-                    {% include 'store/partials/product.html' %}
-                  {% if forloop.counter|divisibleby:4 %}
-                    </div>
-                  {% endif %}
-              {% endfor %}
-        {% else %}
-          <div class="tile is-parent">
-            <div class="tile is-child box">
-              <p class="title has-text-centered" >Unfortunately, there's no product in stock </p>
-            </div>
-          </div>
-        {% endif %}
-      </div>
-
-      <nav class="pagination is-centered" role="navigation" aria-label="pagination" style="margin: 10px">
-          {% if products.has_previous %}
-            <a class="pagination-previous" href="?page={{ products.previous_page_number }}">Previous</a>
-          {% endif %}
-          {% if products.has_next %}
-            <a class="pagination-next" href="?page={{ products.next_page_number }}">Next page</a>
-
-          {%  endif %}
-        <ul class="pagination-list">
-          <li><a class="pagination-link" aria-label="Goto page 1" href="?page=1">First Page</a></li>
-
-          <li><span class="pagination-ellipsis">&hellip;</span></li>
-          <li>
-              <a class="pagination-link is-dark" aria-label="Page 46" aria-current="page">{{ products.number }}</a>
-          </li>
-          <li><span class="pagination-ellipsis">&hellip;</span></li>
-
-          <li><a class="pagination-link" aria-label="Goto page 86" href="?page={{ products.paginator.num_pages }}">Last Page</a></li>
-        </ul>
-      </nav>
-      </section>
     </div>
-  </div>
+  {% endif %}
+</div>
+
+<nav class="pagination is-centered" role="navigation" aria-label="pagination" style="margin: 10px">
+    {% if products.has_previous %}
+      <a class="pagination-previous" href="?page={{ products.previous_page_number }}">Previous</a>
+    {% endif %}
+    {% if products.has_next %}
+      <a class="pagination-next" href="?page={{ products.next_page_number }}">Next page</a>
+
+    {%  endif %}
+  <ul class="pagination-list">
+    <li><a class="pagination-link" aria-label="Goto page 1" href="?page=1">First Page</a></li>
+
+    <li><span class="pagination-ellipsis">&hellip;</span></li>
+    <li>
+        <a class="pagination-link is-dark" aria-label="Page 46" aria-current="page">{{ products.number }}</a>
+    </li>
+    <li><span class="pagination-ellipsis">&hellip;</span></li>
+
+    <li><a class="pagination-link" aria-label="Goto page 86" href="?page={{ products.paginator.num_pages }}">Last Page</a></li>
+  </ul>
+</nav>
+</section>
 
 {% if brand.random_product_images %}
   <script type="text/javascript">

@@ -43,7 +43,7 @@
       <div class="field">
         <label class="label">Username</label>
         <div class="control has-icons-left has-icons-right">
-          <input class="input {% if form.username.errors %}is-dark{% endif %} is-medium" type="text" name="username" placeholder="username"
+          <input class="input {% if form.username.errors %}is-danger{% endif %} is-medium" type="text" name="username" placeholder="username"
           required value="{% if form.username.value %}{{ form.username.value }}{% endif %}">
           <span class="icon is-small is-left">
             <i class="fa fa-user"></i>
@@ -55,7 +55,7 @@
           {% endif %}
         </div>
         {% if form.username.errors %}
-            <p class="help is-dark">
+            <p class="help is-danger is-size-6">
           {% for error in form.username.errors %}
                 {{ error }}
           {% endfor %}
@@ -66,7 +66,7 @@
       <div class="field">
         <label class="label">Email</label>
         <div class="control has-icons-left has-icons-right">
-          <input class="input {% if form.email.errors %}is-dark{% endif %} is-medium" type="email" name="email" placeholder="email address"
+          <input class="input {% if form.email.errors %}is-danger{% endif %} is-medium" type="email" name="email" placeholder="email address"
           required value="{% if form.email.value %}{{ form.email.value }}{% endif %}">
           <span class="icon is-small is-left">
             <i class="fa fa-envelope"></i>
@@ -78,7 +78,7 @@
           {% endif %}
         </div>
         {% if form.email.errors %}
-            <p class="help is-dark">
+            <p class="help is-danger is-size-6">
           {% for error in form.email.errors %}
                 {{ error }}
           {% endfor %}
@@ -89,36 +89,26 @@
           <div class="field">
               <label class="label">Password</label>
             <p class="control has-icons-left">
-              <input class="input{% if form.password.errors %}is-dark{% endif %} is-medium" type="password" name="password" placeholder="Password">
+              <input class="input {% if form.password.errors %}is-danger{% endif %} is-medium" type="password" name="password" placeholder="Password">
               <span class="icon is-small is-left">
                 <i class="fa fa-lock"></i>
               </span>
             </p>
             {% if form.password.errors %}
-            <p class="help is-dark">
-          {% for error in form.password.errors %}
-                {{ error }}
-          {% endfor %}
-                </p>
-        {% endif %}
+            <p class="help is-danger is-size-6">
+            {% for error in form.password.errors %}
+                  {{ error }}
+            {% endfor %}
+                  </p>
+          {% endif %}
           </div>
           {% if form.non_field_errors %}
-            <p class="help is-dark">
+            <p class="help is-danger is-size-6">
             {% for error in form.non_field_errors %}
                   {{ error }}
             {% endfor %}
                   </p>
           {% endif %}
-
-          <!-- <div class="field is-grouped is-grouped-centered">
-            <div class="control">
-              <label class="checkbox">
-                <input type="checkbox" name="terms">
-                I agree to the <a href="#">terms and conditions</a>
-              </label>
-            </div>
-          </div> -->
-
           <div class="field is-grouped is-grouped-centered">
             <p class="control">
               <a href="{% url 'store:login' %}">Registered?</a>

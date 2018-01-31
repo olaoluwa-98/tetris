@@ -1,6 +1,6 @@
 {% extends 'store/base.html' %}
 {% block title %}
- {{ request.user.full_name }}'s Order ({{ order.ref }}) | Tetris Clothing Store
+ {{ request.user.get_full_name }}'s Order ({{ order.ref }}) | Tetris Clothing Store
  {% endblock %}
  {% load static %}
  {% block extra_css %}
@@ -108,12 +108,12 @@
                 {% if order.status == 'processing' or order.status == 'pending' %}
                 <div class="field is-grouped is-grouped-centered">
                     <p class="control">
-                        <a class="button is-dark" id="cancel_order_{{order.id}}" onclick="cancel_order({{order.id}})">
+                        <a class="button is-light" id="showModal">
                           Cancel This Order
                         </a>
                     </p>
                     <p class="control">
-                        <a class="button is-success" id="cancel_order_{{order.id}}" onclick="cancel_order({{order.id}})">
+                        <a class="button is-dark">
                           Confirm Delivery
                         </a>
                     </p>
@@ -123,7 +123,7 @@
                 <div class="field is-grouped is-grouped-centered">
                     <p class="control">
                         <a class="button is-light">
-                          This order was cancelled by {{ order.canceller.full_name }}
+                          This order was cancelled by {{ order.canceller.get_full_name }}
                         </a><br>
                         Reason: <span style="font-weight: bold;">{{ order.reason_cancelled }}</span>
                     </p>
@@ -164,4 +164,21 @@
         <div class="column"></div>
     </div>
 </section>
+
+<div class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Why do you want to cancel this order?</p>
+      <button class="delete modal-close" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <textarea cols="80" rows="4"></textarea>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-dark" id="cancel_order_{{ order.ref }}" onclick="cancel_order({{ order.ref }})">Send</button>
+      <button class="button close-modal">Cancel</button>
+    </footer>
+  </div>
+</div>
 {% endblock %}

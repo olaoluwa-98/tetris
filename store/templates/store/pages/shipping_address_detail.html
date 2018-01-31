@@ -53,11 +53,11 @@
 		  	    <div class="field">
 		  	    	<label class="label">Zip Code</label>
 		  	      <p class="control is-expanded">
-		  	        <input class="input {% if form.zip_code.errors %}is-dark{% endif %}" type="text" name="zip_code" placeholder="Zip Code"
+		  	        <input class="input {% if form.zip_code.errors %}is-danger{% endif %}" type="text" name="zip_code" placeholder="Zip Code"
 		  	        value="{% if form.zip_code.value %}{{ form.zip_code.value }}{% else %} {{shipping_address.zip_code}}{% endif %}">
 		  	      </p>
   			    {% if form.zip_code.errors %}
-    			    <p class="help is-dark">
+    			    <p class="help is-danger is-size-6">
 			      {% for error in form.zip_code.errors %}
                   {{ error }}
 			      {% endfor %}
@@ -70,7 +70,7 @@
 		  	   	{% if shipping_address.is_default == True %}checked{% endif %}>
                 Make this your default address
               	{% if form.is_default.errors %}
-	  			    <p class="help is-dark">
+	  			    <p class="help is-danger is-size-6">
 			      {% for error in form.is_default.errors %}
 	                {{ error }}
 			      {% endfor %}
@@ -86,7 +86,7 @@
 	    	    	<div class="label">Address</div>
 	    	      <div class="field">
 	    	        <p class="control is-expanded has-icons-left">
-	    	          <input class="input {% if form.address.errors %}is-dark{% endif %}" type="tel" name="address" placeholder="your address"
+	    	          <input class="input {% if form.address.errors %}is-danger{% endif %}" type="tel" name="address" placeholder="your address"
 	    	          value="{% if form.address.value %}{{ form.address.value }}{% else %}{{shipping_address.address}}{% endif %}" >
 	    	        <span class="icon is-small is-left">
     			        <i class="fa fa-map-marker"></i>
@@ -94,7 +94,7 @@
 	    	        </p>
 	    	      </div>
 	    	      {% if form.address.errors %}
-	  			    <p class="help is-dark">
+	  			    <p class="help is-danger is-size-6">
 			      {% for error in form.address.errors %}
 	                {{ error }}
 			      {% endfor %}
@@ -109,14 +109,14 @@
 	    	    <div class="field">
     			    <label class="label">City</label>
     			    <div class="control has-icons-left has-icons-right">
-    			      <input class="input {% if form.city.errors %}is-dark{% endif %}" type="text" name="city" placeholder="city"
+    			      <input class="input {% if form.city.errors %}is-danger{% endif %}" type="text" name="city" placeholder="city"
     			      value="{% if form.city.value %}{{ form.city.value }}{% else %} {{shipping_address.city}}{% endif %}">
     			      <span class="icon is-small is-left">
     			        <i class="fa fa-map-marker"></i>
     			      </span>
     			    </div>
 			      {% if form.city.errors %}
-          			<p class="help is-dark">
+          			<p class="help is-danger is-size-6">
     			    {% for error in form.city.errors %}
             	    {{ error }}
     			    {% endfor %}
@@ -128,7 +128,7 @@
     			   <label class="label">State</label>
     			   <div class="control">
     			     <div class="select">
-    			       <select class="{% if form.state.errors %}is-dark{% endif %}" name="state">
+    			       <select class="{% if form.state.errors %}is-danger{% endif %}" name="state">
     			         <option>State</option>
     			         {% for state in states %}
     			         <option value="{{ state.0 }}"
@@ -142,7 +142,7 @@
     			     </div>
     			   </div>
    			      {% if form.state.errors %}
-     	  			    <p class="help is-dark">
+     	  			    <p class="help is-danger is-size-6">
      			      {% for error in form.state.errors %}
      	                {{ error }}
      			      {% endfor %}
@@ -152,7 +152,7 @@
 	    	  </div>
 	    	</div>
 	    	{% if form.non_field_errors %}
-  			    <p class="help is-dark">
+  			    <p class="help is-danger is-size-6">
 		      {% for error in form.non_field_errors %}
                 {{ error }}
 		      {% endfor %}

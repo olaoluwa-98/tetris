@@ -82,7 +82,7 @@ function add_to_cart(product_id){
         if ( add_btn.text().search('Add to Cart') != -1 ) {
           add_btn.text('Remove from Cart');
           add_btn.css('color', '');
-          add_btn.removeClass('is-danger');
+          add_btn.removeClass('is-dark');
           add_btn.addClass('is-light');
         }
         add_btn.removeAttr('disabled');
@@ -110,7 +110,7 @@ function remove_from_cart(product_id){
           remove_btn.text('Add to Cart');
           remove_btn.css('color', '');
           remove_btn.removeClass('is-light');
-          remove_btn.addClass('is-danger');
+          remove_btn.addClass('is-dark');
         }
         $('.cart_item_'+ product_id).css('display', 'none');
         remove_btn.removeAttr('disabled');
@@ -137,7 +137,7 @@ function add_to_wish_list(product_id){
         if ( add_btn.text().search('Add to Wish List') != -1 ) {
           add_btn.text('Remove from Wish List');
           add_btn.css('color', '');
-          add_btn.removeClass('is-danger');
+          add_btn.removeClass('is-dark');
           add_btn.addClass('is-light');
         }
         add_btn.removeAttr('disabled');
@@ -166,7 +166,7 @@ function remove_from_wish_list(product_id){
           remove_btn.text('Add to Wish List');
           remove_btn.css('color', '');
           remove_btn.removeClass('is-light');
-          remove_btn.addClass('is-danger');
+          remove_btn.addClass('is-dark');
         }
         remove_btn.removeAttr('disabled');
       },
@@ -218,6 +218,25 @@ function remove_shipping_address(shipping_id){
       },
       error: function (data) {
         remove_btn.removeAttr('disabled');
+      },
+    });
+}
+
+function cancel_order(order_ref){
+  var cancel_btn = $('#cancel_order_' + order_ref);
+  cancel_btn.attr('disabled', 'disabled');
+  $.ajax({
+      url: '/cancel-order',
+      type: "POST",
+      data: {
+        'order_ref': order_ref,
+      },
+      success: function(data) {
+        // $('.shipping_address_'+ shipping_id).css('display', 'none');
+        cancel_btn.removeAttr('disabled');
+      },
+      error: function (data) {
+        cancel_btn.removeAttr('disabled');
       },
     });
 }

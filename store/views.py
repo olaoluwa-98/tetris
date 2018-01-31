@@ -14,24 +14,21 @@ from .addresses import STATES
 col = Collections()
 
 def get_cart(request):
+    # request.session['cart'] = [{'product_id':1, 'quantity':2}, {'product_id':1, 'quantity':2}]
     # import pdb; pdb.set_trace()
-    # request.session['cart_item_ids'] = ''
-    if request.session.get('cart_item_ids'):
+    if request.session.get('cart'):
         product_ids = []
         real_cart = []
         try:
-            cart = request.session['cart_item_ids'].split('-')[:-1]
-            for x in range(0, len(cart)):
-                product_id_index = cart[x].find('x')
-                product_id = cart[x][0:product_id_index]
-                qty = cart[x][product_id_index+1:]
-                real_cart.append(Cart(product_id=product_id,quantity=qty))
-                product_ids.append(product_id)
+            cart = request.session.get('cart')
+            for cart_item in cart:
+                real_cart.append(Cart(product_id=cart_item['product_id'],quantity=cart_item['quantity']))
+                product_ids.append(cart_item['product_id'])
         # except Exception as e:
         #     raise
         except:
             product_ids = []
-            request.session['cart_item_ids'] = ''
+            request.session['cart'] = ''
             real_cart = []
         if request.user.is_authenticated:
             remaining_cart = request.user.cart.exclude(product_id__in=product_ids)
@@ -345,29 +342,29 @@ class ShippingAddressDetailView(LoginRequiredMixin, TemplateView):
     template_name = 'store/pages/shipping_address_detail.html'
     success_url = '/store/'
 
-    def post(self, request, *args, **kwargs):
-        form = ShippingAddressForm(request.POST or None)
-        context = {}
-        context['cart_count'] = len(get_cart(self.request))
-        context['wish_list_count'] = self.request.user.wishes.count()
-        context['states'] = STATES
-        if form.is_valid():
-            num = int(self.kwargs['num'])
-            shippings = ShippingAddress.objects.filter(user=request.user, is_default=True)
-            shipping_address = ShippingAddress.objects.filter(user=request.user)[num - 1]
-            if request.POST.get('is_default') and shippings.exists():
-                shippings.update(is_default=False)
-                shipping_address.is_default = True
-            shipping_address.zip_code = form.cleaned_data['zip_code']
-            shipping_address.address = form.cleaned_data['address']
-            shipping_address.city = form.cleaned_data['city']
-            shipping_address.state = form.cleaned_data['state']
-            shipping_address.save()
-            context['shipping_address'] = shipping_address
-            context['success'] = 'Your shipping address has been updated'
-            return render(request, 'store/pages/shipping_address_detail.html', context)
-        context['form'] = form
-        return render(request, 'store/pages/shipping_address_detail.html', context)
+    # def post(self, request, *args, **kwargs):
+    #     form = ShippingAddressForm(request.POST or None)
+    #     context = {}
+    #     context['cart_count'] = len(get_cart(self.request))
+    #     context['wish_list_count'] = self.request.user.wishes.count()
+    #     context['states'] = STATES
+    #     if form.is_valid():
+    #         num = int(self.kwargs['num'])
+    #         shippings = ShippingAddress.objects.filter(user=request.user, is_default=True)
+    #         shipping_address = ShippingAddress.objects.filter(user=request.user)[num - 1]
+    #         if request.POST.get('is_default') and shippings.exists():
+    #             shippings.update(is_default=False)
+    #             shipping_address.is_default = True
+    #         shipping_address.zip_code = form.cleaned_data['zip_code']
+    #         shipping_address.address = form.cleaned_data['address']
+    #         shipping_address.city = form.cleaned_data['city']
+    #         shipping_address.state = form.cleaned_data['state']
+    #         shipping_address.save()
+    #         context['shipping_address'] = shipping_address
+    #         context['success'] = 'Your shipping address has been updated'
+    #         return render(request, 'store/pages/shipping_address_detail.html', context)
+    #     context['form'] = form
+    #     return render(request, 'store/pages/shipping_address_detail.html', context)
 
     def get_context_data(self, **kwargs):
         num = int(self.kwargs['num'])
@@ -404,9 +401,9 @@ def update_shipping_address(request):
         shipping_address.state = form.cleaned_data['state']
         shipping_address.save()
         msg = 'Your shipping address has been updated'
-        return redirect('/shipping-address/{0}/?msg={1}'.format(request.POST['shipping_address_num'], msg))
+        return redirect('/shipping-address/{}/?msg={}'.format(request.POST['shipping_address_num'], msg))
     msg = 'some information you provided is incorrect'
-    return redirect('/shipping-address/{0}/?msg={1}'.format(request.POST['shipping_address_num'], msg))
+    return redirect('/shipping-address/{}/?msg={}'.format(request.POST['shipping_address_num'], msg))
 
 
 def handle_login(request):
@@ -414,16 +411,13 @@ def handle_login(request):
         return redirect('/')
     form = LoginForm(request.POST or None)
     if form.is_valid():
-        user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
+        user = authenticate(username=form.cleaned_data['email'], password=form.cleaned_data['password'])
         if user is not None:
             login(request, user)
-            if request.session.get('cart_item_ids'):
-                cart = request.session['cart_item_ids'].split('-')[:-1]
-                for x in range(0, len(cart)):
-                    product_id_index = cart[x].find('x')
-                    product_id = cart[x][0:product_id_index]
-                    qty = cart[x][product_id_index+1:]
-                    cart_item = Cart(user=user, product_id=product_id,quantity=qty)
+            if request.session.get('cart'):
+                cart = request.session['cart']
+                for cart_item in cart:
+                    cart_item = Cart(user=user, product_id=cart_item['product_id'],quantity=cart_item['quantity'])
                     cart_item.save()
             return redirect(request.POST['redirect_url'])
     context = {'form': form}
@@ -441,16 +435,13 @@ def handle_register(request):
         user = user = get_user_model()(username=username, email=email)
         user.set_password(form.cleaned_data['password'])
         user.save()
-        user = authenticate(username=user.username, password=form.cleaned_data.get('password'))
+        user = authenticate(username=user.email, password=form.cleaned_data.get('password'))
         if user is not None:
             login(request, user)
-            if request.session.get('cart_item_ids'):
-                cart = request.session['cart_item_ids'].split('-')[:-1]
-                for x in range(0, len(cart)):
-                    product_id_index = cart[x].find('x')
-                    product_id = cart[x][0:product_id_index]
-                    qty = cart[x][product_id_index+1:]
-                    cart_item = Cart(user=user, product_id=product_id,quantity=qty)
+            if request.session.get('cart'):
+                cart = request.session['cart']
+                for cart_item in cart:
+                    cart_item = Cart(user=user, product_id=cart_item['product_id'],quantity=cart_item['quantity'])
                     cart_item.save()
             return redirect(request.POST['redirect_url'])
     context = {'form': form}
@@ -466,23 +457,12 @@ def handle_logout(request):
 
 @csrf_exempt
 def add_to_cart(request):
-    if request.session.get('cart_item_ids'):
-        if request.POST['product_id'] + 'x' not in request.session.get('cart_item_ids'):
-            request.session['cart_item_ids'] += '{0}x{1}-'\
-                .format(request.POST['product_id'], request.POST['quantity'])
-        else:
-            # product = request.POST['product_id'] + 'x'
-            # cart = request.session.get('cart_item_ids')
-            # index = cart.find(product)
-            # ind`
-            # index_stop = cart.find('-', index)
-            # qty = cart[x][product_id_index+1:]
-            # new_qty = int(cart[index + 2]) + int(request.POST['quantity'])
-            # request.session['cart_item_ids'] = cart.replace(cart[index:index_stop], \
-            #     product + str(new_qty))
-            pass
+    if request.session.get('cart'):
+        cart = request.session['cart']
+        cart.append({'product_id':request.POST['product_id'], 'quantity':request.POST['quantity']})
+        request.session['cart'] = cart
     else:
-        request.session['cart_item_ids'] = '{0}x{1}-'.format(request.POST['product_id'], request.POST['quantity'])
+        request.session['cart'] = [{'product_id':request.POST['product_id'], 'quantity':request.POST['quantity']}]
     if request.user.is_authenticated:
         cart_item = Cart(user=request.user, product_id=request.POST['product_id'], quantity=request.POST['quantity'])
         cart_item.save()
@@ -500,17 +480,14 @@ def change_cart_item_qty(request):
         response = JsonResponse({'status' : 'error', 'msg': 'quantity less than 0' })
         response.status_code = 402
         return response
-
-    if request.session.get('cart_item_ids') and request.POST['product_id'] \
-        + 'x' in request.session.get('cart_item_ids'):
-
-        product = request.POST['product_id'] + 'x'
-        cart = request.session.get('cart_item_ids')
-        index = cart.find(product)
-        index_stop = cart.find('-', index)
-        request.session['cart_item_ids'] = cart.replace(cart[index:index_stop], \
-            product + request.POST['new_quantity'])
-
+    if request.session.get('cart'):
+        product_id = request.POST['product_id']
+        cart = request.session.get('cart')
+        for cart_item in cart:
+            if cart_item['product_id'] == product_id:
+                cart_item['quantity'] = request.POST['new_quantity']
+                break
+        request.session['cart'] = cart
     if request.user.is_authenticated:
         cart = Cart.objects.filter(user=request.user, product_id=request.POST['product_id'])
         if cart.exists():
@@ -530,13 +507,14 @@ def change_cart_item_qty(request):
 
 @csrf_exempt
 def remove_from_cart(request):
-    if request.session.get('cart_item_ids') and request.POST.get('product_id'):
-        product = request.POST['product_id'] + 'x'
-        cart = request.session.get('cart_item_ids')
-        index = cart.find(product)
-        if index != -1:
-            index_stop = cart.find('-', index)
-            request.session['cart_item_ids'] = cart.replace(cart[index:index_stop+1], '')
+    if request.session.get('cart') and request.POST.get('product_id'):
+        product_id = request.POST['product_id']
+        cart = request.session.get('cart')
+        for cart_item in cart:
+            if cart_item['product_id'] == product_id:
+                cart.remove(cart_item)
+                break
+        request.session['cart'] = cart
     if request.user.is_authenticated and request.POST.get('product_id'):
         cart_item = Cart.objects.filter(user=request.user, product_id=request.POST['product_id'])
         if cart_item.exists():
@@ -578,8 +556,8 @@ def remove_from_wish_list(request):
 
 @csrf_exempt
 def empty_cart(request):
-    if request.session.get('cart_item_ids'):
-        request.session['cart_item_ids'] = ''
+    if request.session.get('cart'):
+        request.session['cart'] = []
     if request.user.is_authenticated:
         cart = Cart.objects.filter(user=request.user)
         if cart.exists():
@@ -626,7 +604,7 @@ def make_purchase(request):
             order_item.save()
         # clear cart
         request.user.cart.all().delete()
-        request.session['cart_item_ids'] = ''
+        request.session['cart'] = []
         response = JsonResponse({'status' : 'success', 'msg': 'order successfully made' })
         response.status_code = 200
         return response
