@@ -482,7 +482,7 @@ def add_to_cart(request):
 def change_cart_item_qty(request):
     if int(request.POST['new_quantity']) < 1:
         response = JsonResponse({'status' : 'error', 'msg': 'quantity less than 0' })
-        response.status_code = 402
+        response.status_code = 422
         return response
     if request.session.get('cart'):
         product_id = request.POST['product_id']
@@ -541,7 +541,7 @@ def add_to_wish_list(request):
         return response
 
     response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
-    response.status_code = 402
+    response.status_code = 422
     return response
 
 @csrf_exempt
@@ -555,7 +555,7 @@ def remove_from_wish_list(request):
         return response
 
     response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
-    response.status_code = 402
+    response.status_code = 422
     return response
 
 @csrf_exempt
@@ -588,7 +588,7 @@ def empty_wish_list(request):
 def make_purchase(request):
     if not request.user.shipping_addresses.filter(is_default=True).exists():
         response = JsonResponse({'status' : 'error', 'msg': 'your default shipping address is not set', 'shipping': True })
-        response.status_code = 402
+        response.status_code = 422
         return response
     cart = get_cart(request)
     if len(cart) > 0:
@@ -614,10 +614,10 @@ def make_purchase(request):
         return response
 
         response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
-        response.status_code = 402
+        response.status_code = 422
         return response
     response = JsonResponse({'status' : 'error', 'msg': 'your cart is empty' })
-    response.status_code = 402
+    response.status_code = 422
     return response
 
 @csrf_exempt
@@ -630,7 +630,7 @@ def remove_shipping_address(request):
         response.status_code = 200
         return response
     response = JsonResponse({'status' : 'error', 'msg': 'you cannot delete this shipping address. An order is shipping to it' })
-    response.status_code = 402
+    response.status_code = 422
     return response
 
 @csrf_exempt
@@ -638,7 +638,7 @@ def remove_shipping_address(request):
 def customer_cancel_order(request):
     if request.POST['reason'] == '':
         response = JsonResponse({'status' : 'error', 'msg': 'Please enter a reason' })
-        response.status_code = 402
+        response.status_code = 422
         return response
     order = Order.objects.filter(ref=request.POST['order_ref'], user=request.user)
     if order.exists():
@@ -651,5 +651,5 @@ def customer_cancel_order(request):
         response.status_code = 200
         return response
     response = JsonResponse({'status' : 'error', 'msg': 'an error occured. please try again later' })
-    response.status_code = 402
+    response.status_code = 422
     return response
