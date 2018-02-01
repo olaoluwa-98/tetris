@@ -62,8 +62,15 @@ class Brand(models.Model):
         return OrderItem.objects.filter(product__brand=self).order_by('-created_at')
 
     def random_product_images(self):
-        products = list(self.products.all())
-        return ProductImage.objects.filter(product__in=products[:3])
+        from django.db.models import Count
+        products = list(self.products.all()[:3])
+        images = []
+        if len(products) > 0:
+            for product in products:
+                images.append(ProductImage.objects.filter(product=product).first())
+            if len(images) > 0:
+                return images
+        return None
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.email)
@@ -216,7 +223,7 @@ class Wish(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='wishes',
-        verbose_name ='User from the user table'
+        verbose_name ='Owner'
     )
     product = models.ForeignKey(
         Product,
@@ -253,7 +260,7 @@ class Cart(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='cart',
-        verbose_name ='User from the user table',
+        verbose_name ='Owner',
         blank=True,
         null=True
     )
@@ -300,7 +307,7 @@ class Order(models.Model):
         blank=True,
         null=True,
         related_name='orders',
-        verbose_name ='customer'
+        verbose_name ='Customer'
     )
     shipping_address = models.ForeignKey(
         ShippingAddress,
@@ -316,10 +323,10 @@ class Order(models.Model):
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled')
     )
-    ref = models.CharField(verbose_name='reference', max_length=100, null=True,
-        help_text='type anything in this field. it\'ll be generated automatically'
+    ref = models.CharField(verbose_name='reference',max_length=100,null=True,blank=True,
+        help_text='this field is generated automatically'
     )
-    reason_cancelled = models.CharField(verbose_name='if cancelled, why?', max_length=100, null=True)
+    reason_cancelled = models.CharField(verbose_name='if order is cancelled, why?',max_length=100,blank=True,null=True)
     canceller = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -331,12 +338,20 @@ class Order(models.Model):
     status = models.CharField(choices=ORDER_STATUS, default='pending', max_length=100,
         verbose_name='status'
     )
-    deliver_date = models.DateTimeField(null=True, verbose_name='date order was delivered'
+    deliver_date = models.DateTimeField(null=True, blank=True,
+        verbose_name='date order was delivered'
     )
     created_at = models.DateTimeField( default=datetime.now(), editable=False,
         verbose_name='date ordered'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date order details were updated last' )
+
+    def subtotal(self):
+        from django.db.models import Sum, F
+        total = self.order_items.aggregate( subtotal=Sum(F('price_per_unit') * F('quantity'), output_field=models.DecimalField()))
+        if total['subtotal']:
+            return total['subtotal']
+        return 0
 
     def get_absolute_url(self):
         return reverse('store:order', kwargs={'ref': self.ref})

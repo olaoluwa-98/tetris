@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^add-to-cart', add_to_cart, name ="add_to_cart"),
     url(r'^add-to-wish-list', add_to_wish_list, name ="add_to_wish_list"),
     url(r'^brand/(?P<slug>[\w-]+)/$', BrandDetailView.as_view(), name='brand'),
+    url(r'^cancel-order', customer_cancel_order, name ="customer_cancel_order"),
     url(r'^cart/$', CartView.as_view(), name='cart'),
     url(r'^category/(?P<slug>[\w-]+)/$', CategoryView.as_view(), name='category'),
     url(r'^checkout/$', CheckoutView.as_view(), name='checkout'),

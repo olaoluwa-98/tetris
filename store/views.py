@@ -146,12 +146,16 @@ class OrderDetailView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         orders = Order.objects.filter(user= self.request.user, ref=self.kwargs['ref'])
         order = None
+        context = {}
         if orders.exists():
             order = orders.first()
-        context = { 'order': order}
-        page = self.request.GET.get('page')
-        order_items = paginate(order.order_items.all(), page, 5)
-        context['order_items'] = order_items
+            context['order'] = order
+            page = self.request.GET.get('page')
+            order_items = paginate(order.order_items.all(), page, 5)
+            # import pdb; pdb.set_trace()
+            if not order_items.object_list.exists():
+                order_items = None
+            context['order_items'] = order_items
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
@@ -620,12 +624,32 @@ def make_purchase(request):
 @login_required(login_url='/login/')
 def remove_shipping_address(request):
     shipping_address = ShippingAddress.objects.filter(user = request.user, pk = request.POST['shipping_id']).first()
-    if not shipping_address.orders.all():
+    if not shipping_address.orders.exists():
         shipping_address.delete()
         response = JsonResponse({'status' : 'success', 'msg': 'removed successfully' })
         response.status_code = 200
         return response
+    response = JsonResponse({'status' : 'error', 'msg': 'you cannot delete this shipping address. An order is shipping to it' })
+    response.status_code = 402
+    return response
 
-    response = JsonResponse({'status' : 'error', 'msg': 'you cannot delete this shipping_address. An order is shipping to it' })
+@csrf_exempt
+@login_required(login_url='/login/')
+def customer_cancel_order(request):
+    if request.POST['reason'] == '':
+        response = JsonResponse({'status' : 'error', 'msg': 'Please enter a reason' })
+        response.status_code = 402
+        return response
+    order = Order.objects.filter(ref=request.POST['order_ref'], user=request.user)
+    if order.exists():
+        order = order.first()
+        order.status = 'cancelled'
+        order.reason_cancelled = request.POST['reason']
+        order.canceller = request.user
+        order.save()
+        response = JsonResponse({'status' : 'error', 'msg': 'Order cancelled successfully' })
+        response.status_code = 200
+        return response
+    response = JsonResponse({'status' : 'error', 'msg': 'an error occured. please try again later' })
     response.status_code = 402
     return response

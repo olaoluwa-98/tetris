@@ -224,16 +224,18 @@ function remove_shipping_address(shipping_id){
 
 function cancel_order(order_ref){
   var cancel_btn = $('#cancel_order_' + order_ref);
+  var cancel_order_reason = $('#cancel_order_reason').val();
   cancel_btn.attr('disabled', 'disabled');
   $.ajax({
       url: '/cancel-order',
       type: "POST",
       data: {
-        'order_ref': order_ref,
+        'order_ref': order_ref, 'reason': cancel_order_reason
       },
       success: function(data) {
-        // $('.shipping_address_'+ shipping_id).css('display', 'none');
         cancel_btn.removeAttr('disabled');
+        $(".modal").removeClass("is-active");
+        window.location.reload();
       },
       error: function (data) {
         cancel_btn.removeAttr('disabled');

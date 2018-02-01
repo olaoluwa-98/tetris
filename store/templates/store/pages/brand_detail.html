@@ -15,6 +15,7 @@
 
 <section class="section" style="padding-top: 20px">
   <p class="title has-text-centered">{{ brand.name }} brand</p>
+  {% if brand.random_product_images %}
 <!-- Slideshow container -->
   <div class="slideshow-container">
     <!-- Full-width images with number and caption text -->
@@ -33,6 +34,7 @@
     <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
     <a class="next" onclick="plusSlides(1)">&#10095;</a>
   </div>
+  {% endif %}
   <div class="box">
     <article class="media">
     <div class="media-content">

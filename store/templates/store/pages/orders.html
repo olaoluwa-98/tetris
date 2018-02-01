@@ -55,7 +55,10 @@
                     <div class="media-content">
                         <div class="content">
                             	{{ forloop.counter}}. <strong><a href="{{ order.get_absolute_url}}">
-                            	{{ order.ref }} ({{order.order_items.count}} products ordered)
+                            	{{ order.ref }} ({{order.order_items.count}} products ordered) -
+                                <span style="font-weight: bold; color: green;">
+                                    ₦{{ order.subtotal }}
+                                </span>
                             	</a></strong>
                             	<span style="float: right;">{{ order.created_at | date:"D d M Y"}} {{ order.created_at | time:"g:i A" }}</span>
                             	<br>
@@ -75,7 +78,7 @@
                             	</span>
                             	{% endif %}
                             	{% if order.status == 'cancelled' %}
-                            	<span style="float: left" class="tag is-danger">
+                            	<span style="float: left" class="tag is-dark">
                             	Cancelled
                             	</span>
                             	{% endif %}
@@ -84,8 +87,12 @@
                         		<a href="{{ order.get_absolute_url}}" class="button is-small is-success" style="float: right;" >confirm delivery</a>
                                 {% endif %}
                                 {% if order.status == 'cancelled' %}
-                                <a class="button is-small is-success" href="{{ order.get_absolute_url}}"
+                                <a class="button is-small is-light" href="{{ order.get_absolute_url}}"
                                 style="float: right;">see cancel reason</a>
+                                {% endif %}
+                                {% if order.status == 'delivered' %}
+                                <a class="button is-small is-light" href="{{ order.get_absolute_url}}"
+                                style="float: right;">see deliver date</a>
                                 {% endif %}
                         </div>
                     </div>
