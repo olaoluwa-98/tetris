@@ -16,15 +16,11 @@
   <div class="container">
   <h1 class="title has-text-centered">All Men Products</h1>
   {% if products %}
+  <div class="columns is-multiline">
       {% for product in products %}
-          {% if forloop.counter|add:-1|divisibleby:4 %}
-            <div class="tile is-ancestor">
-          {% endif %}
-            {% include 'store/partials/product.html' %}
-          {% if forloop.counter|divisibleby:4 %}
-            </div>
-          {% endif %}
+        {% include 'store/partials/product.html' %}
       {% endfor %}
+    </div>
     {% else %}
   <div class="tile is-parent">
     <div class="tile is-child box">

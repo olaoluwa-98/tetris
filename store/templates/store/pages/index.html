@@ -33,15 +33,11 @@
     <div class="container">
         <h1 class="title has-text-centered" style="color: white">Latest Popular Releases</h1>
             {% if popular_products %}
+            <div class="columns is-multiline">
               {% for product in popular_products %}
-                  {% if forloop.counter|add:-1|divisibleby:4 %}
-                    <div class="tile is-ancestor">
-                  {% endif %}
                     {% include 'store/partials/product.html' %}
-                  {% if forloop.counter|divisibleby:4 %}
-                    </div>
-                  {% endif %}
               {% endfor %}
+            </div>
             {% else %}
           <div class="tile is-parent">
             <div class="tile is-child box">
@@ -56,23 +52,11 @@
     <div class="container">
         <h1 class="title has-text-centered">Popular Brands</h1>
         {% if popular_brands %}
+        <div class="columns is-multiline">
         {% for brand in popular_brands %}
-        {% if forloop.counter|add:-1|divisibleby:4 %}
-        <div class="tile is-ancestor">
-        {% endif %}
-        <div class="tile is-parent">
-          <article class="tile is-child box has-text-centered product-box">
-              <figure class="image is-3by2">
-                  <a href="{{ brand.get_absolute_url }}"><img src="{{ MEDIA_URL }}{{ brand.brand_image_url }}"></a>
-              </figure>
-              <a href="{{ brand.get_absolute_url }}">{{ brand.name }}</a>
-          </article>
-        </div>
-        {% if forloop.counter|divisibleby:4 %}
-          </div>
-        {% endif %}
+          {% include 'store/partials/brand.html' %}
         {% endfor %}
-
+        </div>
         {% else %}
         <div class="tile is-ancestor">
             <div class="tile is-parent">
