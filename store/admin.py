@@ -1,8 +1,27 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.core.mail import send_mail
 from .models import *
 
 # admin.site.disable_action('delete_selected')
+
+class ModififedUserAdmin(UserAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'is_verified', 'phone')
+    UserAdmin.list_filter += ('is_verified',)
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phone')}),
+        ('Permissions', {'fields': ('is_verified', 'is_active', 'is_staff', 'is_superuser',
+                                       'groups', 'user_permissions')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    )
+    UserAdmin.add_fieldsets += (
+        ('Personal info', {
+            'classes': ('wide',),
+            'fields': ('email', 'first_name', 'last_name', 'phone', 'is_verified'),
+        }),
+    )
+    # readonly_fields = ('is_verified', )
 
 # register the models so the admin can manipulate them
 class OrderItemInlineAdmin(admin.StackedInline):
@@ -19,7 +38,10 @@ class OrderAdmin(admin.ModelAdmin):
     # date_hierarchy = 'created_at'
     # readonly_fields = ('user', 'ref', 'deliver_date', 'shipping_address', 'created_at', 'updated_at')
     readonly_fields = ('ref',)
-    actions = ('change_order_status_to_processing', 'change_order_status_to_pending', 'cancel_orders')
+    actions = ('change_order_status_to_processing', 'change_order_status_to_pending',
+        'notify_customer_order_is_arriving_today', 'notify_customer_order_is_arriving_tomorrow',
+        'cancel_orders'
+    )
     inlines = [
         OrderItemInlineAdmin,
     ]
@@ -42,6 +64,42 @@ class OrderAdmin(admin.ModelAdmin):
             message_bit = "%s orders' status were" % rows_updated
         self.message_user(request, "%s successfully changed to 'processing'." % message_bit)
 
+    def notify_customer_order_is_arriving_today(self, request, queryset):
+        queryset1 = queryset.exclude(status='cancelled').exclude(status='delivered')
+        for order in queryset1:
+            # send mail to the customers
+            subject = 'Your Order {} Is Arriving Today'.format(order.ref)
+            message = ''
+            from_email = 'noreply@tetris.lol'
+            recipient_list = (order.user.email,)
+            html_message = loader.render_to_string(
+              'emails/notify_user_order_arrival.html', {'order': order, 'day_type': 1},
+            )
+            send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+        if rows_updated == 1:
+            message_bit = "1 order's status was"
+        else:
+            message_bit = "%s orders' status were" % rows_updated
+        self.message_user(request, "%s successfully changed to 'processing'." % message_bit)
+
+    def notify_customer_order_is_arriving_tomorrow(self, request, queryset):
+        queryset1 = queryset.exclude(status='cancelled').exclude(status='delivered')
+        for order in queryset1:
+            # send mail to the customers
+            subject = 'Your Order {} Is Arriving Tomorrow'.format(order.ref)
+            message = ''
+            from_email = 'noreply@tetris.lol'
+            recipient_list = (order.user.email,)
+            html_message = loader.render_to_string(
+              'emails/notify_user_order_arrival.html', {'order': order, 'day_type': 2},
+            )
+            send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+        if rows_updated == 1:
+            message_bit = "1 order's status was"
+        else:
+            message_bit = "%s orders' status were" % rows_updated
+        self.message_user(request, "%s successfully changed to 'processing'." % message_bit)
+
     def cancel_orders(self, request, queryset):
         queryset1 = queryset.exclude(status='cancelled').exclude(status='delivered')
         rows_updated = queryset1.update(status='cancelled')
@@ -54,6 +112,8 @@ class OrderAdmin(admin.ModelAdmin):
     change_order_status_to_processing.short_description = "Change the selected orders' status to 'processing'"
     change_order_status_to_pending.short_description = "Change the selected orders' status to 'pending'"
     cancel_orders.short_description = "Cancel the selected orders"
+    notify_customer_order_is_arriving_today.short_description = "Notify customer that order is arriving today"
+    notify_customer_order_is_arriving_tomorrow.short_description = "Notify customer that order is arriving tomorrow"
 
 
 class OrderItemAdmin(admin.ModelAdmin):
@@ -69,10 +129,11 @@ class ProductImageInlineAdmin(admin.StackedInline):
     model = ProductImage
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'admin', 'gender', 'brand', 'size', 'colour', 'orders_count', 'num_deliveries', 'quantity', 'price_per_unit', 'created_at')
+    list_display = ('name', 'gender', 'brand', 'size', 'colour', 'orders_count', 'num_deliveries', 'quantity', 'price_per_unit', 'created_at')
     list_filter = ('gender', 'size', 'colour', 'brand__name')
     search_fields = ('name', 'gender', 'size', 'colour', 'category__name', 'brand__name', 'price_per_unit')
     # readonly_fields = ('created_at', 'updated_at', 'orders_count', 'num_deliveries')
+    readonly_fields = ('created_at', 'updated_at', 'orders_count', 'num_deliveries')
     ordering = ('-created_at', )
     inlines = [
         ProductImageInlineAdmin,
@@ -87,7 +148,7 @@ class ShippingAddressAdmin(admin.ModelAdmin):
     # )
     ordering = ('-created_at', )
 
-admin.site.register(User, UserAdmin)
+admin.site.register(User, ModififedUserAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductImage)
 admin.site.register(Brand)

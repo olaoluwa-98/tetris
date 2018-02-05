@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'phonenumber_field'
+    'phonenumber_field',
+    'django_extensions'
 ]
 
 MIDDLEWARE = [
@@ -54,6 +55,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # 'store.middleware.VerifiedAccountMiddleware',
 ]
 
 ROOT_URLCONF = 'tetris.urls'
@@ -135,7 +138,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+# USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
@@ -151,6 +154,8 @@ AUTH_USER_MODEL = 'store.User'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 LOGIN_URL = '/login/'
+
+SHELL_PLUS = "ipython"
 
 if DEBUG:
     INSTALLED_APPS += ( 'debug_toolbar',)
@@ -171,3 +176,18 @@ if DEBUG:
         'debug_toolbar.panels.redirects.RedirectsPanel',
     ]
     SHOW_TOOLBAR_CALLBACK = True
+
+PRODUCTION = bool(int(os.getenv('PRODUCTION', False)))
+if PRODUCTION:
+    # Email
+    ANYMAIL = {
+        "MAILGUN_API_KEY": os.getenv('MAILGUN_API_KEY'),
+        "MAILGUN_SENDER_DOMAIN": os.getenv('MAILGUN_DOMAIN'),
+    }
+    EMAIL_HOST = os.getenv('EMAIL_HOST')
+    EMAIL_PORT = os.getenv('EMAIL_PORT')
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER'),
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD'),
+    EMAIL_USE_TLS = True
+    EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"
+    DEFAULT_FROM_EMAIL = "Example <norelpy@example.com>"

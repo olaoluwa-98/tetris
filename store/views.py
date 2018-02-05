@@ -7,12 +7,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_exempt#, csrf_protect
 from .collections import Collections
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from datetime import datetime
 from .models import *
 from .forms import *
 from .addresses import STATES
+from django.core.mail import send_mail
 
 col = Collections()
-
+User = get_user_model()
 def get_cart(request):
     # request.session['cart'] = [{'product_id':1, 'quantity':2}, {'product_id':1, 'quantity':2}]
     # import pdb; pdb.set_trace()
@@ -24,8 +26,6 @@ def get_cart(request):
             for cart_item in cart:
                 real_cart.append(Cart(product_id=cart_item['product_id'],quantity=cart_item['quantity']))
                 product_ids.append(cart_item['product_id'])
-        # except Exception as e:
-        #     raise
         except:
             product_ids = []
             request.session['cart'] = ''
@@ -346,30 +346,6 @@ class ShippingAddressDetailView(LoginRequiredMixin, TemplateView):
     template_name = 'store/pages/shipping_address_detail.html'
     success_url = '/store/'
 
-    # def post(self, request, *args, **kwargs):
-    #     form = ShippingAddressForm(request.POST or None)
-    #     context = {}
-    #     context['cart_count'] = len(get_cart(self.request))
-    #     context['wish_list_count'] = self.request.user.wishes.count()
-    #     context['states'] = STATES
-    #     if form.is_valid():
-    #         num = int(self.kwargs['num'])
-    #         shippings = ShippingAddress.objects.filter(user=request.user, is_default=True)
-    #         shipping_address = ShippingAddress.objects.filter(user=request.user)[num - 1]
-    #         if request.POST.get('is_default') and shippings.exists():
-    #             shippings.update(is_default=False)
-    #             shipping_address.is_default = True
-    #         shipping_address.zip_code = form.cleaned_data['zip_code']
-    #         shipping_address.address = form.cleaned_data['address']
-    #         shipping_address.city = form.cleaned_data['city']
-    #         shipping_address.state = form.cleaned_data['state']
-    #         shipping_address.save()
-    #         context['shipping_address'] = shipping_address
-    #         context['success'] = 'Your shipping address has been updated'
-    #         return render(request, 'store/pages/shipping_address_detail.html', context)
-    #     context['form'] = form
-    #     return render(request, 'store/pages/shipping_address_detail.html', context)
-
     def get_context_data(self, **kwargs):
         num = int(self.kwargs['num'])
         shipping_addresses = ShippingAddress.objects.filter(user=self.request.user)
@@ -436,9 +412,19 @@ def handle_register(request):
     if form.is_valid():
         username = form.cleaned_data['username'].lower()
         email = form.cleaned_data['email'].lower()
-        user = user = get_user_model()(username=username, email=email)
+        user = user = User(username=username, email=email)
         user.set_password(form.cleaned_data['password'])
         user.save()
+        # send user account verification email
+        subject = 'Verify Your Tetris Account'
+        message = ''
+        from_email = 'noreply@tetris.com'
+        recipient_list = (user.email, )
+        html_message = loader.render_to_string(
+          'emails/account_verification_email.html', {'user': user,},
+        )
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+
         user = authenticate(username=user.email, password=form.cleaned_data.get('password'))
         if user is not None:
             login(request, user)
@@ -590,6 +576,11 @@ def make_purchase(request):
         response = JsonResponse({'status' : 'error', 'msg': 'your default shipping address is not set', 'shipping': True })
         response.status_code = 422
         return response
+    if not request.user.is_verified:
+        response = JsonResponse({'status' : 'error', 'msg': 'You cannot order without verifying your email', 'email': True })
+        response.status_code = 422
+        return response
+
     cart = get_cart(request)
     if len(cart) > 0:
         # create an order
@@ -606,6 +597,17 @@ def make_purchase(request):
             product.orders_count += 1
             product.save()
             order_item.save()
+
+        # send mail to the customers
+        subject = 'You Just Placed an Order from Tetris'
+        message = ''
+        from_email = 'noreply@tetris.lol'
+        recipient_list = (request.user.email,)
+        html_message = loader.render_to_string(
+          'emails/customer_order_list.html', {'order': order,},
+        )
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+
         # clear cart
         request.user.cart.all().delete()
         request.session['cart'] = []
@@ -647,9 +649,94 @@ def customer_cancel_order(request):
         order.reason_cancelled = request.POST['reason']
         order.canceller = request.user
         order.save()
-        response = JsonResponse({'status' : 'error', 'msg': 'Order cancelled successfully' })
+
+        # send mail to the customers
+        subject = 'You Have Cancelled Order {} from Tetris'.format(order.ref)
+        message = ''
+        from_email = 'noreply@tetris.lol'
+        recipient_list = (request.user.email,)
+        html_message = loader.render_to_string(
+          'emails/customer_cancel_order.html', {'order': order,},
+        )
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+
+
+        response = JsonResponse({'status' : 'success', 'msg': 'Order cancelled successfully' })
         response.status_code = 200
         return response
     response = JsonResponse({'status' : 'error', 'msg': 'an error occured. please try again later' })
     response.status_code = 422
     return response
+
+@csrf_exempt
+@login_required(login_url='/login/')
+def customer_confirm_delivery(request):
+    if not request.POST.get('order_ref'):
+        response = JsonResponse({'status' : 'error', 'msg': 'the order reference is needed' })
+        response.status_code = 422
+        return response
+    orders = Order.objects.filter(ref=request.POST['order_ref'], user=request.user)
+    if orders.exists():
+        order = orders.first()
+        order.confirm_delivery_date = datetime.now()
+        order.status = 'delivered'
+        order.save()
+        for order_item in order.order_items.all():
+            order_item.product.num_deliveries += 1
+            order_item.product.save()
+
+        # send mail to the customers
+        subject = 'You Have Confirmed Delivery of Order {} from Tetris'.format(order.ref)
+        message = ''
+        from_email = 'noreply@tetris.lol'
+        recipient_list = (request.user.email,)
+        html_message = loader.render_to_string(
+          'emails/customer_confirm_delivery.html', {'order': order,},
+        )
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+
+        response = JsonResponse({'status' : 'success', 'msg': 'Order delivery confirmed successfully' })
+        response.status_code = 200
+        return response
+
+def verify_email(request):
+    uid = request.GET.get('uid')
+    if User.objects.filter(id=uid).exists():
+        user = User.objects.get(id=uid)
+        user.is_verified = True
+        user.save()
+        context = {'verified': True}
+    else:
+        context = {'verified': False}
+    return render(request, 'store/emails/verify_account.html', context)
+
+def resend_verification(request):
+    context = {}
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email=email)
+            if user.is_verified == False:
+                # send user account verification email
+                subject = 'Verify Your Tetris Account'
+                message = ''
+                from_email = 'noreply@tetris.com'
+                recipient_list = (user.email, )
+                html_message = loader.render_to_string(
+                'emails/account_verification_email.html', {'user': user,},
+                )
+                send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+                context['verification_sent'] = True
+            else:
+                context['account_is_verified'] = True;
+        else:
+            context['email_not_found'] = True
+    else:
+        context['show_verification_form'] = True
+    return render(request, 'resend-verification.html', data)
+
+def page_not_found(request):
+  return render(request, 'store/pages/error/404.html')
+
+def internal_server_error(request):
+  return render(request, 'store/pages/error/500.html')

@@ -77,7 +77,7 @@
           <footer class="card-footer">
           {% load humanize %}
           <p class="card-footer-item">Price per item:
-          <span style="font-weight: bold;color: green"> &nbsp;₦{{ product.price_per_unit | intcomma }}</span></p>
+          <span style="font-weight: bold"> &nbsp;₦{{ product.price_per_unit | intcomma }}</span></p>
           </footer>
           <footer class="card-footer">
           <p class="card-footer-item">Brand:<span style="font-weight: bold">
@@ -97,7 +97,7 @@
           <p class="card-footer-item">Size: <span style="font-weight: bold"> &nbsp;{{ product.size }}</span></p>
           </footer>
           <footer class="card-footer">
-          <p class="card-footer-item">Quantity Left in store: <span style="font-weight: bold"> &nbsp;{{ product.quantity }}</span></p>
+          <p class="card-footer-item">Quantity Left in store: <span style="font-weight: bold;color: green"> &nbsp;{{ product.quantity }}</span></p>
           </footer>
           {% load tetris %}
           <footer class="card-footer">

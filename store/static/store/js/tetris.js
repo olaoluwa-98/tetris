@@ -18,7 +18,13 @@ function purchase(){
         purchase_btn.text('Purchase All');
         alert('Error: '+ data['responseJSON']['msg']);
         if (data['responseJSON']['shipping'])
+        {
           window.location.replace("/shipping-addresses");
+        }
+        else if (data['responseJSON']['email'])
+        {
+          window.location.replace("/verify-email");
+        }
       },
     });
 
@@ -241,4 +247,28 @@ function cancel_order(order_ref){
         cancel_btn.removeAttr('disabled');
       },
     });
+}
+
+function confirm_delivery(order_ref){
+  var confirm_btn = $('#confirm_order_' + order_ref);
+  if (confirm("Are you sure you want to confirm the delivery?") == true){
+  confirm_btn.attr('disabled', 'disabled');
+  confirm_btn.text('Confirming Delivery');
+  $.ajax({
+      url: '/confirm-delivery',
+      type: "POST",
+      data: {
+        'order_ref': order_ref
+      },
+      success: function(data) {
+        confirm_btn.removeAttr('disabled');
+        window.location.reload();
+      },
+      error: function (data) {
+        confirm_btn.removeAttr('disabled');
+        confirm_btn.text('Confirm Delivery');
+      },
+    });
+  }
+  else {}
 }

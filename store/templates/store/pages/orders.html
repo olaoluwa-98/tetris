@@ -56,7 +56,7 @@
                         <div class="content">
                             	{{ forloop.counter}}. <strong><a href="{{ order.get_absolute_url}}">
                             	{{ order.ref }} ({{order.order_items.count}} products ordered) -
-                                <span style="font-weight: bold; color: green;">
+                                <span style="font-weight: bold;">
                                     ₦{{ order.subtotal }}
                                 </span>
                             	</a></strong>

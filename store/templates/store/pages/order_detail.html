@@ -62,15 +62,15 @@
                     </a>
                     </li>
                     <li>Subtotal:
-                    <span style="font-weight: bold; color: green;">
-                        ₦{{ order.subtotal }}
+                    <span style="font-weight: bold;">
+                        {% load humanize %}
+                        ₦{{ order.subtotal | intcomma}}
                     </span>
                     </li>
                 </ul>
             </div>
             {% if order %}
             {% if order_items %}
-            {% load humanize %}
             {% for order_item in order_items %}
             <div class="box item order_item_{{order_item.product.id}}">
                 <article class="media">
@@ -83,7 +83,7 @@
                     <div class="media-content">
                         <div class="content">
                             <strong><a href="{{ order_item.product.get_absolute_url}}">{{ order_item.product.name }}</a></strong>
-                            <p style="font-weight: bold; color: green; margin-bottom: 0px">
+                            <p style="font-weight: bold; margin-bottom: 0px">
                                 ₦{{ order_item.price_per_unit | intcomma}}
                             </p>
                             <p>x{{ order_item.quantity }}</p>
@@ -120,7 +120,7 @@
                         </a>
                     </p>
                     <p class="control">
-                        <a class="button is-dark">
+                        <a class="button is-dark" onclick="confirm_delivery('{{ order.ref }}')">
                           Confirm Delivery
                         </a>
                     </p>
@@ -146,8 +146,8 @@
                     <div class="field is-grouped is-grouped-centered">
                     <p class="control">
                         <a class="button is-primary">
-                            {% load humanize %} Delivered at
-                            {{ order.deliver_date | date:"D d M Y"}}  {{order.deliver_date | time:"g:i A"}}
+                            {% load humanize %} You confirmed delivery at
+                            {{ order.confirm_delivery_date | date:"D d M Y"}}  {{order.confirm_delivery_date | time:"g:i A"}}
                         </a>
                     </p>
                 </div>

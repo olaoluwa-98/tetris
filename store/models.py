@@ -2,7 +2,6 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.auth import get_user_model
-from datetime import datetime
 from django.utils.crypto import get_random_string
 from .addresses import STATES
 from autoslug import AutoSlugField
@@ -28,7 +27,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username']
 
     def __str__(self):
-        return '{} {} (@{})'.format(self.first_name, self.last_name, self.username)
+        return '{}'.format(self.email)
 
 
 class Brand(models.Model):
@@ -43,7 +42,7 @@ class Brand(models.Model):
         unique=True,
         sep='',
         )
-    created_at = models.DateTimeField( default=datetime.now(), editable=False,
+    created_at = models.DateTimeField(auto_now_add=True, editable=False,
         verbose_name='date brand was added to db'
     )
 
@@ -73,7 +72,7 @@ class Brand(models.Model):
         return None
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.email)
+        return '{}'.format(self.name)
 
     class Meta:
         get_latest_by = 'created_at'
@@ -93,7 +92,7 @@ class ShippingAddress(models.Model):
     city = models.CharField( max_length=30, verbose_name='city' )
     state = models.CharField( max_length=15, verbose_name='state', choices=STATES )
     country = models.CharField( max_length=30, default='Nigeria', verbose_name='country' )
-    created_at = models.DateTimeField( default=datetime.now(), editable=False,
+    created_at = models.DateTimeField(auto_now_add=True, editable=False,
         verbose_name='date added'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date shipping address details were updated last' )
@@ -122,7 +121,7 @@ class ProductCategory(models.Model):
         unique=True,
         sep='',
     )
-    created_at = models.DateTimeField( default=datetime.now(), editable=False,
+    created_at = models.DateTimeField(auto_now_add=True, editable=False,
         verbose_name='date product category was added to db'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date product category details were updated last')
@@ -202,7 +201,7 @@ class Product(models.Model):
         unique=True,
         sep='',
     )
-    created_at = models.DateTimeField( default=datetime.now(), editable=False,
+    created_at = models.DateTimeField(auto_now_add=True, editable=False,
         verbose_name='date added'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date product details were updated last' )
@@ -233,7 +232,7 @@ class Wish(models.Model):
         related_name='wishes',
         verbose_name ='Product'
     )
-    created_at = models.DateTimeField( default=datetime.now(), editable=False,
+    created_at = models.DateTimeField(auto_now_add=True, editable=False,
         verbose_name='date wish was added to db'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date wish details were updated last' )
@@ -273,7 +272,7 @@ class Cart(models.Model):
         verbose_name ='product in the cart'
     )
     quantity = models.PositiveIntegerField(verbose_name='quantity of the product added')
-    created_at = models.DateTimeField( default=datetime.now(), editable=False,
+    created_at = models.DateTimeField(auto_now_add=True, editable=False,
         verbose_name='date cart product was added to db'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date cart product details were updated last' )
@@ -339,9 +338,12 @@ class Order(models.Model):
         verbose_name='status'
     )
     deliver_date = models.DateTimeField(null=True, blank=True,
-        verbose_name='date order was delivered'
+        verbose_name='delivered (tetris)'
     )
-    created_at = models.DateTimeField( default=datetime.now(), editable=False,
+    confirm_delivery_date = models.DateTimeField(null=True, blank=True,
+        verbose_name='confirmed delivered (customer)'
+    )
+    created_at = models.DateTimeField(auto_now_add=True, editable=False,
         verbose_name='date ordered'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date order details were updated last' )
@@ -391,7 +393,7 @@ class OrderItem(models.Model):
     )
     quantity = models.PositiveIntegerField(verbose_name='quantity ordered')
     price_per_unit = models.DecimalField(decimal_places=2, max_digits=17)
-    created_at = models.DateTimeField( default=datetime.now(), editable=False,
+    created_at = models.DateTimeField(auto_now_add=True, editable=False,
         verbose_name='date ordered'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date order details were updated last' )
@@ -413,7 +415,7 @@ class ProductImage(models.Model):
         verbose_name ='product image belongs to'
     )
     product_image_url = models.ImageField(upload_to='img/products/', max_length=255, blank=True)
-    created_at = models.DateTimeField( default=datetime.now(), editable=False,
+    created_at = models.DateTimeField(auto_now_add=True, editable=False,
         verbose_name='date image was added to db'
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date image was updated last' )
@@ -431,7 +433,7 @@ class ProductImage(models.Model):
 #     size_format = models.CharField(max_length=15, verbose_name='size format e.g UK, US')
 #     value = models.IntegerField(verbose_name='size value')
 #     post_fix = models.CharField(max_length=10, verbose_name='post fix of size value e.g 27cm')
-#     created_at = models.DateTimeField( default=datetime.now(), editable=False,
+#     created_at = models.DateTimeField(auto_now_add=True, editable=False,
 #         verbose_name='date size was added to db'
 #     )
 #     updated_at = models.DateTimeField( auto_now=True, verbose_name='date size details were updated last' )

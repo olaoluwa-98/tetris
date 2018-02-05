@@ -12,22 +12,55 @@
 
 {% block content %}
 
-<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
+{% include 'store/header.html' %}
+<!-- <section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
   <div class="hero-head">
-    {% include 'store/header.html' %}
   </div>
 
   <div class="hero-body" style="font-family: LobsterTwo-Italic;">
     <div class="container has-text-centered text-white">
       <p class="title">
-        Login to Shop the New Look
+        About Us
+      </p>
+    </div>
+  </div>
+</section> -->
+
+<section class="hero is-medium is-light">
+  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+    <div class="container">
+      <p class="title">
+        WHO ARE WE?
       </p>
       <p class="subtitle">
-        The new look of simple
+        Tetris Retails, a new age business that manufactures and Retails contemporary urban streetwear.
       </p>
-      <a class="shop-tetris-text" href="{% url 'store:store' %}">
-        Shop tetris
-      </a>
+    </div>
+  </div>
+</section>
+
+<section class="hero is-medium is-dark">
+  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+    <div class="container">
+      <p class="title">
+        WHAT WE'RE ABOUT
+      </p>
+      <p class="subtitle">
+        Making you (yes you!) our esteemed customer look better, be more stylish and ultimately feel more confident. To that effect we have partnerships with innovative fashion brands to keep you on the edge of your fad as well as style seats.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="hero is-medium is-light">
+  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+    <div class="container">
+      <p class="title">
+        OUR PRIORITY
+      </p>
+      <p class="subtitle">
+        Customer experience, hence we are working tirelessly and around the clock to make the experience better for you. We are open to any suggestions or enquiries. Do enjoy the Tetris experience!
+      </p>
     </div>
   </div>
 </section>

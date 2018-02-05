@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^cart/$', CartView.as_view(), name='cart'),
     url(r'^category/(?P<slug>[\w-]+)/$', CategoryView.as_view(), name='category'),
     url(r'^checkout/$', CheckoutView.as_view(), name='checkout'),
+    url(r'^confirm-delivery', customer_confirm_delivery, name ="customer_confirm_delivery"),
     url(r'^customer-care/$', CustomerCareView.as_view(), name='customer_care'),
     url(r'^change-cart-item-qty', change_cart_item_qty, name ="change_cart_item_qty"),
     url(r'^empty-cart', empty_cart, name ="empty_cart"),
@@ -49,6 +50,9 @@ urlpatterns = [
     url(r'^login/$', handle_login, name='login'),
     url(r'^logout/$', handle_logout, name='logout'),
     url(r'^register/$', handle_register, name='register'),
+    # verify account email
+    url(r'^verify/$', verify_email, name='verify_account'),
+    url(r'^resend-verification/$', resend_verification, name='resend_verification'),
 
     # change password and reset password
     url(r'^password-change/$', PasswordChangeView.as_view(success_url=reverse_lazy('store:password_change_done')), name='password_change'),
