@@ -266,7 +266,9 @@ class ProfileView(LoginRequiredMixin, TemplateView):
             user.first_name = form.cleaned_data['first_name']
             user.last_name = form.cleaned_data['last_name']
             user.username = form.cleaned_data['username']
-            user.email = form.cleaned_data['email']
+            if user.email != form.cleaned_data['email']:
+                user.email = form.cleaned_data['email']
+                user.is_verified = False
             user.phone = form.cleaned_data['phone']
             user.save()
             context['success'] = 'Your profile has been updated'
@@ -752,30 +754,22 @@ def verify_email(request, email_token):
             context['verified'] = True
     return render(request, 'emails/verify_account.html', context)
 
+@login_required(login_url='/login/')
 def resend_verification(request):
+    # uid = force_text(urlsafe_base64_decode(uidb64))
+    user = request.user
     context = {}
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        if User.objects.filter(email=email).exists():
-            user = User.objects.get(email=email)
-            if user.is_verified == False:
-                # send user account verification email
-                subject = 'Verify Your Tetris Account'
-                message = ''
-                from_email = 'noreply@tetris.com'
-                recipient_list = (user.email, )
-                html_message = loader.render_to_string(
-                'emails/account_verification_email.html', {'user': user,},
-                )
-                send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
-                context['verification_sent'] = True
-            else:
-                context['account_is_verified'] = True;
-        else:
-            context['email_not_found'] = True
-    else:
-        context['show_verification_form'] = True
-    return render(request, 'resend-verification.html', data)
+    if user.is_verified == False:
+        # send user account verification email
+        subject = 'Verify Your Tetris Account'
+        message = ''
+        from_email = 'noreply@tetris.com'
+        recipient_list = (user.email, )
+        html_message = loader.render_to_string(
+        'emails/account_verification_email.html', {'user': user,},
+        )
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+    return redirect('/profile')
 
 def page_not_found(request):
   return render(request, 'store/pages/error/404.html')
@@ -785,8 +779,8 @@ def internal_server_error(request):
 
 def handle_email(request):
     user = request.user
-    # uidb64 =  urlsafe_base64_encode(force_bytes(user.pk))
-    # return render(request, 'emails/account_verification_email.html', {'user': user} )
+    uidb64 =  urlsafe_base64_encode(force_bytes(user.pk))
+    return render(request, 'emails/account_verification_email.html', {'user': user} )
 
 
     order = Order.objects.all().first()

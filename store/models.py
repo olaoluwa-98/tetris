@@ -25,12 +25,11 @@ class User(AbstractUser):
 
     # Override models save method:
     def save(self, *args, **kwargs):
-        if not self.pk:
-            # generate email_token for the user
-            # email_token must be unique
+        # generate email_token for the user
+        # email_token must be unique
+        self.email_token = '{}{}'.format(self.email[:2], get_random_string(length=14))
+        while User.objects.filter(email_token=self.email_token).exists():
             self.email_token = '{}{}'.format(self.email[:2], get_random_string(length=14))
-            while User.objects.filter(email_token=self.email_token).exists():
-                self.email_token = '{}{}'.format(self.email[:2], get_random_string(length=14))
         super(User, self).save(*args, **kwargs)
 
     def __str__(self):

@@ -23,7 +23,7 @@ function purchase(){
         }
         else if (data['responseJSON']['email'])
         {
-          window.location.replace("/verify-email");
+          window.location.replace("/profile");
         }
       },
     });
