@@ -19,6 +19,7 @@ from django.utils.encoding import force_bytes
 
 col = Collections()
 User = get_user_model()
+admins = User.objects.filter(is_staff=True)
 def get_cart(request):
     # request.session['cart'] = [{'product_id':1, 'quantity':2}, {'product_id':1, 'quantity':2}]
     # import pdb; pdb.set_trace()
@@ -214,7 +215,7 @@ class StoreView(TemplateView):
         context = {}
         context['popular_brands'] = col.popular_brands(4)
         context['latest_products'] = col.latest_products(8)
-        context['categories'] = col.categories(4)
+        context['categories'] = ProductCategory.objects.order_by('-created_at')[:4]
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
@@ -229,7 +230,6 @@ class MenStoreView(TemplateView):
         product_list = Product.objects.filter(gender__in=['male', 'unisex'])
         page = self.request.GET.get('page')
         products = paginate(product_list, page, 8)
-        context['categories'] = col.categories()
         context['cart_count'] = len(get_cart(self.request))
         context['products'] = products
         if self.request.user.is_authenticated:
@@ -245,7 +245,6 @@ class WomenStoreView(TemplateView):
         product_list = Product.objects.filter(gender__in=['female', 'unisex'])
         page = self.request.GET.get('page')
         products = paginate(product_list, page, 8)
-        context['categories'] = col.categories()
         context['cart_count'] = len(get_cart(self.request))
         context['products'] = products
         if self.request.user.is_authenticated:
@@ -260,7 +259,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         form = ProfileForm(request.POST or None, request.user)
         context = {'form': form}
-
+        context['wish_list_count'] = self.request.user.wishes.count()
         context['cart_count'] = len(get_cart(self.request))
         if form.is_valid():
             user = request.user
@@ -611,6 +610,18 @@ def make_purchase(request):
         )
         send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
 
+        # send mail to the admins
+        subject = '{} Just Placed an Order from Tetris'.format(request.user.username)
+        message = ''
+        from_email = 'noreply@tetris.lol'
+        recipient_list = ()
+        for admin in admins:
+            recipient_list += (admin,)
+        html_message = loader.render_to_string(
+          'emails/customer_order_to_admin.html', {'order': order,},
+        )
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+
         # clear cart
         request.user.cart.all().delete()
         request.session['cart'] = []
@@ -652,6 +663,18 @@ def customer_cancel_order(request):
         order.reason_cancelled = request.POST['reason']
         order.canceller = request.user
         order.save()
+
+        # send mail to the admins
+        subject = '{} Just Cancelled an Order from Tetris'.format(request.user.username)
+        message = ''
+        from_email = 'noreply@tetris.lol'
+        recipient_list = ()
+        for admin in admins:
+            recipient_list += (admin,)
+        html_message = loader.render_to_string(
+          'emails/customer_cancel_order_to_admin.html', {'order': order,},
+        )
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
 
         # send mail to the customers
         subject = 'You Have Cancelled Order {} from Tetris'.format(order.ref)
@@ -695,6 +718,19 @@ def customer_confirm_delivery(request):
         recipient_list = (request.user.email,)
         html_message = loader.render_to_string(
           'emails/customer_confirm_delivery.html', {'order': order,},
+        )
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+
+        # send mail to the admins
+        subject = '{} Just Confirmed the Delivery of Order {}'\
+            .format(request.user.username, order.ref)
+        message = ''
+        from_email = 'noreply@tetris.lol'
+        recipient_list = ()
+        for admin in admins:
+            recipient_list += (admin,)
+        html_message = loader.render_to_string(
+          'emails/customer_confirm_order_to_admin.html', {'order': order,},
         )
         send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
 
@@ -750,10 +786,10 @@ def internal_server_error(request):
 def handle_email(request):
     user = request.user
     # uidb64 =  urlsafe_base64_encode(force_bytes(user.pk))
-    return render(request, 'emails/account_verification_email.html', {'user': user} )
+    # return render(request, 'emails/account_verification_email.html', {'user': user} )
 
 
-    # order = Order.objects.all().first()
-    # return render(request, 'emails/notify_user_order_arrival.html', {'order': order} )
+    order = Order.objects.all().first()
+    # return render(request, 'emails/customer_order_to_admin.html', {'order': order} )
     # return render(request, 'emails/customer_order_list.html', {'order': order} )
-    # return render(request, 'emails/customer_cancel_order.html', {'order': order} )
+    return render(request, 'emails/notify_user_order_arrival.html', {'order': order, 'day_type':'tomorrow'} )

@@ -18,7 +18,13 @@
             <table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" width="100%">
                 <tr>
                     <td style="padding: 40px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555;">
-                        <p>Hi <span style="font-weight: bold">@{{ user.username }}</span>, you recenty confirmed the delivery an order from Tetris</p>
+                        <p>The following user <span style="font-weight: bold">@{{ user.username }}</span>has cancelled an order from us, please check it out</p>
+                        <a href="{% url 'admin:store_order_change' order.pk  %}"> {{ order.ref }}</a>
+                        <br>
+                        <h3>Shipping Address</h3>
+                        <p>{{ order.shipping_address.address }}</p>
+                        <p>{{ order.shipping_address.city }}, <p>{{ order.shipping_address.state }}</p></p>
+                        <p style="font-weight: bold">{{ order.user.phone }}</p>
 
                         <P>Click the button below to view the order</P>
 
@@ -28,7 +34,7 @@
                         <table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: auto;">
                             <tr>
                                 <td style="border-radius: 3px; background: teal; text-align: center;" class="button-td">
-                                    <a href="{% url 'store:order' order.ref  %}" style="background: teal; border: 15px solid teal; font-family: sans-serif; font-size: 13px; line-height: 1.1; text-align: center; text-decoration: none; display: block; border-radius: 3px; font-weight: bold;" class="button-a">
+                                    <a href="{% url 'admin:store_order_change' order.pk  %}" style="background: teal; border: 15px solid teal; font-family: sans-serif; font-size: 13px; line-height: 1.1; text-align: center; text-decoration: none; display: block; border-radius: 3px; font-weight: bold;" class="button-a">
                                         <span style="color:#ffffff;" class="button-link">&nbsp;&nbsp;&nbsp;&nbsp;View Order&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                     </a>
                                 </td>

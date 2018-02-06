@@ -31,7 +31,7 @@
 
 <section class="section">
     <div class="container">
-        <h1 class="title has-text-centered" style="color: white">Latest Popular Releases</h1>
+        <h1 class="title has-text-centered" style="color: white" title="of last 30 days">Latest Popular Releases</h1>
             {% if popular_products %}
             <div class="columns is-multiline">
               {% for product in popular_products %}
@@ -50,7 +50,7 @@
 
 <section class="section">
     <div class="container">
-        <h1 class="title has-text-centered">Popular Brands</h1>
+        <h1 class="title has-text-centered" title="of all time">Popular Brands</h1>
         {% if popular_brands %}
         <div class="columns is-multiline">
         {% for brand in popular_brands %}

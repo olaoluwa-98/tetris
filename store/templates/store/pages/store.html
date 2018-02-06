@@ -10,7 +10,7 @@
 
 <section class="section">
   <div class="container">
-  <h1 class="title has-text-centered">Latest Products</h1>
+  <h1 class="title has-text-centered" title="of last 30 days">Latest Products</h1>
   {% if latest_products %}
   <div class="columns is-multiline">
     {% for product in latest_products %}
@@ -30,7 +30,7 @@
 
 <section class="section">
     <div class="container">
-        <h1 class="title has-text-centered">Popular Brands</h1>
+        <h1 class="title has-text-centered" title="of all time">Popular Brands</h1>
         {% if popular_brands %}
         <div class="columns is-multiline">
         {% for brand in popular_brands %}

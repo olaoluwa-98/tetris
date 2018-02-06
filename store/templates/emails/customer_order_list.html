@@ -17,15 +17,22 @@
         <td bgcolor="#ffffff">
             <table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" width="100%">
                 <tr>
+                    {% load humanize %}
                     <td style="padding: 40px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555;">
-                        <p>Hi @{{ user.username }}, you have placed an order with the following products from Tetris</p>
+                        <p>Hi <span style="font-weight: bold">@{{ user.username }}</span>, you have placed an order with the following products from Tetris</p>
                         {% for order_item in order.order_items.all %}
-                        <p style="font-weight: bold">{{forloop.counter}}. {{order_item.product.name}} x {{order_item.quantity}} {{order_item.price_per_unit}}</p>
+                        <p style="font-weight: bold">{{forloop.counter}}. {{order_item.product.name}} x {{order_item.quantity}} ₦{{ order_item.price_per_unit | intcomma }}</p>
                         </div>
                         {% endfor %}
+                        <br>
+                        <h3>Shipping Address</h3>
+                        <p>{{ order.shipping_address.address }}</p>
+                        <p>{{ order.shipping_address.city }}, <p>{{ order.shipping_address.state }}</p></p>
+                        <p style="font-weight: bold">{{ order.user.phone }}</p>
+
                         <p>Click the button below to view the order</p>
                         <div style="text-align: right;">- Tetris Team</div>
-                        <br><br>
+                        <br>
                         <!-- Button : BEGIN -->
                         <table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: auto;">
                             <tr>

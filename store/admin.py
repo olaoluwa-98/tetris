@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.core.mail import send_mail
 from .models import *
 from django.template import loader
+from datetime import datetime, timedelta
 
 # admin.site.disable_action('delete_selected')
 
@@ -68,6 +69,8 @@ class OrderAdmin(admin.ModelAdmin):
     def notify_customer_order_is_arriving_today(self, request, queryset):
         queryset1 = queryset.exclude(status='cancelled').exclude(status='delivered')
         for order in queryset1:
+            order.deliver_date = datetime.now()
+            order.save()
             # send mail to the customers
             subject = 'Your Order {} Is Arriving Today'.format(order.ref)
             message = ''
@@ -82,6 +85,8 @@ class OrderAdmin(admin.ModelAdmin):
     def notify_customer_order_is_arriving_tomorrow(self, request, queryset):
         queryset1 = queryset.exclude(status='cancelled').exclude(status='delivered')
         for order in queryset1:
+            order.deliver_date = datetime.now() + timedelta(days=1)
+            order.save()
             # send mail to the customers
             subject = 'Your Order {} Is Arriving Tomorrow'.format(order.ref)
             message = ''
