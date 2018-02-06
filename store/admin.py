@@ -79,7 +79,7 @@ class OrderAdmin(admin.ModelAdmin):
             html_message = loader.render_to_string(
               'emails/notify_user_order_arrival.html', {'order': order, 'day_type': 'today'},
             )
-            send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+            send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
         self.message_user(request, "mails successfully sent to customers")
 
     def notify_customer_order_is_arriving_tomorrow(self, request, queryset):

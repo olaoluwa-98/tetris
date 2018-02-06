@@ -8,17 +8,13 @@ from autoslug import AutoSlugField
 from django.urls import reverse
 from phonenumber_field.modelfields import PhoneNumberField
 
-# this is for when a user gets deleted from the db
-def get_sentinel_user():
-    return get_user_model().objects.get_or_create(username='deleted-'+get_random_string(length=10), is_verified=0, is_active=0)[0]
-
 # this returns the location of the uploaded profile picture
 def get_profile_pic_path(instance, filename):
     return 'profile_pictures/{}-{}'.format(instance.user.username, filename)
 
 class User(AbstractUser):
     email = models.EmailField( verbose_name='email address', unique=True)
-    email_token = models.CharField( verbose_name='email token', max_length=16, editable=False, null=True)
+    email_token = models.CharField(verbose_name='email token', max_length=16, editable=False, null=True)
     is_verified = models.BooleanField(default=False)
     phone = PhoneNumberField(blank=True, null=True,
         help_text='Please use the following format: <em>+234 XXX XXX XXXX</em>.',
@@ -163,7 +159,7 @@ class ProductCategory(models.Model):
 class Product(models.Model):
     admin = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET(get_sentinel_user),
+        on_delete=models.SET_NULL,
         related_name='products',
         verbose_name ='Staff',
         blank=True,
@@ -324,7 +320,7 @@ class Cart(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         blank=True,
         null=True,
         related_name='orders',

@@ -19,7 +19,7 @@
                 <tr>
                     {% load humanize %}
                     <td style="padding: 40px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555;">
-                        <p>The following user <span style="font-weight: bold">@{{ user.username }}</span>placed an order from us, please check it out</p>
+                        <p>The following user <span style="font-weight: bold">@{{ user.username }}</span> placed an order from us, please check it out</p>
                         {% for order_item in order.order_items.all %}
                         <p style="font-weight: bold">{{forloop.counter}}. {{order_item.product.name}} x {{order_item.quantity}} ₦{{order_item.price_per_unit | intcomma}}</p>
                         </div>

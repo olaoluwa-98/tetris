@@ -616,7 +616,7 @@ def make_purchase(request):
         from_email = 'noreply@tetris.lol'
         recipient_list = ()
         for admin in admins:
-            recipient_list += (admin,)
+            recipient_list += (admin.email,)
         html_message = loader.render_to_string(
           'emails/customer_order_to_admin.html', {'order': order,},
         )
@@ -670,11 +670,11 @@ def customer_cancel_order(request):
         from_email = 'noreply@tetris.lol'
         recipient_list = ()
         for admin in admins:
-            recipient_list += (admin,)
+            recipient_list += (admin.email,)
         html_message = loader.render_to_string(
           'emails/customer_cancel_order_to_admin.html', {'order': order,},
         )
-        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
         # send mail to the customers
         subject = 'You Have Cancelled Order {} from Tetris'.format(order.ref)
@@ -684,7 +684,7 @@ def customer_cancel_order(request):
         html_message = loader.render_to_string(
           'emails/customer_cancel_order.html', {'order': order,},
         )
-        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 
         response = JsonResponse({'status' : 'success', 'msg': 'Order cancelled successfully' })
@@ -728,7 +728,7 @@ def customer_confirm_delivery(request):
         from_email = 'noreply@tetris.lol'
         recipient_list = ()
         for admin in admins:
-            recipient_list += (admin,)
+            recipient_list += (admin.email,)
         html_message = loader.render_to_string(
           'emails/customer_confirm_order_to_admin.html', {'order': order,},
         )
@@ -790,6 +790,6 @@ def handle_email(request):
 
 
     order = Order.objects.all().first()
-    # return render(request, 'emails/customer_order_to_admin.html', {'order': order} )
+    return render(request, 'emails/customer_cancel_order_to_admin.html', {'order': order} )
     # return render(request, 'emails/customer_order_list.html', {'order': order} )
-    return render(request, 'emails/notify_user_order_arrival.html', {'order': order, 'day_type':'tomorrow'} )
+    # return render(request, 'emails/notify_user_order_arrival.html', {'order': order, 'day_type':'tomorrow'} )

@@ -253,7 +253,7 @@ function confirm_delivery(order_ref){
   var confirm_btn = $('#confirm_order_' + order_ref);
   if (confirm("Are you sure you want to confirm the delivery?") == true){
   confirm_btn.attr('disabled', 'disabled');
-  confirm_btn.text('Confirming Delivery');
+  confirm_btn.text('Confirming Delivery..');
   $.ajax({
       url: '/confirm-delivery',
       type: "POST",
