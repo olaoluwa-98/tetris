@@ -50,8 +50,12 @@ urlpatterns = [
     url(r'^login/$', handle_login, name='login'),
     url(r'^logout/$', handle_logout, name='logout'),
     url(r'^register/$', handle_register, name='register'),
+
+    # test emails
+    url(r'^email-test/$', handle_email, name='email_test'),
+
     # verify account email
-    url(r'^verify/$', verify_email, name='verify_account'),
+    url(r'^verify/(?P<email_token>[0-9A-Za-z]+)/$', verify_email, name='verify_account'),
     url(r'^resend-verification/$', resend_verification, name='resend_verification'),
 
     # change password and reset password

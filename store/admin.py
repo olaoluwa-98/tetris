@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.core.mail import send_mail
 from .models import *
+from django.template import loader
 
 # admin.site.disable_action('delete_selected')
 
@@ -70,17 +71,13 @@ class OrderAdmin(admin.ModelAdmin):
             # send mail to the customers
             subject = 'Your Order {} Is Arriving Today'.format(order.ref)
             message = ''
-            from_email = 'noreply@tetris.lol'
+            from_email = 'noreply@tetris.com'
             recipient_list = (order.user.email,)
             html_message = loader.render_to_string(
-              'emails/notify_user_order_arrival.html', {'order': order, 'day_type': 1},
+              'emails/notify_user_order_arrival.html', {'order': order, 'day_type': 'today'},
             )
             send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
-        if rows_updated == 1:
-            message_bit = "1 order's status was"
-        else:
-            message_bit = "%s orders' status were" % rows_updated
-        self.message_user(request, "%s successfully changed to 'processing'." % message_bit)
+        self.message_user(request, "mails successfully sent to customers")
 
     def notify_customer_order_is_arriving_tomorrow(self, request, queryset):
         queryset1 = queryset.exclude(status='cancelled').exclude(status='delivered')
@@ -88,17 +85,13 @@ class OrderAdmin(admin.ModelAdmin):
             # send mail to the customers
             subject = 'Your Order {} Is Arriving Tomorrow'.format(order.ref)
             message = ''
-            from_email = 'noreply@tetris.lol'
+            from_email = 'noreply@tetris.com'
             recipient_list = (order.user.email,)
             html_message = loader.render_to_string(
-              'emails/notify_user_order_arrival.html', {'order': order, 'day_type': 2},
+              'emails/notify_user_order_arrival.html', {'order': order, 'day_type': 'tomorrow'},
             )
             send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
-        if rows_updated == 1:
-            message_bit = "1 order's status was"
-        else:
-            message_bit = "%s orders' status were" % rows_updated
-        self.message_user(request, "%s successfully changed to 'processing'." % message_bit)
+        self.message_user(request, "mails successfully sent to customers")
 
     def cancel_orders(self, request, queryset):
         queryset1 = queryset.exclude(status='cancelled').exclude(status='delivered')

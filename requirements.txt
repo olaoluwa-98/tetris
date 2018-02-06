@@ -25,3 +25,4 @@ python-dotenv==0.7.1
 # production
 gunicorn==19.7.1
 whitenoise==3.3.1
+django-anymail==0.6.1

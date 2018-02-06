@@ -1,0 +1,21 @@
+{% extends "store/base.html" %}
+
+{% block content %}
+{% include 'store/header2.html' %}
+<section class="hero is-medium is-light">
+  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+    <div class="container">
+      <p class="title">
+        Email Verification
+      </p>
+      <p class="subtitle">
+        {% if verified %}
+			Your account has been verified! <a href="{% url 'store:login' %}">Click here to Sign In</a>
+		{% else %}
+			An error occured when we tried to verify your account. Please try again or contact us if the issue persists.
+		{% endif %}
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %}

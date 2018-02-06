@@ -182,12 +182,12 @@ if PRODUCTION:
     # Email
     ANYMAIL = {
         "MAILGUN_API_KEY": os.getenv('MAILGUN_API_KEY'),
-        "MAILGUN_SENDER_DOMAIN": os.getenv('MAILGUN_DOMAIN'),
+        "MAILGUN_SENDER_DOMAIN": os.getenv('MAILGUN_DOMAIN')
     }
     EMAIL_HOST = os.getenv('EMAIL_HOST')
     EMAIL_PORT = os.getenv('EMAIL_PORT')
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER'),
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD'),
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
     EMAIL_USE_TLS = True
     EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"
-    DEFAULT_FROM_EMAIL = "Example <norelpy@example.com>"
+    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')

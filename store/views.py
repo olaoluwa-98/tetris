@@ -12,6 +12,10 @@ from .models import *
 from .forms import *
 from .addresses import STATES
 from django.core.mail import send_mail
+from django.template import loader
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
 col = Collections()
 User = get_user_model()
@@ -282,9 +286,8 @@ class CategoryView(TemplateView):
     success_url = '/store/'
 
     def get_context_data(self, **kwargs):
-        context = {'popular_products':col.popular_products(8) }
-        context['latest_products'] = col.latest_products(8)
-        context['categories'] = col.categories(4)
+        category = ProductCategory.objects.get(slug=self.kwargs['slug'])
+        context = { 'category': category }
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
@@ -421,7 +424,7 @@ def handle_register(request):
         from_email = 'noreply@tetris.com'
         recipient_list = (user.email, )
         html_message = loader.render_to_string(
-          'emails/account_verification_email.html', {'user': user,},
+          'emails/account_verification_email.html', {'user': user},
         )
         send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
 
@@ -699,16 +702,19 @@ def customer_confirm_delivery(request):
         response.status_code = 200
         return response
 
-def verify_email(request):
-    uid = request.GET.get('uid')
-    if User.objects.filter(id=uid).exists():
-        user = User.objects.get(id=uid)
-        user.is_verified = True
-        user.save()
-        context = {'verified': True}
-    else:
-        context = {'verified': False}
-    return render(request, 'store/emails/verify_account.html', context)
+def verify_email(request, email_token):
+    # uid = force_text(urlsafe_base64_decode(uidb64))
+    users = User.objects.filter(email_token=email_token)
+    context = {'verified': False}
+    if users.exists():
+        user = users.first()
+        if user.is_verified == True:
+            context['verified'] = True
+        elif user.email_token == email_token:
+            user.is_verified = True
+            user.save()
+            context['verified'] = True
+    return render(request, 'emails/verify_account.html', context)
 
 def resend_verification(request):
     context = {}
@@ -740,3 +746,14 @@ def page_not_found(request):
 
 def internal_server_error(request):
   return render(request, 'store/pages/error/500.html')
+
+def handle_email(request):
+    user = request.user
+    # uidb64 =  urlsafe_base64_encode(force_bytes(user.pk))
+    return render(request, 'emails/account_verification_email.html', {'user': user} )
+
+
+    # order = Order.objects.all().first()
+    # return render(request, 'emails/notify_user_order_arrival.html', {'order': order} )
+    # return render(request, 'emails/customer_order_list.html', {'order': order} )
+    # return render(request, 'emails/customer_cancel_order.html', {'order': order} )

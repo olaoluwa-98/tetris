@@ -1,0 +1,46 @@
+<nav class="navbar is-black">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="{% url 'store:index' %}">
+        {% load static %}
+        <img class="navbar-item" src="{% static 'store/img/tetris-logo.png' %}?v=1" alt="TETRIS: a clothing store"
+        style="height: 45px;width: 95px; padding: 0px; max-height: 55px">
+      </a>
+      <div class="navbar-burger burger" data-target="navMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+    <div id="navMenu" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="{% url 'store:men' %}">
+          Men's
+        </a>
+
+        <a class="navbar-item" href="{% url 'store:women' %}">
+          Women's
+        </a>
+
+        <a class="navbar-item" href="{% url 'store:products' %}">
+          All Products
+        </a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="javascript:void(0);">
+          </a>
+          <div class="navbar-dropdown is-boxed">
+            <a class="navbar-item" href="{% url 'store:store' %}">
+              Store
+            </a>
+              <a class="navbar-item" href="{% url 'store:login' %}">
+                Login
+              </a>
+              <a class="navbar-item" href="{% url 'store:register'%}">
+                Register
+              </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

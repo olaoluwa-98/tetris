@@ -18,6 +18,7 @@ def get_profile_pic_path(instance, filename):
 
 class User(AbstractUser):
     email = models.EmailField( verbose_name='email address', unique=True)
+    email_token = models.CharField( verbose_name='email token', max_length=16, editable=False, null=True)
     is_verified = models.BooleanField(default=False)
     phone = PhoneNumberField(blank=True, null=True,
         help_text='Please use the following format: <em>+234 XXX XXX XXXX</em>.',
@@ -25,6 +26,16 @@ class User(AbstractUser):
     profile_pic_path = models.ImageField(upload_to=get_profile_pic_path, max_length=255)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
+
+    # Override models save method:
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # generate email_token for the user
+            # email_token must be unique
+            self.email_token = '{}{}'.format(self.email[:2], get_random_string(length=14))
+            while User.objects.filter(email_token=self.email_token).exists():
+                self.email_token = '{}{}'.format(self.email[:2], get_random_string(length=14))
+        super(User, self).save(*args, **kwargs)
 
     def __str__(self):
         return '{}'.format(self.email)
@@ -128,6 +139,17 @@ class ProductCategory(models.Model):
 
     def get_absolute_url(self):
         return reverse('store:category', kwargs={'slug': self.slug})
+
+    def random_product_images(self):
+        from django.db.models import Count
+        products = list(self.products.all()[:3])
+        images = []
+        if len(products) > 0:
+            for product in products:
+                images.append(ProductImage.objects.filter(product=product).first())
+            if len(images) > 0:
+                return images
+        return None
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.cat_type)

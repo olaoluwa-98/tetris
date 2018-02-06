@@ -1,33 +1,43 @@
 <footer class="footer">
-  <div class="footer-item-links">
-    <ul>
-      <li><a href="{% url 'store:about' %}">About</a></li>
-      <li><a href="{% url 'store:customer_care' %}">Customer Care</a></li>
-      <li><a href="{% url 'store:customer_care' %}">Privacy and Terms</a></li>
-    </ul>
-  </div>
-  <div class="footer-item-social">
-    <ul>
-      <li><a href="https://facebook.com/tetris">Facebook</a></li>
-      <li><a href="https://instagram.com/tetris">Instagram</a></li>
-      <li><a href="https://twitter.com/tetris">Twitter</a></li>
-    </ul>
-  </div>
-  <div class="footer-item-subscribe">
-    <h3>Newsletter</h3>
-    <div class="field has-addons">
-      <div class="control">
-        <input class="input" type="text" name="subscriber_email" placeholder="Enter your email address">
-      </div>
-      <div class="control">
-        <a class="button is-light">
-          Enter
-        </a>
+  <div class="container">
+    <div class="content">
+
+      <div class="columns">
+        <div class="column">
+          <ul>
+            <li><a href="{% url 'store:about' %}">About</a></li>
+            <li><a href="{% url 'store:customer_care' %}">Customer Care</a></li>
+            <li><a href="{% url 'store:customer_care' %}">Privacy and Terms</a></li>
+          </ul>
+        </div>
+
+        <div class="column">
+          <ul>
+            <li><a href="https://facebook.com/tetris">Facebook</a></li>
+            <li><a href="https://instagram.com/tetris">Instagram</a></li>
+            <li><a href="https://twitter.com/tetris">Twitter</a></li>
+          </ul>
+        </div>
+
+        <div class="column">
+
+          <h3 style="color: #d7dbdc;">Newsletter</h3>
+          <div class="field has-addons">
+            <div class="control">
+              <input class="input" type="text" name="subscriber_email" placeholder="Enter your email address">
+            </div>
+            <div class="control">
+              <a class="button is-light">
+                Enter
+              </a>
+            </div>
+          </div>
+          <br>
+
+          Made By <a target="_blank" href="https://twitter.com/olaoluwa_98">Emmanuel</a><br>
+          Powered By HazelDev
+        </div>
       </div>
     </div>
-  </div>
-  <div class="footer-item-copyright">
-    Copy right is here
-    <a href="{% url 'store:index' %}">Tetris</a>
   </div>
 </footer>
