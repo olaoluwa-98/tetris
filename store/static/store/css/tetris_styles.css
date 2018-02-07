@@ -1,13 +1,16 @@
 /* Tetris customized styling*/
-
+ p, h1, h2, h3, a {
+  font-family: Poppins !important;
+}
 .footer {
   background-color: #424242;
-  font-family: MaisonNeue-Light;
+  font-family: Poppins !important;
   /*text-align: left;*/
   color: #d7dbdc;
 }
 
 .footer a {
+  font-size: 0.8em !important;
   color: #d7dbdc;
   text-decoration: none;
 }
