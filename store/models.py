@@ -72,7 +72,8 @@ class Brand(models.Model):
         images = []
         if len(products) > 0:
             for product in products:
-                images.append(ProductImage.objects.filter(product=product).first())
+                if product.product_images.first():
+                    images.append(product.product_images.first())
             if len(images) > 0:
                 return images
         return None
@@ -141,7 +142,8 @@ class ProductCategory(models.Model):
         images = []
         if len(products) > 0:
             for product in products:
-                images.append(ProductImage.objects.filter(product=product).first())
+                if product.product_images.first():
+                    images.append(product.product_images.first())
             if len(images) > 0:
                 return images
         return None
@@ -156,6 +158,14 @@ class ProductCategory(models.Model):
 
 
 class Size(models.Model):
+    category = models.ForeignKey(
+        ProductCategory,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='sizes',
+        verbose_name ='Category'
+    )
     size_format = models.CharField(max_length=15, verbose_name='size format e.g UK, US')
     value = models.CharField(max_length=10, verbose_name='size value e.g 43 or XL')
     created_at = models.DateTimeField(auto_now_add=True, editable=False,
@@ -163,9 +173,12 @@ class Size(models.Model):
     )
     updated_at = models.DateTimeField( auto_now=True, verbose_name='date size details were updated last' )
 
+    def __str__(self):
+        return '{} - {} {}'.format(self.size_format, self.value, self.category.name)
+
     class Meta:
         get_latest_by = 'created_at'
-        ordering  = ['size_format']
+        ordering  = ['value']
 
 
 class Product(models.Model):

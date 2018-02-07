@@ -68,30 +68,60 @@ class Command(BaseCommand):
         )
         product_category5.save()
 
+        size_format = models.CharField(max_length=15, verbose_name='size format e.g UK, US')
+        value = models.CharField(max_length=10, verbose_name='size value e.g 43 or XL')
+
+        size1 = Size(category=product_category1, size_format="", value="S")
+        size1.save()
+        size2 = Size(category=product_category1, size_format="", value="M")
+        size2.save()
+        size3 = Size(category=product_category1, size_format="", value="L")
+        size3.save()
+        size4 = Size(category=product_category1, size_format="", value="XL")
+        size4.save()
+
+        size5 = Size(category=product_category2, size_format="", value="S")
+        size5.save()
+        size6 = Size(category=product_category2, size_format="", value="M")
+        size6.save()
+        size7 = Size(category=product_category2, size_format="", value="L")
+        size7.save()
+        size8 = Size(category=product_category2, size_format="", value="XL")
+        size8.save()
+
+        size9 = Size(category=product_category4, size_format="UK", value="9")
+        size9.save()
+        size10 = Size(category=product_category4, size_format="UK", value="10")
+        size10.save()
+        size11 = Size(category=product_category4, size_format="UK", value="11")
+        size11.save()
+        size12 = Size(category=product_category4, size_format="UK", value="12")
+        size12.save()
+
         product1 = Product(admin=None, brand=brand1, category=product_category1,
             gender="unisex", name='Nice T-Shirt',
-            desc="Wear anytime of the day", size="M",
+            desc="Wear anytime of the day", size=size2,
             colour="black", price_per_unit=2000, quantity=15
         )
         product1.save()
 
         product2 = Product(admin=None, brand=brand2, category=product_category4,
             gender="unisex", name='The New Addidas Trainers 4',
-            desc="very durable for jogging", size="EUR 43",
+            desc="very durable for jogging", size=size11,
             colour="white", price_per_unit=13000, quantity=10
         )
         product2.save()
 
 
         product3 = Product(admin=None, brand=brand3, category=product_category3, gender="male",
-            name='Stressed Jeans', desc="Wear anytime of the day", size="L",
+            name='Stressed Jeans', desc="Wear anytime of the day", size=size3,
             colour="blue", price_per_unit=5000, quantity=5
         )
         product3.save()
 
 
         product4 = Product(admin=None, brand=None, category=product_category5, gender="unisex",
-            name='Lionhead Lapels', desc="Enhance your style", size="not applicable",
+            name='Lionhead Lapels', desc="Enhance your style", size=None,
             colour="black", price_per_unit=2000, quantity=15
         )
         product4.save()
