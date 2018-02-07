@@ -99,7 +99,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     def cancel_orders(self, request, queryset):
         queryset1 = queryset.exclude(status='cancelled').exclude(status='delivered')
-        rows_updated = queryset1.update(status='cancelled')
+        rows_updated = queryset1.update(status='cancelled', canceller=request.user)
         if rows_updated == 1:
             message_bit = "1 order was"
         else:
