@@ -57,7 +57,7 @@
                             	{{ forloop.counter}}. <strong><a href="{{ order.get_absolute_url}}">
                             	{{ order.ref }} ({{order.order_items.count}} products ordered) -
                                 <span style="font-weight: bold;">
-                                    ₦{{ order.subtotal }}
+                                    ₦{{ order.subtotal | intcomma }}
                                 </span>
                             	</a></strong>
                             	<span style="float: right;">{{ order.created_at | date:"D d M Y"}} {{ order.created_at | time:"g:i A" }}</span>
