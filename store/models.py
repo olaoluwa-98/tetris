@@ -155,6 +155,19 @@ class ProductCategory(models.Model):
         ordering  = ['name',]
 
 
+class Size(models.Model):
+    size_format = models.CharField(max_length=15, verbose_name='size format e.g UK, US')
+    value = models.CharField(max_length=10, verbose_name='size value e.g 43 or XL')
+    created_at = models.DateTimeField(auto_now_add=True, editable=False,
+        verbose_name='date size was added to db'
+    )
+    updated_at = models.DateTimeField( auto_now=True, verbose_name='date size details were updated last' )
+
+    class Meta:
+        get_latest_by = 'created_at'
+        ordering  = ['size_format']
+
+
 class Product(models.Model):
     admin = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -208,7 +221,14 @@ class Product(models.Model):
     name = models.CharField(max_length=50, verbose_name='name')
     desc = models.CharField(max_length=255, verbose_name='description', blank=True, null=True)
     gender = models.CharField(max_length=15, choices=GENDER, verbose_name='gender')
-    size = models.CharField(max_length=15, verbose_name='size')
+    size = models.ForeignKey(
+        Size,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='products',
+        verbose_name ='Product'
+    )
     colour = models.CharField(max_length=15, verbose_name='colour', choices=COLOURS)
     price_per_unit = models.DecimalField(decimal_places=2, max_digits=17, verbose_name='price (₦)')
     quantity = models.PositiveIntegerField(verbose_name='quantity left')
@@ -448,17 +468,3 @@ class ProductImage(models.Model):
         verbose_name_plural = 'Product Images'
         get_latest_by = 'created_at'
         ordering  = ['product_id',]
-
-# Not sure to add this.
-# class Size(models.Model):
-#     size_format = models.CharField(max_length=15, verbose_name='size format e.g UK, US')
-#     value = models.IntegerField(verbose_name='size value')
-#     post_fix = models.CharField(max_length=10, verbose_name='post fix of size value e.g 27cm')
-#     created_at = models.DateTimeField(auto_now_add=True, editable=False,
-#         verbose_name='date size was added to db'
-#     )
-#     updated_at = models.DateTimeField( auto_now=True, verbose_name='date size details were updated last' )
-
-#     class Meta:
-#         get_latest_by = 'created_at'
-#         ordering  = ['size_format']
