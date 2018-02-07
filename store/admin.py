@@ -6,7 +6,6 @@ from django.template import loader
 from datetime import datetime, timedelta
 
 # admin.site.disable_action('delete_selected')
-
 class ModififedUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'is_verified', 'phone')
     UserAdmin.list_filter += ('is_verified',)

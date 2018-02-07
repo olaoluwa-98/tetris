@@ -124,7 +124,7 @@
     			    {% if request.user.is_verified == False %}
     			    <p class="help is-danger">
     			    Please check the link we sent to your mail to verify your email.<br>
-    			    <a href="{% url 'store:resend_verification' %}">visit this link to resend the verification</a>
+    			    <a href="{% url 'store:resend_verification' %}">click this link to resend the verification to your email</a>
 		    	  	</p>
 		    	  	{% else %}
 		    	  	<p class="help" style="color: green">

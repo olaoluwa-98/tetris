@@ -25,6 +25,10 @@
 
 }
 
+.footer li a:hover {
+  color: grey;
+}
+
 .center-box {
   box-shadow: -1px 1px 15px 0px #a59c9c;
   -ms-transform: translate(0px,-100px); /* IE 9 */

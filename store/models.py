@@ -391,6 +391,10 @@ class Order(models.Model):
     class Meta:
         get_latest_by = 'created_at'
         ordering  = ['-created_at', 'user_id']
+        # permissions = (
+        #     ('change_status_to_processing', 'Change Status to Processing'),
+        #     ('change_status_to_pending', 'Change Status to Pending'),
+        # )
 
 
 class OrderItem(models.Model):
