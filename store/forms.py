@@ -6,6 +6,7 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from .addresses import STATES
 from .models import *
+from phonenumber_field.formfields import PhoneNumberField
 
 class LoginForm(forms.Form):
     email = forms.EmailField()
@@ -86,7 +87,7 @@ class ProfileForm(forms.Form):
     email = forms.EmailField(label='Email', max_length=60, required=False)
     first_name = forms.CharField(label='First Name', max_length=30, strip=True)
     last_name = forms.CharField(label='Last Name', max_length=30, strip=True)
-    phone = forms.CharField(label='Phone Number', strip=True)
+    phone = PhoneNumberField(label='Phone Number')
 
     def clean(self, *args, **kwargs):
         cleaned_data = super(ProfileForm, self).clean()
