@@ -25,6 +25,14 @@ function purchase(){
         {
           window.location.replace("/profile");
         }
+        else if (data['responseJSON']['quantity'])
+        {
+          document.getElementById(data['responseJSON']['qty']).focus();
+        }
+        else if (data['responseJSON']['out_of_stock'])
+        {
+          document.getElementById(data['responseJSON']['qty']).focus();
+        }
       },
     });
 

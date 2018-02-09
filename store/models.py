@@ -434,6 +434,8 @@ class OrderItem(models.Model):
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
+        blank=True,
+        null=True,
         related_name='order_items',
         verbose_name ='order'
     )

@@ -51,6 +51,8 @@
             {% load humanize %}
             {% for order in orders %}
             <div class="box item">
+            <!-- {% if order.status == 'cancelled' %}style="background: #ececec;"
+            {% elif order.status == 'delivered' %}style="background: #c9ccde;"{% endif %}> -->
                 <article class="media">
                     <div class="media-content">
                         <div class="content">

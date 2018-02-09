@@ -39,7 +39,8 @@
             </div>
             {% load humanize %}
             {% if wish_list %} {% for wish_item in wish_list %}
-            <div class="box item wish_item_{{wish_item.product.id}}">
+            <div class="box item wish_item_{{wish_item.product.id}}"
+            {% if wish_item.product.quantity == 0 %}style="background: #ececec;"{% endif %}>
                 <article class="media">
                     <div class="media-left">
                         <figure class="image is-64x64">
@@ -48,7 +49,21 @@
                     </div>
                     <div class="media-content">
                         <div class="content">
-                        <strong><a href="{{ wish_item.product.get_absolute_url}}">{{ wish_item.product.name }}</a></strong>
+                        <strong><a href="{{ wish_item.product.get_absolute_url}}">{{ wish_item.product.name }}</a>
+                        <span style="font-weight: normal;">
+                        {% if wish_item.product.quantity < 10 and wish_item.product.quantity >= 1%}
+                        <br>
+                        <span class="icon" title="currently {{ wish_item.product.quantity }}">
+                        <i class="fa fa-arrow-down"></i>
+                        </span><span title="currently {{ wish_item.product.quantity }}">Low in stock</span>
+                        {% elif wish_item.product.quantity == 0 %}
+                        <br>
+                        <span class="icon">
+                        <i class="fa fa-close"></i>
+                        </span>Out of stock
+                        {% endif %}
+                        </span>
+                        </strong>
                         <p style="font-weight: bold; margin-bottom: 0px">
                         ₦{{ wish_item.product.price_per_unit | intcomma }}
                         </p>

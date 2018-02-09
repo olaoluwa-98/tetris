@@ -100,6 +100,13 @@ class OrderAdmin(admin.ModelAdmin):
     def cancel_orders(self, request, queryset):
         queryset1 = queryset.exclude(status='cancelled').exclude(status='delivered')
         rows_updated = queryset1.update(status='cancelled', canceller=request.user)
+        for order in queryset1:
+            for item in order.order_items.all():
+                # increase sales count of the product
+                product = item.product
+                product.orders_count -= int(item.quantity)
+                product.quantity += int(item.quantity)
+                product.save()
         if rows_updated == 1:
             message_bit = "1 order was"
         else:

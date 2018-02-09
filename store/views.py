@@ -16,6 +16,8 @@ from django.template import loader
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes
+from django.shortcuts import reverse
+
 
 col = Collections()
 User = get_user_model()
@@ -590,17 +592,38 @@ def make_purchase(request):
         # create an order
         order = Order(user=request.user)
         order.shipping_address = request.user.shipping_addresses.filter(is_default=True).first()
-        order.save()
+        orders = []
         for item in cart:
             # create order_items
             order_item = OrderItem(product_id=item.product_id,
-                order=order, quantity=item.quantity, price_per_unit=item.product.price_per_unit
+                quantity=item.quantity, price_per_unit=item.product.price_per_unit
             )
-            # increase sales count of the product
+            orders.append(order_item)
             product = Product.objects.get(pk=item.product_id)
-            product.orders_count += 1
+            if product.quantity == 0:
+                response = JsonResponse({'status' : 'error',
+                    'msg': '#Item {} is out of stock'.format(product.name),
+                    'out_of_stock': True, 'qty': 'qty_{}'.format(product.pk)  })
+                response.status_code = 422
+                return response
+            if product.quantity < int(order_item.quantity):
+                response = JsonResponse({'status' : 'error',
+                    'msg': 'There are only {} {} left, please change the quantity'\
+                    .format(product.quantity, product.name),
+                    'quantity': True, 'qty': 'qty_{}'.format(product.pk) })
+                response.status_code = 422
+                return response
+
+        order.save()
+        # save the orders
+        for item in orders:
+            # increase sales count of the product
+            product = item.product
+            product.orders_count += int(item.quantity)
+            product.quantity -= int(item.quantity)
             product.save()
-            order_item.save()
+            item.order = order
+            item.save()
 
         # send mail to the customers
         subject = 'You Just Placed an Order from Tetris'
@@ -629,10 +652,6 @@ def make_purchase(request):
         request.session['cart'] = []
         response = JsonResponse({'status' : 'success', 'msg': 'order successfully made' })
         response.status_code = 200
-        return response
-
-        response = JsonResponse({'status' : 'error', 'msg': 'error occured, please try again later.' })
-        response.status_code = 422
         return response
     response = JsonResponse({'status' : 'error', 'msg': 'your cart is empty' })
     response.status_code = 422
@@ -665,6 +684,14 @@ def customer_cancel_order(request):
         order.reason_cancelled = request.POST['reason']
         order.canceller = request.user
         order.save()
+
+        # increase stock
+        for item in order.order_items.all():
+            # increase sales count of the product
+            product = item.product
+            product.orders_count -= int(item.quantity)
+            product.quantity += int(item.quantity)
+            product.save()
 
         # send mail to the admins
         subject = '{} Just Cancelled an Order from Tetris'.format(request.user.username)
