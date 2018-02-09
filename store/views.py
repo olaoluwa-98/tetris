@@ -605,7 +605,7 @@ def make_purchase(request):
         # send mail to the customers
         subject = 'You Just Placed an Order from Tetris'
         message = ''
-        from_email = 'noreply@tetris.lol'
+        from_email = 'noreply@tetris.com'
         recipient_list = (request.user.email,)
         html_message = loader.render_to_string(
           'emails/customer_order_list.html', {'order': order,},
@@ -615,7 +615,7 @@ def make_purchase(request):
         # send mail to the admins
         subject = '{} Just Placed an Order from Tetris'.format(request.user.username)
         message = ''
-        from_email = 'noreply@tetris.lol'
+        from_email = 'noreply@tetris.com'
         recipient_list = ()
         for admin in admins:
             recipient_list += (admin.email,)
@@ -669,24 +669,24 @@ def customer_cancel_order(request):
         # send mail to the admins
         subject = '{} Just Cancelled an Order from Tetris'.format(request.user.username)
         message = ''
-        from_email = 'noreply@tetris.lol'
+        from_email = 'noreply@tetris.com'
         recipient_list = ()
         for admin in admins:
             recipient_list += (admin.email,)
         html_message = loader.render_to_string(
           'emails/customer_cancel_order_to_admin.html', {'order': order,},
         )
-        send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
 
         # send mail to the customers
         subject = 'You Have Cancelled Order {} from Tetris'.format(order.ref)
         message = ''
-        from_email = 'noreply@tetris.lol'
+        from_email = 'noreply@tetris.com'
         recipient_list = (request.user.email,)
         html_message = loader.render_to_string(
           'emails/customer_cancel_order.html', {'order': order,},
         )
-        send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
 
 
         response = JsonResponse({'status' : 'success', 'msg': 'Order cancelled successfully' })
@@ -716,7 +716,7 @@ def customer_confirm_delivery(request):
         # send mail to the customers
         subject = 'You Have Confirmed Delivery of Order {} from Tetris'.format(order.ref)
         message = ''
-        from_email = 'noreply@tetris.lol'
+        from_email = 'noreply@tetris.com'
         recipient_list = (request.user.email,)
         html_message = loader.render_to_string(
           'emails/customer_confirm_delivery.html', {'order': order,},
@@ -727,7 +727,7 @@ def customer_confirm_delivery(request):
         subject = '{} Just Confirmed the Delivery of Order {}'\
             .format(request.user.username, order.ref)
         message = ''
-        from_email = 'noreply@tetris.lol'
+        from_email = 'noreply@tetris.com'
         recipient_list = ()
         for admin in admins:
             recipient_list += (admin.email,)
