@@ -127,6 +127,9 @@ class Command(BaseCommand):
         product4.save()
 
     def handle(self, *args, **options):
-        self._populate()
-
-        self.stdout.write(self.style.SUCCESS("Seeding complete!"))
+        if Brand.objects.exists() or ProductCategory.objects.exists() or \
+        Size.objects.exists() or Product.objects.exists():
+            self.stdout.write(self.style.SUCCESS("Data found in database, so seeding is not run!"))
+        else:
+            self._populate()
+            self.stdout.write(self.style.SUCCESS("Seeding complete!"))
