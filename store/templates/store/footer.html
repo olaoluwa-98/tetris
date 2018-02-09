@@ -2,38 +2,41 @@
   <div class="container">
     <div class="content">
 
-      <div class="columns">
+      <div class="columns has-text-centered">
         <div class="column">
           <ul>
             <li><a href="{% url 'store:about' %}">About</a></li>
-            <li><a href="{% url 'store:customer_care' %}">Customer Care</a></li>
-            <li><a href="{% url 'store:customer_care' %}">Privacy and Terms</a></li>
+            <li><a href="{% url 'store:about' %}">Customer Care</a></li>
+            <li><a href="{% url 'store:about' %}">Privacy and Terms</a></li>
           </ul>
         </div>
 
         <div class="column">
           <ul>
-            <li><a target="_blank" href="https://facebook.com/tetris">Facebook</a></li>
-            <li><a target="_blank" href="https://instagram.com/tetris">Instagram</a></li>
-            <li><a target="_blank" href="https://twitter.com/tetris">Twitter</a></li>
+            <li><a target="_blank" href="https://instagram.com/Tetrisxretails">Instagram</a></li>
+            <li><a target="_blank" href="https://twitter.com/Tetrisxretails">Twitter</a></li>
           </ul>
         </div>
 
-        <div class="column" style="font-size: 0.8em !important;">
-          <h3 style="color: #d7dbdc;">Newsletter</h3>
-          <h4 style="color: #7d7878;">Subscribe to our newsletter for exclusive offers and latest products</h4>
-          <div class="field has-addons">
+        <div class="column">
+          <h3 style="color: #d7dbdc;font-size: 0.8em !important;">Newsletter</h3>
+          <h4 style="color: #7d7878;font-size: 0.8em !important;">Subscribe to our newsletter for exclusive offers and latest products</h4>
+          <div class="field is-grouped is-grouped-centered">
+            <div class="field has-addons">
             <div class="control">
               <input class="input is-small" type="text" name="subscriber_email" placeholder="Enter your email address">
             </div>
             <div class="control">
-              <a class="button is-light">
+              <p class="button is-small is-light">
                 Enter
-              </a>
+              </p>
             </div>
           </div>
-          Powered By HazelDev
         </div>
+        <p>Powered By HazelDev</p>
+        </div>
+
+
       </div>
     </div>
   </div>

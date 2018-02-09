@@ -16,6 +16,7 @@ register
 tetris
 tetris.com
 tetris.ng
+tetris.com.ng
 wish
 cart
 admin
@@ -53,4 +54,4 @@ policy
 learn
 reset
 discover
-explor
+explore

@@ -73,7 +73,7 @@ class OrderAdmin(admin.ModelAdmin):
             # send mail to the customers
             subject = 'Your Order {} Is Arriving Today'.format(order.ref)
             message = ''
-            from_email = 'noreply@tetris.com'
+            from_email = 'noreply@tetris.com.ng'
             recipient_list = (order.user.email,)
             html_message = loader.render_to_string(
               'emails/notify_user_order_arrival.html', {'order': order, 'day_type': 'today'},
@@ -89,7 +89,7 @@ class OrderAdmin(admin.ModelAdmin):
             # send mail to the customers
             subject = 'Your Order {} Is Arriving Tomorrow'.format(order.ref)
             message = ''
-            from_email = 'noreply@tetris.com'
+            from_email = 'noreply@tetris.com.ng'
             recipient_list = (order.user.email,)
             html_message = loader.render_to_string(
               'emails/notify_user_order_arrival.html', {'order': order, 'day_type': 'tomorrow'},
