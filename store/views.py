@@ -424,7 +424,7 @@ def handle_register(request):
         # send user account verification email
         subject = 'Verify Your Tetris Account'
         message = ''
-        from_email = 'noreply@tetris.com.ng'
+        from_email = 'noreply@tetrisretails.com'
         recipient_list = (user.email, )
         html_message = loader.render_to_string(
           'emails/account_verification_email.html', {'user': user},
@@ -628,7 +628,7 @@ def make_purchase(request):
         # send mail to the customers
         subject = 'You Just Placed an Order from Tetris'
         message = ''
-        from_email = 'noreply@tetris.com.ng'
+        from_email = 'noreply@tetrisretails.com'
         recipient_list = (request.user.email,)
         html_message = loader.render_to_string(
           'emails/customer_order_list.html', {'order': order,},
@@ -638,7 +638,7 @@ def make_purchase(request):
         # send mail to the admins
         subject = '{} Just Placed an Order from Tetris'.format(request.user.username)
         message = ''
-        from_email = 'noreply@tetris.com.ng'
+        from_email = 'noreply@tetrisretails.com'
         recipient_list = ()
         for admin in admins:
             recipient_list += (admin.email,)
@@ -696,7 +696,7 @@ def customer_cancel_order(request):
         # send mail to the admins
         subject = '{} Just Cancelled an Order from Tetris'.format(request.user.username)
         message = ''
-        from_email = 'noreply@tetris.com.ng'
+        from_email = 'noreply@tetrisretails.com'
         recipient_list = ()
         for admin in admins:
             recipient_list += (admin.email,)
@@ -708,7 +708,7 @@ def customer_cancel_order(request):
         # send mail to the customers
         subject = 'You Have Cancelled Order {} from Tetris'.format(order.ref)
         message = ''
-        from_email = 'noreply@tetris.com.ng'
+        from_email = 'noreply@tetrisretails.com'
         recipient_list = (request.user.email,)
         html_message = loader.render_to_string(
           'emails/customer_cancel_order.html', {'order': order,},
@@ -743,7 +743,7 @@ def customer_confirm_delivery(request):
         # send mail to the customers
         subject = 'You Have Confirmed Delivery of Order {} from Tetris'.format(order.ref)
         message = ''
-        from_email = 'noreply@tetris.com.ng'
+        from_email = 'noreply@tetrisretails.com'
         recipient_list = (request.user.email,)
         html_message = loader.render_to_string(
           'emails/customer_confirm_delivery.html', {'order': order,},
@@ -754,7 +754,7 @@ def customer_confirm_delivery(request):
         subject = '{} Just Confirmed the Delivery of Order {}'\
             .format(request.user.username, order.ref)
         message = ''
-        from_email = 'noreply@tetris.com.ng'
+        from_email = 'noreply@tetrisretails.com'
         recipient_list = ()
         for admin in admins:
             recipient_list += (admin.email,)
@@ -790,7 +790,7 @@ def resend_verification(request):
         # send user account verification email
         subject = 'Verify Your Tetris Account'
         message = ''
-        from_email = 'noreply@tetris.com.ng'
+        from_email = 'noreply@tetrisretails.com'
         recipient_list = (user.email, )
         html_message = loader.render_to_string(
         'emails/account_verification_email.html', {'user': user,},
