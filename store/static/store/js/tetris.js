@@ -21,7 +21,7 @@ function purchase(){
         {
           window.location.replace("/shipping-addresses");
         }
-        else if (data['responseJSON']['email'])
+        else if (data['responseJSON']['profile'])
         {
           window.location.replace("/profile");
         }
@@ -56,7 +56,7 @@ function empty_cart(){
       error: function (data) {
         empty_btn.removeAttr('disabled');
         empty_btn.text('Empty cart');
-		alert('Error: '+ data['responseJSON']['msg']);
+		    alert('Error: '+ data['responseJSON']['msg']);
       },
     });
 }
@@ -103,6 +103,7 @@ function add_to_cart(product_id){
       },
       error: function (data) {
         add_btn.removeAttr('disabled');
+        alert('Error: '+ data['responseJSON']['msg']);
       },
     });
 }
@@ -131,6 +132,7 @@ function remove_from_cart(product_id){
       },
       error: function (data) {
         remove_btn.removeAttr('disabled');
+        alert('Error: '+ data['responseJSON']['msg']);
       },
     });
 }
@@ -158,6 +160,7 @@ function add_to_wish_list(product_id){
       },
       error: function (data) {
         add_btn.removeAttr('disabled');
+        alert('Error: '+ data['responseJSON']['msg']);
       },
     });
 }
@@ -186,6 +189,7 @@ function remove_from_wish_list(product_id){
       },
       error: function (data) {
         remove_btn.removeAttr('disabled');
+        alert('Error: '+ data['responseJSON']['msg']);
       },
     });
 }
@@ -232,6 +236,7 @@ function remove_shipping_address(shipping_id){
       },
       error: function (data) {
         remove_btn.removeAttr('disabled');
+        alert('Error: '+ data['responseJSON']['msg']);
       },
     });
 }
@@ -253,6 +258,7 @@ function cancel_order(order_ref){
       },
       error: function (data) {
         cancel_btn.removeAttr('disabled');
+        alert('Error: '+ data['responseJSON']['msg']);
       },
     });
 }
@@ -275,6 +281,7 @@ function confirm_delivery(order_ref){
       error: function (data) {
         confirm_btn.removeAttr('disabled');
         confirm_btn.text('Confirm Delivery');
+        alert('Error: '+ data['responseJSON']['msg']);
       },
     });
   }

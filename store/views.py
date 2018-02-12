@@ -583,7 +583,11 @@ def make_purchase(request):
         response.status_code = 422
         return response
     if not request.user.is_verified:
-        response = JsonResponse({'status' : 'error', 'msg': 'You cannot order without verifying your email', 'email': True })
+        response = JsonResponse({'status' : 'error', 'msg': 'You cannot order without verifying your email', 'profile': True })
+        response.status_code = 422
+        return response
+    if not request.user.phone or request.user.phone == '' :
+        response = JsonResponse({'status' : 'error', 'msg': 'You cannot order without having a phone number', 'profile': True })
         response.status_code = 422
         return response
 
