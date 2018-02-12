@@ -152,6 +152,12 @@ class ShippingAddressAdmin(admin.ModelAdmin):
     # )
     ordering = ('-created_at', )
 
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('email', 'content', 'created_at')
+    search_fields = ('email', 'content')
+    readonly_fields = ('created_at',)
+    ordering = ('-created_at', )
+
 admin.site.register(User, ModififedUserAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductImage)
@@ -162,3 +168,4 @@ admin.site.register(Cart)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(ShippingAddress, ShippingAddressAdmin)
+admin.site.register(Feedback, FeedbackAdmin)

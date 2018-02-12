@@ -122,3 +122,7 @@ class ShippingAddressForm(forms.Form):
     class Meta:
         model = ShippingAddress
         fields = ('is_default', 'zip_code', 'address', 'city', 'state', )
+
+class FeedbackForm(forms.Form):
+    email = forms.EmailField()
+    feedback = forms.CharField(strip=True)

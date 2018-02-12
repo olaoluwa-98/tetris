@@ -20,15 +20,81 @@
   <div class="hero-body" style="font-family: LobsterTwo-Italic;">
     <div class="container has-text-centered text-white">
       <p class="title">
-        Login to Shop the New Look
+        We would love to get your feedback
       </p>
       <p class="subtitle">
-        The new look of simple
+        to improve your experience at Tetris
       </p>
-      <a class="shop-tetris-text" href="{% url 'store:store' %}">
+      <!-- <a class="shop-tetris-text" href="{% url 'store:store' %}">
         Shop tetris
-      </a>
+      </a> -->
     </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="columns">
+    <div class="column"></div>
+
+    <!-- center-box is a tetris styling -->
+    <div class="column box center-box">
+      <form action="{% url 'store:customer_care' %}" method="post">
+      {% csrf_token %}
+      <div class="field">
+        <label class="label">Email Address</label>
+        <div class="control has-icons-left has-icons-right">
+          <input class="input {% if form.email.errors %}is-danger{% endif %} is-medium" type="email" name="email" placeholder="Email"
+          required value="{% if form.email.value %}{{ form.email.value }}{% endif %}">
+          <span class="icon is-small is-left">
+            <i class="fa fa-user"></i>
+          </span>
+          {% if form.email.errors %}
+          <span class="icon is-small is-right">
+            <i class="fa fa-warning"></i>
+          </span>
+          {% endif %}
+        </div>
+      {% if form.email.errors %}
+            <p class="help is-danger is-size-6">
+          {% for error in form.email.errors %}
+                {{ error }}
+          {% endfor %}
+                </p>
+        {% endif %}
+          </div>
+
+          <div class="field">
+            <label class="label">Feedback</label>
+            <textarea name="feedback" class="textarea">{% if form.feedback.value %}{{ form.feedback.value }}{% endif %}</textarea>
+            {% if form.feedback.errors %}
+              <p class="help is-danger is-size-6">
+            {% for error in form.feedback.errors %}
+                  {{ error }}
+            {% endfor %}
+                  </p>
+            {% endif %}
+          </div>
+          {% if form.non_field_errors %}
+            <p class="help is-danger is-size-6">
+          {% for error in form.non_field_errors %}
+                {{ error }}
+          {% endfor %}
+                </p>
+        {% endif %}
+
+          <div class="field is-grouped is-grouped-centered">
+            <p class="control">
+              <button class="button is-dark">
+                Submit
+              </button>
+            </p>
+          </div>
+          <p style="font-size: 1.2em;" class="help is-success field is-grouped is-grouped-centered">
+          	{{ success }}
+      	  </p>
+      </form>
+    </div>
+    <div class="column"></div>
   </div>
 </section>
 {% endblock %}

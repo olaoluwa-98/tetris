@@ -483,3 +483,12 @@ class ProductImage(models.Model):
         verbose_name_plural = 'Product Images'
         get_latest_by = 'created_at'
         ordering  = ['product_id',]
+
+class Feedback(models.Model):
+    email = models.EmailField( verbose_name='email address')
+    content = models.TextField(verbose_name='feedback')
+    created_at = models.DateTimeField(auto_now_add=True, editable=False,
+        verbose_name='feedback was made'
+    )
+    def __str__(self):
+        return '{}\'s feedback'.format(self.email)

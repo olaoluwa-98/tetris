@@ -74,6 +74,32 @@ class IndexView(TemplateView):
 class CustomerCareView(TemplateView):
     template_name = 'store/pages/customer_care.html'
 
+    def post(self, request, *args, **kwargs):
+        context = {}
+        context['cart_count'] = len(get_cart(self.request))
+        if self.request.user.is_authenticated:
+            context['wish_list_count'] = self.request.user.wishes.count()        
+        form = FeedbackForm(request.POST or None)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            content = form.cleaned_data['feedback']
+            feedback = Feedback.objects.create(email=email,content=content)
+            # send mail to the admins
+            subject = 'Someone just submitted a feedback'
+            message = ''
+            from_email = 'noreply@tetrisretails.com'
+            recipient_list = ()
+            for admin in admins:
+                recipient_list += (admin.email,)
+            html_message = loader.render_to_string(
+            'emails/customer_feedback.html', {'feedback': feedback},
+            )
+            send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+            context['success'] = 'Your feedback has been received'
+        else:
+            context['form'] = form
+        return render(request, 'store/pages/customer_care.html', context)
+
     def get_context_data(self, **kwargs):
         context = {}
         context['cart_count'] = len(get_cart(self.request))
@@ -809,12 +835,12 @@ def internal_server_error(request):
   return render(request, 'store/pages/error/500.html')
 
 def handle_email(request):
-    user = request.user
-    uidb64 =  urlsafe_base64_encode(force_bytes(user.pk))
-    return render(request, 'emails/account_verification_email.html', {'user': user} )
+    # user = request.user
+    # uidb64 =  urlsafe_base64_encode(force_bytes(user.pk))
+    # return render(request, 'emails/account_verification_email.html', {'user': user} )
 
 
-    order = Order.objects.all().first()
-    return render(request, 'emails/customer_cancel_order_to_admin.html', {'order': order} )
+    feedback = Feedback.objects.first()
+    return render(request, 'emails/customer_feedback.html', {'feedback': feedback} )
     # return render(request, 'emails/customer_order_list.html', {'order': order} )
     # return render(request, 'emails/notify_user_order_arrival.html', {'order': order, 'day_type':'tomorrow'} )
