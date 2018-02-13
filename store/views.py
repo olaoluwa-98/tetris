@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.views.generic.base import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.decorators.csrf import csrf_exempt#, csrf_protect
+from django.views.decorators.csrf import csrf_exempt
 from .collections import Collections
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
@@ -13,15 +13,14 @@ from .forms import *
 from .addresses import STATES
 from django.core.mail import send_mail
 from django.template import loader
-from django.utils.encoding import force_text
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from django.shortcuts import reverse
-
+# from django.utils.encoding import force_text
+# from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+# from django.utils.encoding import force_bytes
 
 col = Collections()
 User = get_user_model()
 admins = User.objects.filter(is_staff=True)
+
 def get_cart(request):
     # request.session['cart'] = [{'product_id':1, 'quantity':2}, {'product_id':1, 'quantity':2}]
     # import pdb; pdb.set_trace()
@@ -78,7 +77,7 @@ class CustomerCareView(TemplateView):
         context = {}
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
-            context['wish_list_count'] = self.request.user.wishes.count()        
+            context['wish_list_count'] = self.request.user.wishes.count()
         form = FeedbackForm(request.POST or None)
         if form.is_valid():
             email = form.cleaned_data['email']
@@ -280,6 +279,24 @@ class WomenStoreView(TemplateView):
         return context
 
 
+class SearchView(TemplateView):
+    template_name = 'store/pages/search.html'
+
+    def get_context_data(self, **kwargs):
+        page = self.request.GET.get('page')
+        context = {}
+        if self.request.GET.get('q'):
+            q = self.request.GET.get('q')
+            product_list = col.search_products(q)
+            products = paginate(product_list, page, 12)
+            context['products'] = products
+            context['q'] = self.request.GET.get('q')
+        context['cart_count'] = len(get_cart(self.request))
+        if self.request.user.is_authenticated:
+            context['wish_list_count'] = self.request.user.wishes.count()
+        return context
+
+
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'store/pages/profile.html'
     success_url = '/store/'
@@ -312,7 +329,6 @@ class ProfileView(LoginRequiredMixin, TemplateView):
 
 class CategoryView(TemplateView):
     template_name = 'store/pages/category.html'
-    success_url = '/store/'
 
     def get_context_data(self, **kwargs):
         category = ProductCategory.objects.get(slug=self.kwargs['slug'])
@@ -835,9 +851,9 @@ def internal_server_error(request):
   return render(request, 'store/pages/error/500.html')
 
 def handle_email(request):
-    # user = request.user
+    user = request.user
     # uidb64 =  urlsafe_base64_encode(force_bytes(user.pk))
-    # return render(request, 'emails/account_verification_email.html', {'user': user} )
+    return render(request, 'emails/account_verification_email.html', {'user': user} )
 
 
     feedback = Feedback.objects.first()

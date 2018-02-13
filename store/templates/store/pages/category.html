@@ -57,24 +57,28 @@
 </div>
 
 <nav class="pagination is-centered" role="navigation" aria-label="pagination" style="margin: 10px">
-    {% if products.has_previous %}
-      <a class="pagination-previous" href="?page={{ products.previous_page_number }}">Previous</a>
-    {% endif %}
-    {% if products.has_next %}
-      <a class="pagination-next" href="?page={{ products.next_page_number }}">Next page</a>
+  {% if products.has_previous %}
+    <a class="pagination-previous" href="?page={{ products.previous_page_number }}">Previous</a>
+  {% endif %}
+  {% if products.has_next %}
+    <a class="pagination-next" href="?page={{ products.next_page_number }}">Next page</a>
+  {%  endif %}
 
-    {%  endif %}
-  <ul class="pagination-list">
-    <li><a class="pagination-link" aria-label="Goto page 1" href="?page=1">First Page</a></li>
+<ul class="pagination-list">
+  {% if products.has_previous %}
+  <li><a class="pagination-link" aria-label="Goto page 1" href="?page=1">First Page</a></li>
+  {% endif %}
 
-    <li><span class="pagination-ellipsis">&hellip;</span></li>
-    <li>
-        <a class="pagination-link is-dark" aria-label="Page 46" aria-current="page">{{ products.number }}</a>
-    </li>
-    <li><span class="pagination-ellipsis">&hellip;</span></li>
+  <li><span class="pagination-ellipsis">&hellip;</span></li>
+  <li>
+      <a class="pagination-link is-dark" aria-label="Page 46" aria-current="page">{{ products.number }}</a>
+  </li>
+  <li><span class="pagination-ellipsis">&hellip;</span></li>
 
-    <li><a class="pagination-link" aria-label="Goto page 86" href="?page={{ products.paginator.num_pages }}">Last Page</a></li>
-  </ul>
+  {% if products.has_next %}
+  <li><a class="pagination-link" aria-label="Goto page 86" href="?page={{ products.paginator.num_pages }}">Last Page</a></li>
+  {% endif %}
+</ul>
 </nav>
 </section>
 

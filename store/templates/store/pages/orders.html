@@ -102,23 +102,27 @@
             </div>
             {% if forloop.last %}
             <nav class="pagination is-centered" role="navigation" aria-label="pagination" style="margin: 10px">
-                {% if orders.has_previous %}
-                  <a class="pagination-previous" href="?page={{ orders.previous_page_number }}">Previous</a>
+                {% if products.has_previous %}
+                  <a class="pagination-previous" href="?page={{ products.previous_page_number }}">Previous</a>
                 {% endif %}
-                {% if orders.has_next %}
-                  <a class="pagination-next" href="?page={{ orders.next_page_number }}">Next page</a>
-
+                {% if products.has_next %}
+                  <a class="pagination-next" href="?page={{ products.next_page_number }}">Next page</a>
                 {%  endif %}
+            
               <ul class="pagination-list">
+                {% if products.has_previous %}
                 <li><a class="pagination-link" aria-label="Goto page 1" href="?page=1">First Page</a></li>
-
+                {% endif %}
+            
                 <li><span class="pagination-ellipsis">&hellip;</span></li>
                 <li>
-                    <a class="pagination-link is-dark" aria-label="Page 46" aria-current="page">{{ orders.number }}</a>
+                    <a class="pagination-link is-dark" aria-label="Page 46" aria-current="page">{{ products.number }}</a>
                 </li>
                 <li><span class="pagination-ellipsis">&hellip;</span></li>
-
-                <li><a class="pagination-link" aria-label="Goto page 86" href="?page={{ orders.paginator.num_pages }}">Last Page</a></li>
+            
+                {% if products.has_next %}
+                <li><a class="pagination-link" aria-label="Goto page 86" href="?page={{ products.paginator.num_pages }}">Last Page</a></li>
+                {% endif %}
               </ul>
             </nav>
             {% endif %}

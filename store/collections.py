@@ -60,3 +60,19 @@ class Collections:
             (created_at__gte=post_time_threshold)\
             .order_by('-created_at')[:limit]
         return latest_products
+
+    def search_products(self, q):
+        q_list = q.strip().split(' ')
+        # import pdb; pdb.set_trace()
+        total = []
+        ids = []
+        for item in q_list:
+            s = Product.objects.filter(
+                Q(name__icontains=item) |\
+                Q(colour__icontains=item) |\
+                Q(brand__name__istartswith=item) | \
+                Q(category__name__istartswith=item)
+            ).exclude(id__in=ids)
+            ids += list(s.values_list('id', flat=True))
+            total += list(s)
+        return total

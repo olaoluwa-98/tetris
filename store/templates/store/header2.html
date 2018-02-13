@@ -25,6 +25,24 @@
         <a class="navbar-item" href="{% url 'store:products' %}">
           All Products
         </a>
+
+        <a class="navbar-item" href="javascript:void(0);">
+          <form action="{% url 'store:search' %}">
+          <div class="field has-addons">
+            <div class="control">
+              <input class="input is-small" type="text" name="q" placeholder="search for a product">
+            </div>
+            <div class="control">
+              <button type="submit" class="button is-small is-dark">
+                <span class="icon">
+                <i class="fa fa-search"></i>
+              </span>
+              </button>
+            </div>
+          </div>
+          </form>
+        </a>
+
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link" href="javascript:void(0);">
           </a>
