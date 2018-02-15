@@ -176,15 +176,12 @@ class OrderDetailView(LoginRequiredMixin, TemplateView):
     template_name = 'store/pages/order_detail.html'
     success_url = '/store/'
     def get_context_data(self, **kwargs):
-        orders = Order.objects.filter(user= self.request.user, ref=self.kwargs['ref'])
-        order = None
+        order = Order.objects.filter(user= self.request.user, ref=self.kwargs['ref']).first()
         context = {}
-        if orders.exists():
-            order = orders.first()
+        if order:
             context['order'] = order
             page = self.request.GET.get('page')
             order_items = paginate(order.order_items.all(), page, 5)
-            # import pdb; pdb.set_trace()
             if not order_items.object_list.exists():
                 order_items = None
             context['order_items'] = order_items
@@ -331,8 +328,11 @@ class CategoryView(TemplateView):
     template_name = 'store/pages/category.html'
 
     def get_context_data(self, **kwargs):
-        category = ProductCategory.objects.get(slug=self.kwargs['slug'])
+        category = ProductCategory.objects.filter(slug=self.kwargs['slug']).first()
+        page = self.request.GET.get('page')
+        cat_products = paginate(category.products.all().order_by('-created_at'), page, 12)
         context = { 'category': category }
+        context['cat_products'] =  cat_products
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
@@ -364,7 +364,7 @@ class NewShippingAddressView(LoginRequiredMixin, TemplateView):
         if form.is_valid():
             shipping_address = ShippingAddress()
             shipping_address.user = request.user
-            shipping= ShippingAddress.objects.filter(user=request.user, is_default=True)
+            shipping = ShippingAddress.objects.filter(user=request.user, is_default=True)
             if shipping.exists() and request.POST.get('is_default'):
                 shipping.update(is_default=False)
                 shipping_address.is_default = True
@@ -416,7 +416,7 @@ class ShippingAddressDetailView(LoginRequiredMixin, TemplateView):
 def update_shipping_address(request):
     form = ShippingAddressForm(request.POST or None)
     if form.is_valid():
-        shippings = ShippingAddress.objects.filter(user=request.user, is_default=True, )
+        shippings = ShippingAddress.objects.filter(user=request.user, is_default=True)
         shipping_address = ShippingAddress.objects.filter(
             user=request.user, pk=request.POST['shipping_id']
         ).first()
@@ -527,9 +527,9 @@ def change_cart_item_qty(request):
                 break
         request.session['cart'] = cart
     if request.user.is_authenticated:
-        cart = Cart.objects.filter(user=request.user, product_id=request.POST['product_id'])
-        if cart.exists():
-            cart_item = cart.first()
+        cart_item = Cart.objects.filter(user=request.user, product_id=request.POST['product_id']).first()
+        if cart_item:
+            cart_item = cart
             cart_item.quantity = request.POST['new_quantity']
             cart_item.save()
             response = JsonResponse({'status' : 'success', 'msg': 'quantity changed successfully' })
@@ -554,8 +554,8 @@ def remove_from_cart(request):
                 break
         request.session['cart'] = cart
     if request.user.is_authenticated and request.POST.get('product_id'):
-        cart_item = Cart.objects.filter(user=request.user, product_id=request.POST['product_id'])
-        if cart_item.exists():
+        cart_item = Cart.objects.filter(user=request.user, product_id=request.POST['product_id']).first()
+        if cart_item:
             cart_item.delete()
             response = JsonResponse({'status' : 'success', 'msg': 'removed successfully' })
             response.status_code = 200
@@ -581,8 +581,8 @@ def add_to_wish_list(request):
 @csrf_exempt
 @login_required(login_url='/login/')
 def remove_from_wish_list(request):
-    wish_item = Wish.objects.filter(user=request.user, product_id=request.POST['product_id'])
-    if wish_item.exists():
+    wish_item = Wish.objects.filter(user=request.user, product_id=request.POST['product_id']).first()
+    if wish_item:
         wish_item.delete()
         response = JsonResponse({'status' : 'success', 'msg': 'removed successfully' })
         response.status_code = 200
@@ -598,8 +598,7 @@ def empty_cart(request):
         request.session['cart'] = []
     if request.user.is_authenticated:
         cart = Cart.objects.filter(user=request.user)
-        if cart.exists():
-            cart.delete()
+        cart.delete()
         response = JsonResponse({'status' : 'success', 'msg': 'cart emptied' })
         response.status_code = 200
         return response
@@ -611,8 +610,7 @@ def empty_cart(request):
 @login_required(login_url='/login/')
 def empty_wish_list(request):
         wishes = Wish.objects.filter(user=request.user)
-        for wish in wishes:
-            wish.delete()
+        wishes.delete()
         response = JsonResponse({'status' : 'success', 'msg': 'wish list emptied' })
         response.status_code = 200
         return response
@@ -719,15 +717,14 @@ def remove_shipping_address(request):
 @csrf_exempt
 @login_required(login_url='/login/')
 def customer_cancel_order(request):
-    if request.POST['reason'] == '':
+    if not request.POST.get('reason') or request.POST['reason'].strip() == '':
         response = JsonResponse({'status' : 'error', 'msg': 'Please enter a reason' })
         response.status_code = 422
         return response
-    order = Order.objects.filter(ref=request.POST['order_ref'], user=request.user)
-    if order.exists():
-        order = order.first()
+    order = Order.objects.filter(ref=request.POST['order_ref'], user=request.user).first()
+    if order:
         order.status = 'cancelled'
-        order.reason_cancelled = request.POST['reason']
+        order.reason_cancelled = request.POST['reason'].strip()
         order.canceller = request.user
         order.save()
 
@@ -776,9 +773,8 @@ def customer_confirm_delivery(request):
         response = JsonResponse({'status' : 'error', 'msg': 'the order reference is needed' })
         response.status_code = 422
         return response
-    orders = Order.objects.filter(ref=request.POST['order_ref'], user=request.user)
-    if orders.exists():
-        order = orders.first()
+    order = Order.objects.filter(ref=request.POST['order_ref'], user=request.user).first()
+    if order:
         order.confirm_delivery_date = datetime.now()
         order.status = 'delivered'
         order.save()
@@ -815,10 +811,9 @@ def customer_confirm_delivery(request):
 
 def verify_email(request, email_token):
     # uid = force_text(urlsafe_base64_decode(uidb64))
-    users = User.objects.filter(email_token=email_token)
+    user = User.objects.filter(email_token=email_token).first()
     context = {'verified': False}
-    if users.exists():
-        user = users.first()
+    if user:
         if user.is_verified == True:
             context['verified'] = True
         elif user.email_token == email_token:
