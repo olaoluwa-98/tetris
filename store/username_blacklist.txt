@@ -16,7 +16,7 @@ register
 tetris
 tetris.com
 tetris.ng
-tetris.com.ng
+tetrisretails.com
 wish
 cart
 admin

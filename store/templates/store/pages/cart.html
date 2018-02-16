@@ -101,10 +101,12 @@
                 {% endif %}
                 {% if cart_list.has_next %}
                   <a class="pagination-next" href="?page={{ cart_list.next_page_number }}">Next page</a>
-
                 {%  endif %}
+
               <ul class="pagination-list">
+                {% if cart_list.has_previous %}
                 <li><a class="pagination-link" aria-label="Goto page 1" href="?page=1">First Page</a></li>
+                {% endif %}
 
                 <li><span class="pagination-ellipsis">&hellip;</span></li>
                 <li>
@@ -112,7 +114,9 @@
                 </li>
                 <li><span class="pagination-ellipsis">&hellip;</span></li>
 
+                {% if cart_list.has_next %}
                 <li><a class="pagination-link" aria-label="Goto page 86" href="?page={{ cart_list.paginator.num_pages }}">Last Page</a></li>
+                {% endif %}
               </ul>
             </nav>
             <div class="field is-grouped is-grouped-centered">

@@ -73,7 +73,7 @@ class OrderAdmin(admin.ModelAdmin):
             # send mail to the customers
             subject = 'Your Order {} Is Arriving Today'.format(order.ref)
             message = ''
-            from_email = 'noreply@tetris.com.ng'
+            from_email = 'noreply@tetrisretails.com'
             recipient_list = (order.user.email,)
             html_message = loader.render_to_string(
               'emails/notify_user_order_arrival.html', {'order': order, 'day_type': 'today'},
@@ -89,7 +89,7 @@ class OrderAdmin(admin.ModelAdmin):
             # send mail to the customers
             subject = 'Your Order {} Is Arriving Tomorrow'.format(order.ref)
             message = ''
-            from_email = 'noreply@tetris.com.ng'
+            from_email = 'noreply@tetrisretails.com'
             recipient_list = (order.user.email,)
             html_message = loader.render_to_string(
               'emails/notify_user_order_arrival.html', {'order': order, 'day_type': 'tomorrow'},
@@ -152,6 +152,12 @@ class ShippingAddressAdmin(admin.ModelAdmin):
     # )
     ordering = ('-created_at', )
 
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('email', 'content', 'created_at')
+    search_fields = ('email', 'content')
+    readonly_fields = ('created_at',)
+    ordering = ('-created_at', )
+
 admin.site.register(User, ModififedUserAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductImage)
@@ -162,3 +168,4 @@ admin.site.register(Cart)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(ShippingAddress, ShippingAddressAdmin)
+admin.site.register(Feedback, FeedbackAdmin)

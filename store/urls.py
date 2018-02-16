@@ -38,6 +38,7 @@ urlpatterns = [
     url(r'^remove-from-cart', remove_from_cart, name ="remove_from_cart"),
     url(r'^remove-from-wish-list', remove_from_wish_list, name ="remove_from_wish_list"),
     url(r'^remove-shipping-address', remove_shipping_address, name ="remove_shipping_address"),
+    url(r'^search/$', SearchView.as_view(), name='search'),
     url(r'^store/$', StoreView.as_view(), name='store'),
     url(r'^store/men/$', MenStoreView.as_view(), name='men'),
     url(r'^store/women/$', WomenStoreView.as_view(), name='women'),

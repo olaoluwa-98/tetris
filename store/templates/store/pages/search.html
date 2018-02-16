@@ -1,7 +1,7 @@
 {% extends 'store/base.html' %}
 
 {% block title %}
-    Search | Tetris Clothing Store
+  {{ q }}| Tetris Clothing Store
 {% endblock %}
 
 {% load static %}
@@ -11,24 +11,48 @@
 {% endblock %}
 
 {% block content %}
-
-<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
-  <div class="hero-head">
-    {% include 'store/header.html' %}
-  </div>
-
-  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
-    <div class="container has-text-centered text-white">
-      <p class="title">
-        Login to Shop the New Look
-      </p>
-      <p class="subtitle">
-        The new look of simple
-      </p>
-      <a class="shop-tetris-text" href="{% url 'store:store' %}">
-        Shop tetris
-      </a>
+{% include 'store/header.html' %}
+<section class="section">
+  <div class="container">
+  <h1 class="title has-text-centered">Search Result</h1>
+    {% if products %}
+    <div class="columns is-multiline">
+      {% for product in products %}
+        {% include 'store/partials/product.html' %}
+      {% endfor %}
+    </div>
+    {% else %}
+  <div class="tile is-parent">
+    <div class="tile is-child box">
+      <p class="title has-text-centered" >Unfortunately, there's no product from your search </p>
     </div>
   </div>
+  {% endif %}
+</div>
+
+<nav class="pagination is-centered" role="navigation" aria-label="pagination" style="margin: 10px">
+    {% if products.has_previous %}
+      <a class="pagination-previous" href="?page={{ products.previous_page_number }}">Previous</a>
+    {% endif %}
+    {% if products.has_next %}
+      <a class="pagination-next" href="?page={{ products.next_page_number }}">Next page</a>
+    {%  endif %}
+
+  <ul class="pagination-list">
+    {% if products.has_previous %}
+    <li><a class="pagination-link" aria-label="Goto page 1" href="?page=1">First Page</a></li>
+    {% endif %}
+
+    <li><span class="pagination-ellipsis">&hellip;</span></li>
+    <li>
+        <a class="pagination-link is-dark" aria-label="Page 46" aria-current="page">{{ products.number }}</a>
+    </li>
+    <li><span class="pagination-ellipsis">&hellip;</span></li>
+
+    {% if products.has_next %}
+    <li><a class="pagination-link" aria-label="Goto page 86" href="?page={{ products.paginator.num_pages }}">Last Page</a></li>
+    {% endif %}
+  </ul>
+</nav>
 </section>
 {% endblock %}
