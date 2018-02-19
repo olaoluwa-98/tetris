@@ -1,11 +1,10 @@
 /* Tetris customized styling*/
  p, h1, h2, h3, a {
-  font-family: Poppins !important;
+  font-family: Raleway !important;
 }
 .footer {
   background-color: #424242;
-  font-family: Poppins !important;
-  /*text-align: left;*/
+  font-family: Raleway !important;
   color: #d7dbdc;
 }
 
@@ -76,6 +75,10 @@ a:hover {
   padding: 5px;
   color: white;
   font-size: 1.5em;
+}
+
+#logo:hover {
+  background-color: transparent !important;
 }
 
 
