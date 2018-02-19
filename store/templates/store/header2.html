@@ -1,7 +1,7 @@
 <nav class="navbar is-black">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item" href="{% url 'store:index' %}" id="logo">
+      <a class="navbar-item" href="{% url 'store:index' %}" id="nohover">
         {% load static %}
         <img class="navbar-item" src="{% static 'store/img/tetris-logo.png' %}?v=1" alt="TETRIS: a clothing store"
         style="height: 45px;width: 95px; padding: 0px; max-height: 55px">
@@ -26,7 +26,7 @@
           All Products
         </a>
 
-        <a class="navbar-item" href="javascript:void(0);">
+        <a class="navbar-item" href="javascript:void(0);" id="nohover">
           <form action="{% url 'store:search' %}">
           <div class="field has-addons">
             <div class="control">
@@ -43,10 +43,10 @@
           </form>
         </a>
 
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" href="javascript:void(0);">
+        <div class="navbar-item has-dropdown is-hoverable" id="nohover">
+          <a class="navbar-link" href="javascript:void(0);" id="nohover">
           </a>
-          <div class="navbar-dropdown is-boxed">
+          <div class="navbar-dropdown is-boxed"  id="nohover">
             <a class="navbar-item" href="{% url 'store:store' %}">
               Store
             </a>
