@@ -11,9 +11,9 @@ class Command(BaseCommand):
         )
         brand1.save()
 
-        brand2 = Brand(name='Addidas',
-            email="store@addidas.com", phone="+123445687",
-            desc="Addidas Inc", brand_image_url=None
+        brand2 = Brand(name='Adidas',
+            email="store@adidas.com", phone="+123445687",
+            desc="Adidas Inc", brand_image_url=None
         )
         brand2.save()
 

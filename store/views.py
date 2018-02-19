@@ -330,7 +330,10 @@ class CategoryView(TemplateView):
     def get_context_data(self, **kwargs):
         category = ProductCategory.objects.filter(slug=self.kwargs['slug']).first()
         page = self.request.GET.get('page')
-        cat_products = paginate(category.products.all().order_by('-created_at'), page, 12)
+        cat_products = None
+        import pdb; pdb.set_trace()
+        if category and category.products.exists():
+            cat_products = paginate(category.products.all().order_by('-created_at'), page, 12)
         context = { 'category': category }
         context['cat_products'] =  cat_products
         context['cart_count'] = len(get_cart(self.request))

@@ -6,9 +6,6 @@
     </figure>
     <div class="content">
     <p style="font-size: 1.2em; margin-bottom: 0px"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></p>
-    <span class="icon">
-    <i class="fa fa-user-circle"></i>
-    </span><a href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a><br>
     {% if request.user.is_authenticated %}
     {% if product.id|product_wished:user %}
     <span class="icon" style="cursor: pointer; color:red;" onclick="remove_from_wish_list({{ product.id }})" id="remove_from_wish_list_{{product.id}}">
