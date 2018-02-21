@@ -52,6 +52,7 @@ function empty_cart(){
         $('.item').css('display', 'none');
         $('#checkout_btn').css('display', 'none');
         empty_btn.css('display', 'none');
+        $('#cart_count').text(0);
       },
       error: function (data) {
         empty_btn.removeAttr('disabled');
@@ -71,6 +72,8 @@ function empty_wish_list(){
       success: function(data) {
         $('.item').css('display', 'none');
         empty_btn.css('display', 'none');
+        wish_list_count = $('#wish_list_count').text();
+        $('#wish_list_count').text(0);
       },
       error: function (data) {
         empty_btn.removeAttr('disabled');
@@ -99,6 +102,8 @@ function add_to_cart(product_id){
           add_btn.removeClass('is-dark');
           add_btn.addClass('is-light');
         }
+        cart_count = $('#cart_count').text();
+        $('#cart_count').text(parseInt(cart_count) + 1);
         add_btn.removeAttr('disabled');
       },
       error: function (data) {
@@ -128,6 +133,8 @@ function remove_from_cart(product_id){
           remove_btn.addClass('is-dark');
         }
         $('.cart_item_'+ product_id).css('display', 'none');
+        cart_count = $('#cart_count').text();
+        $('#cart_count').text(parseInt(cart_count) - 1);
         remove_btn.removeAttr('disabled');
       },
       error: function (data) {
@@ -156,6 +163,8 @@ function add_to_wish_list(product_id){
           add_btn.removeClass('is-dark');
           add_btn.addClass('is-light');
         }
+        wish_list_count = $('#wish_list_count').text();
+        $('#wish_list_count').text(parseInt(wish_list_count) + 1);
         add_btn.removeAttr('disabled');
       },
       error: function (data) {
@@ -185,6 +194,8 @@ function remove_from_wish_list(product_id){
           remove_btn.removeClass('is-light');
           remove_btn.addClass('is-dark');
         }
+        wish_list_count = $('#wish_list_count').text();
+        $('#wish_list_count').text(parseInt(wish_list_count) - 1);
         remove_btn.removeAttr('disabled');
       },
       error: function (data) {

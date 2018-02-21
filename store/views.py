@@ -34,7 +34,7 @@ def get_cart(request):
                 product_ids.append(cart_item['product_id'])
         except:
             product_ids = []
-            request.session['cart'] = ''
+            request.session['cart'] = []
             real_cart = []
         if request.user.is_authenticated:
             remaining_cart = request.user.cart.exclude(product_id__in=product_ids)
@@ -448,8 +448,9 @@ def handle_login(request):
             if request.session.get('cart'):
                 cart = request.session['cart']
                 for cart_item in cart:
-                    cart_item = Cart(user=user, product_id=cart_item['product_id'],quantity=cart_item['quantity'])
-                    cart_item.save()
+                    if not Cart.objects.filter(user=user, product_id=cart_item['product_id']).exists():
+                        cart_item = Cart(user=user, product_id=cart_item['product_id'],quantity=cart_item['quantity'])
+                        cart_item.save()
             return redirect(request.POST['redirect_url'])
     context = {'form': form}
     context['cart_count'] = len(get_cart(request))
@@ -532,7 +533,6 @@ def change_cart_item_qty(request):
     if request.user.is_authenticated:
         cart_item = Cart.objects.filter(user=request.user, product_id=request.POST['product_id']).first()
         if cart_item:
-            cart_item = cart
             cart_item.quantity = request.POST['new_quantity']
             cart_item.save()
             response = JsonResponse({'status' : 'success', 'msg': 'quantity changed successfully' })

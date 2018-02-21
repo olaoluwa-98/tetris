@@ -75,6 +75,14 @@ a:hover {
   padding: 5px;
   color: white;
   font-size: 1.5em;
+  -webkit-transition: background-color 1s, color 1s, font-size 1s; /* Safari */
+  transition: background-color color font-size 1s;
+}
+
+.shop-tetris-text:hover {
+  background-color: white;
+  color: black;
+  font-size: 1.6em;
 }
 
 #nohover {
