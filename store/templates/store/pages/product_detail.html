@@ -100,7 +100,7 @@
           <p class="card-footer-item">Quantity Left in store: <span style="font-weight: bold;color: green"> &nbsp;{{ product.quantity }}</span></p>
           </footer>
           {% load tetris %}
-          <footer class="card-footer">
+          <footer class="card-footer" id="product-footer">
               {% if request.user.is_authenticated %}
                 {% if product.id|product_wished:user %}
                 <p class="card-footer-item">

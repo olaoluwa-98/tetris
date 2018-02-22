@@ -201,4 +201,7 @@ a:hover {
   .shop-tetris-text {
     font-size: 1em;
   }
+  #product-footer{
+    display: block !important;
+  }
 }
