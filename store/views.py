@@ -13,6 +13,7 @@ from .forms import *
 from .addresses import STATES
 from django.core.mail import send_mail
 from django.template import loader
+from django.conf import settings
 # from django.utils.encoding import force_text
 # from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 # from django.utils.encoding import force_bytes
@@ -86,12 +87,12 @@ class CustomerCareView(TemplateView):
             # send mail to the admins
             subject = 'Someone just submitted a feedback'
             message = ''
-            from_email = 'noreply@tetrisretails.com'
+            from_email = settings.DEFAULT_FROM_EMAIL or 'Tetris Retails <noreply@tetrisretails.com>'
             recipient_list = ()
             for admin in admins:
                 recipient_list += (admin.email,)
             html_message = loader.render_to_string(
-            'emails/customer_feedback.html', {'feedback': feedback},
+            'emails/customer_feedback.html', {'feedback': feedback, 'request':request},
             )
             send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
             context['success'] = 'Your feedback has been received'
@@ -470,10 +471,10 @@ def handle_register(request):
         # send user account verification email
         subject = 'Verify Your Tetris Account'
         message = ''
-        from_email = 'noreply@tetrisretails.com'
+        from_email = settings.DEFAULT_FROM_EMAIL or 'Tetris Retails <noreply@tetrisretails.com>'
         recipient_list = (user.email, )
         html_message = loader.render_to_string(
-          'emails/account_verification_email.html', {'user': user},
+          'emails/account_verification_email.html', {'user': user,'request':request},
         )
         send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
 
@@ -675,22 +676,22 @@ def make_purchase(request):
         # send mail to the customers
         subject = 'You Just Placed an Order from Tetris'
         message = ''
-        from_email = 'noreply@tetrisretails.com'
+        from_email = settings.DEFAULT_FROM_EMAIL or 'Tetris Retails <noreply@tetrisretails.com>'
         recipient_list = (request.user.email,)
         html_message = loader.render_to_string(
-          'emails/customer_order_list.html', {'order': order,},
+          'emails/customer_order_list.html', {'order': order,'request':request},
         )
         send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
 
         # send mail to the admins
         subject = '{} Just Placed an Order from Tetris'.format(request.user.username)
         message = ''
-        from_email = 'noreply@tetrisretails.com'
+        from_email = settings.DEFAULT_FROM_EMAIL or 'Tetris Retails <noreply@tetrisretails.com>'
         recipient_list = ()
         for admin in admins:
             recipient_list += (admin.email,)
         html_message = loader.render_to_string(
-          'emails/customer_order_to_admin.html', {'order': order,},
+          'emails/customer_order_to_admin.html', {'order': order,'request':request},
         )
         send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
 
@@ -742,22 +743,22 @@ def customer_cancel_order(request):
         # send mail to the admins
         subject = '{} Just Cancelled an Order from Tetris'.format(request.user.username)
         message = ''
-        from_email = 'noreply@tetrisretails.com'
+        from_email = settings.DEFAULT_FROM_EMAIL or 'Tetris Retails <noreply@tetrisretails.com>'
         recipient_list = ()
         for admin in admins:
             recipient_list += (admin.email,)
         html_message = loader.render_to_string(
-          'emails/customer_cancel_order_to_admin.html', {'order': order,},
+          'emails/customer_cancel_order_to_admin.html', {'order': order,'request':request},
         )
         send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
 
         # send mail to the customers
         subject = 'You Have Cancelled Order {} from Tetris'.format(order.ref)
         message = ''
-        from_email = 'noreply@tetrisretails.com'
+        from_email = settings.DEFAULT_FROM_EMAIL or 'Tetris Retails <noreply@tetrisretails.com>'
         recipient_list = (request.user.email,)
         html_message = loader.render_to_string(
-          'emails/customer_cancel_order.html', {'order': order,},
+          'emails/customer_cancel_order.html', {'order': order,'request':request},
         )
         send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
 
@@ -788,25 +789,25 @@ def customer_confirm_delivery(request):
         # send mail to the customers
         subject = 'You Have Confirmed Delivery of Order {} from Tetris'.format(order.ref)
         message = ''
-        from_email = 'noreply@tetrisretails.com'
+        from_email = settings.DEFAULT_FROM_EMAIL or 'Tetris Retails <noreply@tetrisretails.com>'
         recipient_list = (request.user.email,)
         html_message = loader.render_to_string(
-          'emails/customer_confirm_delivery.html', {'order': order,},
+          'emails/customer_confirm_delivery.html', {'order': order,'request':request},
         )
-        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
         # send mail to the admins
         subject = '{} Just Confirmed the Delivery of Order {}'\
             .format(request.user.username, order.ref)
         message = ''
-        from_email = 'noreply@tetrisretails.com'
+        from_email = settings.DEFAULT_FROM_EMAIL or 'Tetris Retails <noreply@tetrisretails.com>'
         recipient_list = ()
         for admin in admins:
             recipient_list += (admin.email,)
         html_message = loader.render_to_string(
-          'emails/customer_confirm_order_to_admin.html', {'order': order,},
+          'emails/customer_confirm_order_to_admin.html', {'order': order,'request':request},
         )
-        send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
         response = JsonResponse({'status' : 'success', 'msg': 'Order delivery confirmed successfully' })
         response.status_code = 200
@@ -834,10 +835,10 @@ def resend_verification(request):
         # send user account verification email
         subject = 'Verify Your Tetris Account'
         message = ''
-        from_email = 'noreply@tetrisretails.com'
+        from_email = settings.DEFAULT_FROM_EMAIL or 'Tetris Retails <noreply@tetrisretails.com>'
         recipient_list = (user.email, )
         html_message = loader.render_to_string(
-        'emails/account_verification_email.html', {'user': user,},
+        'emails/account_verification_email.html', {'user': user,'request':request},
         )
         send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
     return redirect('/profile')
@@ -851,10 +852,11 @@ def internal_server_error(request):
 def handle_email(request):
     user = request.user
     # uidb64 =  urlsafe_base64_encode(force_bytes(user.pk))
-    return render(request, 'emails/account_verification_email.html', {'user': user} )
+    return render(request, 'emails/account_verification_email.html', {'user': user, 'request':request} )
 
 
     feedback = Feedback.objects.first()
-    return render(request, 'emails/customer_feedback.html', {'feedback': feedback} )
-    # return render(request, 'emails/customer_order_list.html', {'order': order} )
-    # return render(request, 'emails/notify_user_order_arrival.html', {'order': order, 'day_type':'tomorrow'} )
+    return render(request, 'emails/customer_feedback.html', {'feedback': feedback, 'request':request} )
+    # return render(request, 'emails/customer_order_list.html', {'order': order, 'request':request} )
+    # return render(request, 'emails/notify_user_order_arrival.html', {'order': order, 'day_type':'tomorrow'
+    # ,'request':request} )

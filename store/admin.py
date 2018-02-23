@@ -4,6 +4,7 @@ from django.core.mail import send_mail
 from .models import *
 from django.template import loader
 from datetime import datetime, timedelta
+from django.conf import settings
 
 # admin.site.disable_action('delete_selected')
 class ModififedUserAdmin(UserAdmin):
@@ -41,7 +42,7 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ('ref',)
     actions = ('change_order_status_to_processing', 'change_order_status_to_pending',
         'notify_customer_order_is_arriving_today', 'notify_customer_order_is_arriving_tomorrow',
-        'cancel_orders'
+        # 'cancel_orders'
     )
     inlines = [
         OrderItemInlineAdmin,
@@ -73,12 +74,12 @@ class OrderAdmin(admin.ModelAdmin):
             # send mail to the customers
             subject = 'Your Order {} Is Arriving Today'.format(order.ref)
             message = ''
-            from_email = 'noreply@tetrisretails.com'
+            from_email = settings.DEFAULT_FROM_EMAIL or 'Tetris Retails <noreply@tetrisretails.com>'
             recipient_list = (order.user.email,)
             html_message = loader.render_to_string(
               'emails/notify_user_order_arrival.html', {'order': order, 'day_type': 'today'},
             )
-            send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
+            send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
         self.message_user(request, "mails successfully sent to customers")
 
     def notify_customer_order_is_arriving_tomorrow(self, request, queryset):
@@ -89,7 +90,7 @@ class OrderAdmin(admin.ModelAdmin):
             # send mail to the customers
             subject = 'Your Order {} Is Arriving Tomorrow'.format(order.ref)
             message = ''
-            from_email = 'noreply@tetrisretails.com'
+            from_email = settings.DEFAULT_FROM_EMAIL or 'Tetris Retails <noreply@tetrisretails.com>'
             recipient_list = (order.user.email,)
             html_message = loader.render_to_string(
               'emails/notify_user_order_arrival.html', {'order': order, 'day_type': 'tomorrow'},
@@ -97,27 +98,27 @@ class OrderAdmin(admin.ModelAdmin):
             send_mail(subject, message, from_email, recipient_list, fail_silently=True, html_message=html_message)
         self.message_user(request, "mails successfully sent to customers")
 
-    def cancel_orders(self, request, queryset):
-        queryset1 = queryset.exclude(status='cancelled').exclude(status='delivered')
-        rows_updated = queryset1.update(status='cancelled', canceller=request.user)
-        for order in queryset1:
-            for item in order.order_items.all():
-                # increase sales count of the product
-                product = item.product
-                product.orders_count -= int(item.quantity)
-                product.quantity += int(item.quantity)
-                product.save()
-        if rows_updated == 1:
-            message_bit = "1 order was"
-        else:
-            message_bit = "%s orders were" % rows_updated
-        self.message_user(request, "%s successfully cancelled. please state the reasons individually" % message_bit)
+    # def cancel_orders(self, request, queryset):
+    #     queryset1 = queryset.exclude(status='cancelled').exclude(status='delivered')
+    #     rows_updated = queryset1.update(status='cancelled', canceller=request.user)
+    #     for order in queryset1:
+    #         for item in order.order_items.all():
+    #             # increase sales count of the product
+    #             product = item.product
+    #             product.orders_count -= int(item.quantity)
+    #             product.quantity += int(item.quantity)
+    #             product.save()
+    #     if rows_updated == 1:
+    #         message_bit = "1 order was"
+    #     else:
+    #         message_bit = "%s orders were" % rows_updated
+    #     self.message_user(request, "%s successfully cancelled. please state the reasons individually" % message_bit)
 
     change_order_status_to_processing.short_description = "Change the selected orders' status to 'processing'"
     change_order_status_to_pending.short_description = "Change the selected orders' status to 'pending'"
-    cancel_orders.short_description = "Cancel the selected orders"
     notify_customer_order_is_arriving_today.short_description = "Notify customer that order is arriving today"
     notify_customer_order_is_arriving_tomorrow.short_description = "Notify customer that order is arriving tomorrow"
+    # cancel_orders.short_description = "Cancel the selected orders"
 
 
 class OrderItemAdmin(admin.ModelAdmin):
