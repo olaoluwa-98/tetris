@@ -108,6 +108,18 @@ class CustomerCareView(TemplateView):
         return context
 
 
+class TermsView(TemplateView):
+    template_name = 'store/pages/terms.html'
+
+    def get_context_data(self, **kwargs):
+        context = {'popular_products':col.popular_products(8)}
+        context['popular_brands'] = col.popular_brands(4)
+        context['cart_count'] = len(get_cart(self.request))
+        if self.request.user.is_authenticated:
+            context['wish_list_count'] = self.request.user.wishes.count()
+        return context
+
+
 class AboutView(TemplateView):
     template_name = 'store/pages/about.html'
 
@@ -851,12 +863,4 @@ def internal_server_error(request):
 
 def handle_email(request):
     user = request.user
-    # uidb64 =  urlsafe_base64_encode(force_bytes(user.pk))
-    return render(request, 'emails/account_verification_email.html', {'user': user, 'request':request} )
-
-
-    feedback = Feedback.objects.first()
-    return render(request, 'emails/customer_feedback.html', {'feedback': feedback, 'request':request} )
-    # return render(request, 'emails/customer_order_list.html', {'order': order, 'request':request} )
-    # return render(request, 'emails/notify_user_order_arrival.html', {'order': order, 'day_type':'tomorrow'
-    # ,'request':request} )
+    return render(request, 'emails/account_verification_email.html', {'user': user, 'request':request})

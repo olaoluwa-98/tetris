@@ -45,6 +45,7 @@ urlpatterns = [
     url(r'^shipping-address/(?P<num>[0-9]+)/$', ShippingAddressDetailView.as_view(), name='shipping_address'),
     url(r'^shipping-address-update/$', update_shipping_address, name='shipping_address_update'),
     url(r'^shipping-addresses/$', ShippingAddressesView.as_view(), name='shipping_addresses'),
+    url(r'^terms/$', TermsView.as_view(), name='terms'),
     url(r'^wish-list/$', WishListView.as_view(), name='wish_list'),
 
     # auth

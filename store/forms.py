@@ -47,19 +47,18 @@ class RegisterForm(ModelForm):
         fields = ['username', 'email', 'password']
         error_messages = {
             'username': {
-                'required': 'A username is required.',
+                'required': 'Username is required'
             },
             'email': {
-                'required': 'An email address is required.',
+                'required': 'Email address is required'
             },
             'password': {
-                'required': 'A password is required.',
-            },
+                'required': 'Password is required'
+            }
         }
 
     def clean(self):
         cleaned_data = super(RegisterForm, self).clean()
-
         username = cleaned_data.get("username")
         email = cleaned_data.get("email")
 
@@ -69,13 +68,14 @@ class RegisterForm(ModelForm):
             username_blacklist = ub_file.read().splitlines()
         # username must not be in username blacklist
         if username in username_blacklist:
-            raise ValidationError("The username you've chosen is not allowed! Please use another.")
+            self.add_error('username',
+                'The username you\'ve chosen is not allowed! Please use another.'
+            )
 
         # email must be unique
         # NB: users w/o emails have their email field as empty string
-        if get_user_model().objects.filter(email=email).exists() and email != "":
-            raise ValidationError("A user with that email address already exists.")
-
+        if get_user_model().objects.filter(email=email).exists():
+            self.add_error('email', 'That email address is already in use')
         return cleaned_data
 
 

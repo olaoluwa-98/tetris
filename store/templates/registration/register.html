@@ -17,7 +17,7 @@
     {% include 'store/header.html' %}
   </div>
 
-  <div class="hero-body" style="font-family: LobsterTwo-Italic;">
+  <div class="hero-body" >
     <div class="container has-text-centered text-white">
       <p class="title">
         Register to Join the New Look
@@ -109,6 +109,13 @@
             {% endfor %}
                   </p>
           {% endif %}
+          <div class="field">
+            <div class="control">
+              <label>
+                By registering, you agree to comply with our <a href="{% url 'store:terms' %}">terms and condition</a>
+              </label>
+            </div>
+          </div>
           <div class="field is-grouped is-grouped-centered">
             <p class="control">
               <a href="{% url 'store:login' %}">Registered?</a>
