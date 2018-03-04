@@ -61,7 +61,7 @@ urlpatterns = [
     url(r'^resend-verification/$', resend_verification, name='resend_verification'),
 
     # change password and reset password
-    url(r'^password-change/$', PasswordChangeView.as_view(success_url=reverse_lazy('store:password_change_done')), name='password_change'),
+    url(r'^password-change/$', PasswordChangeViewMod.as_view(success_url=reverse_lazy('store:password_change_done')), name='password_change'),
     url(r'^password-change/done/$', PasswordChangeDoneView.as_view(), name='password_change_done'),
     url(r'^password-reset/$', PasswordResetView.as_view(success_url=reverse_lazy('store:password_reset_done')), name='password_reset'),
     url(r'^password-reset/done/$', PasswordResetDoneView.as_view(), name='password_reset_done'),

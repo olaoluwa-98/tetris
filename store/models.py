@@ -492,3 +492,22 @@ class Feedback(models.Model):
     )
     def __str__(self):
         return '{}\'s feedback'.format(self.email)
+
+
+class TetrisImage(models.Model):
+    TYPES = (
+        ('background-image', 'Background Image (1366px by 738px )'),
+        ('default-product-img', 'Default Product Image (should be a perfect square)'),
+        ('default-brand-img', 'Default Brand Image (should be a perfect square)'),
+        ('default-category-img', 'Default Category Image (should be a perfect square)'),
+    )
+    name = models.CharField(max_length=30, verbose_name='name of the image', choices=TYPES)
+    description = models.TextField(verbose_name='description of the image', blank=True, null=True )
+    image_url = models.ImageField(upload_to='img/tetris-img/', max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False,
+        verbose_name='date image was added to db'
+    )
+    updated_at = models.DateTimeField( auto_now=True, verbose_name='date image was updated last' )
+
+    def __str__(self):
+        return self.name

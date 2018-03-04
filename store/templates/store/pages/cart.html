@@ -1,10 +1,14 @@
 {% extends 'store/base.html' %} {% block title %} Cart | Tetris Clothing Store {% endblock %} {% load static %} {% block extra_css %}
 <style type="text/css">
-
+    body {
+        background-image: url("{{ bg_img }}");
+        background-repeat: no-repeat;
+        background-position: top;
+    }
 </style>
 {% endblock %} {% block content %}
 
-<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
+<section class="hero is-medium" >
     <div class="hero-head">
         {% include 'store/header.html' %}
     </div>
@@ -48,8 +52,18 @@
                 <article class="media">
                     <div class="media-left">
                         <figure class="image is-64x64">
-                            <a href="{{ cart_item.product.get_absolute_url}}"><img src="{{ MEDIA_URL }}{{ cart_item.product.product_images.all.0.product_image_url }}" alt="{{ cart_item.product.name }}">
+                            <a href="{{ cart_item.product.get_absolute_url}}">
+                                <img
+                                {% if cart_item.product.product_images.exists %}
+                                src="{{ MEDIA_URL }}{{ cart_item.product.product_images.all.0.product_image_url }}"
+                                {% else %}
+                                src="{{ product_img_default }}"
+                                {% endif %}
+                                alt="{{ cart_item.product.name }}"
+                                >
+                                
                             </a>
+
                         </figure>
                     </div>
                     <div class="media-content">

@@ -1,7 +1,15 @@
 <div class="column is-3">
     <div class="box has-text-centered product-box">
-    <figure class="image is-3by2">
-	  <a href="{{ brand.get_absolute_url }}"><img src="{{ MEDIA_URL }}{{ brand.brand_image_url }}"></a>
+    <figure class="image">
+	  <a href="{{ brand.get_absolute_url }}">
+      <img
+      {% if brand.brand_image_url %}
+        src="{{ MEDIA_URL }}{{ brand.brand_image_url }}"
+      {% else %}
+       src="{{ brand_img_default }}"
+       {% endif %}
+      >
+    </a>
 	</figure>
 	<a href="{{ brand.get_absolute_url }}">{{ brand.name }}</a>
   </div>

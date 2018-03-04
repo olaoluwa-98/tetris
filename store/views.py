@@ -5,15 +5,16 @@ from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.views.generic.base import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_exempt
-from .collections import Collections
+from store.collections import Collections
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
-from .models import *
-from .forms import *
-from .addresses import STATES
+from store.models import *
+from store.forms import *
+from store.addresses import STATES
 from django.core.mail import send_mail
 from django.template import loader
 from django.conf import settings
+from django.contrib.auth.views import PasswordChangeView
 # from django.utils.encoding import force_text
 # from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 # from django.utils.encoding import force_bytes
@@ -21,6 +22,35 @@ from django.conf import settings
 col = Collections()
 User = get_user_model()
 admins = User.objects.filter(is_staff=True)
+
+def bg_img():
+    img = TetrisImage.objects.filter(
+        name='background-image').first()
+    if img:
+        return img.image_url.url
+    return '/static/store/img/index-bg.jpg'
+
+def product_img_default():
+    img = TetrisImage.objects.filter(
+        name='default-product-img').first()
+    if img:
+        return img.image_url.url
+    return '/static/store/img/default-product-img.jpg'
+
+def brand_img_default():
+    img = TetrisImage.objects.filter(
+        name='default-brand-img').first()
+    if img:
+        return img.image_url.url
+    return ''
+
+def category_img_default():
+    img = TetrisImage.objects.filter(
+        name='default-category-img').first()
+    if img:
+        return img.image_url.url
+    return ''
+
 
 def get_cart(request):
     # request.session['cart'] = [{'product_id':1, 'quantity':2}, {'product_id':1, 'quantity':2}]
@@ -58,7 +88,6 @@ def paginate(input_list, page, results_per_page=10):
         output_list = paginator.page(paginator.num_pages)
     return output_list
 
-
 class IndexView(TemplateView):
     template_name = 'store/pages/index.html'
 
@@ -66,6 +95,10 @@ class IndexView(TemplateView):
         context = {'popular_products':col.popular_products(8)}
         context['popular_brands'] = col.popular_brands(4)
         context['cart_count'] = len(get_cart(self.request))
+        context['bg_img'] = bg_img()
+        context['product_img_default'] = product_img_default()
+        context['brand_img_default'] = brand_img_default()
+        context['category_img_default'] = category_img_default()
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -77,6 +110,7 @@ class CustomerCareView(TemplateView):
     def post(self, request, *args, **kwargs):
         context = {}
         context['cart_count'] = len(get_cart(self.request))
+        context['bg_img'] = bg_img()
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         form = FeedbackForm(request.POST or None)
@@ -102,6 +136,7 @@ class CustomerCareView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {}
+        context['bg_img'] = bg_img()
         context['cart_count'] = len(get_cart(self.request))
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
@@ -142,6 +177,8 @@ class CartView(TemplateView):
         cart_list = paginate(cart, page, 5)
         context['cart_list'] = cart_list
         context['cart_count'] = len(cart)
+        context['bg_img'] = bg_img()
+        context['product_img_default'] = product_img_default()
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -154,8 +191,10 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = {}
         context['cart'] = get_cart(self.request)
+        context['bg_img'] = bg_img()
         context['cart_count'] = len(get_cart(self.request))
         context['wish_list_count'] = self.request.user.wishes.count()
+        context['product_img_default'] = product_img_default()
         return context
 
 
@@ -169,7 +208,9 @@ class WishListView(LoginRequiredMixin, TemplateView):
         wishes = paginate(self.request.user.wishes.all(), page, 5)
         context['cart_count'] = len(get_cart(self.request))
         context['wish_list'] = wishes
+        context['bg_img'] = bg_img()
         context['wish_list_count'] = self.request.user.wishes.count()
+        context['product_img_default'] = product_img_default()
         return context
 
 
@@ -182,6 +223,7 @@ class OrdersView(LoginRequiredMixin, TemplateView):
         orders = paginate(self.request.user.orders.all(), page, 5)
         context = {'orders': orders}
         context['cart_count'] = len(get_cart(self.request))
+        context['bg_img'] = bg_img()
         context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
@@ -199,6 +241,8 @@ class OrderDetailView(LoginRequiredMixin, TemplateView):
                 order_items = None
             context['order_items'] = order_items
         context['cart_count'] = len(get_cart(self.request))
+        context['bg_img'] = bg_img()
+        context['product_img_default'] = product_img_default()
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -210,6 +254,8 @@ class ProductDetailView(TemplateView):
         context = { 'product': product}
         context['related_products'] = col.related_products(product, 4)
         context['cart_count'] = len(get_cart(self.request))
+        context['bg_img'] = bg_img()
+        context['product_img_default'] = product_img_default()
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -224,6 +270,7 @@ class ProductsView(TemplateView):
         products = paginate(product_list, page, 8)
         context = {'products':products}
         context['cart_count'] = len(get_cart(self.request))
+        context['product_img_default'] = product_img_default()
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -239,6 +286,8 @@ class BrandDetailView(TemplateView):
         brand_products = paginate(brand.products.all().order_by('-created_at'), page, 12)
         context['brand_products'] = brand_products
         context['cart_count'] = len(get_cart(self.request))
+        context['product_img_default'] = product_img_default()
+        context['brand_img_default'] = brand_img_default()
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -254,6 +303,9 @@ class StoreView(TemplateView):
         context['latest_products'] = col.latest_products(8)
         context['categories'] = ProductCategory.objects.order_by('-created_at')[:4]
         context['cart_count'] = len(get_cart(self.request))
+        context['product_img_default'] = product_img_default()
+        context['brand_img_default'] = brand_img_default()
+        context['category_img_default'] = category_img_default()
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -269,6 +321,7 @@ class MenStoreView(TemplateView):
         products = paginate(product_list, page, 8)
         context['cart_count'] = len(get_cart(self.request))
         context['products'] = products
+        context['product_img_default'] = product_img_default()
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -284,6 +337,7 @@ class WomenStoreView(TemplateView):
         products = paginate(product_list, page, 8)
         context['cart_count'] = len(get_cart(self.request))
         context['products'] = products
+        context['product_img_default'] = product_img_default()
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -302,6 +356,7 @@ class SearchView(TemplateView):
             context['products'] = products
             context['q'] = self.request.GET.get('q')
         context['cart_count'] = len(get_cart(self.request))
+        context['product_img_default'] = product_img_default()
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -316,6 +371,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         context = {'form': form}
         context['wish_list_count'] = self.request.user.wishes.count()
         context['cart_count'] = len(get_cart(self.request))
+        context['bg_img'] = bg_img()
         if form.is_valid():
             user = request.user
             user.first_name = form.cleaned_data['first_name']
@@ -333,6 +389,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = {}
         context['cart_count'] = len(get_cart(self.request))
+        context['bg_img'] = bg_img()
         context['wish_list_count'] = self.request.user.wishes.count()
         return context
 
@@ -344,12 +401,13 @@ class CategoryView(TemplateView):
         category = ProductCategory.objects.filter(slug=self.kwargs['slug']).first()
         page = self.request.GET.get('page')
         cat_products = None
-        import pdb; pdb.set_trace()
         if category and category.products.exists():
             cat_products = paginate(category.products.all().order_by('-created_at'), page, 12)
         context = { 'category': category }
         context['cat_products'] =  cat_products
         context['cart_count'] = len(get_cart(self.request))
+        context['product_img_default'] = product_img_default()
+        context['category_img_default'] = category_img_default()
         if self.request.user.is_authenticated:
             context['wish_list_count'] = self.request.user.wishes.count()
         return context
@@ -364,6 +422,7 @@ class ShippingAddressesView(LoginRequiredMixin, TemplateView):
         context = {'shipping_addresses':shipping_addresses}
         context['cart_count'] = len(get_cart(self.request))
         context['wish_list_count'] = self.request.user.wishes.count()
+        context['bg_img'] = bg_img()
         return context
 
 
@@ -394,6 +453,7 @@ class NewShippingAddressView(LoginRequiredMixin, TemplateView):
             context['success'] = 'Your shipping address has been uploaded'
             return render(request, 'store/pages/new_shipping_address.html', context)
         context['form'] = form
+        context['bg_img'] = bg_img()
         return render(request, 'store/pages/new_shipping_address.html', context)
 
     def get_context_data(self, **kwargs):
@@ -403,6 +463,7 @@ class NewShippingAddressView(LoginRequiredMixin, TemplateView):
         context['states'] = STATES
         context['cart_count'] = len(get_cart(self.request))
         context['wish_list_count'] = self.request.user.wishes.count()
+        context['bg_img'] = bg_img()
         return context
 
 
@@ -426,6 +487,7 @@ class ShippingAddressDetailView(LoginRequiredMixin, TemplateView):
             context['success'] = self.request.GET.get('msg')
         context['cart_count'] = len(get_cart(self.request))
         context['wish_list_count'] = self.request.user.wishes.count()
+        context['bg_img'] = bg_img()
         return context
 
 @login_required(login_url='/login/')
@@ -450,6 +512,7 @@ def update_shipping_address(request):
     return redirect('/shipping-address/{}/?msg={}'.format(request.POST['shipping_address_num'], msg))
 
 
+# AUTH
 def handle_login(request):
     if request.user.is_authenticated:
         return redirect('/')
@@ -467,6 +530,7 @@ def handle_login(request):
             return redirect(request.POST['redirect_url'])
     context = {'form': form}
     context['cart_count'] = len(get_cart(request))
+    context['bg_img'] = bg_img()
     return render(request, 'registration/login.html', context)
 
 
@@ -501,6 +565,7 @@ def handle_register(request):
             return redirect(request.POST['redirect_url'])
     context = {'form': form}
     context['cart_count'] = len(get_cart(request))
+    context['bg_img'] = bg_img()
     return render(request, 'registration/register.html', context)
 
 
@@ -510,6 +575,14 @@ def handle_logout(request):
     return redirect('/login')
 
 
+class PasswordChangeViewMod(PasswordChangeView):
+    def get_context_data(self, **kwargs):
+        context = super(PasswordChangeView, self).get_context_data(**kwargs)
+        context['bg_img'] = bg_img()
+        return context
+
+
+# AJAX CALLS
 @csrf_exempt
 def add_to_cart(request):
     if request.session.get('cart'):

@@ -162,6 +162,7 @@ class FeedbackAdmin(admin.ModelAdmin):
 admin.site.register(User, ModififedUserAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductImage)
+admin.site.register(TetrisImage)
 admin.site.register(Brand)
 admin.site.register(ProductCategory)
 admin.site.register(Wish)

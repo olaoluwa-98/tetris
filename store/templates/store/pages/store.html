@@ -55,9 +55,18 @@
         {% for cat in categories %}
         <div class="column is-3">
           <div class="box has-text-centered product-box">
-        <figure class="image is-3by2">
-        <a href="{{ cat.get_absolute_url }}"><img src="{{ MEDIA_URL }}{{ cat.cat_image_url }}"></a>
+        <figure class="image">
+        <a href="{{ cat.get_absolute_url }}">
+          <img
+          {% if cat.cat_image_url %}
+            src="{{ MEDIA_URL }}{{ cat.cat_image_url }}"
+          {% else %}
+          src="{{ category_img_default }}"
+          {% endif %}
+          >
+        </a>
         </figure>
+
           <a href="{{ cat.get_absolute_url }}">{{ cat.name }}</a>
           </div>
         </div>

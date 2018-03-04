@@ -1,8 +1,16 @@
 {% load tetris %} {% load humanize %}
 <div class="column is-3">
     <div class="box product-box">
-    <figure class="image is-3by2">
-    <a href="{{ product.get_absolute_url }}"><img src="{{ MEDIA_URL }}{{ product.product_images.all.0.product_image_url }}"></a>
+    <figure class="image">
+    <a href="{{ product.get_absolute_url }}">
+      <img
+      {% if product.product_images.exists %}
+        src="{{ MEDIA_URL }}{{ product.product_images.all.0.product_image_url }}"
+      {% else %}
+       src="{{ product_img_default }}"
+       {% endif %}
+      >
+    </a>
     </figure>
     <div class="content">
     <p style="font-size: 1.2em; margin-bottom: 0px"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></p>

@@ -42,4 +42,4 @@ __pycache__
 .env
 *.env
 venv
-start.sh
+startup*.sh

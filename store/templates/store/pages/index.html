@@ -2,7 +2,7 @@
 {% extends "store/base.html" %} {% block title %} Tetris Clothing Store {% endblock %} {% load static %} {% block extra_css %}
 <style type="text/css">
     body {
-        background-image: url({% static 'store/img/index-bg.jpg' %});
+        background-image: url("{{ bg_img }}");
         background-repeat: no-repeat;
         background-position: top;
     }

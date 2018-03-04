@@ -8,11 +8,16 @@
 
  {% block extra_css %}
 <style type="text/css">
+    body {
+        background-image: url("{{ bg_img }}");
+        background-repeat: no-repeat;
+        background-position: top;
+    }
 </style>
 {% endblock %}
 {% block content %}
 
-<section class="hero is-medium" style="background-image: url({% static 'store/img/index-bg.jpg' %})">
+<section class="hero is-medium" >
     <div class="hero-head">
         {% include 'store/header.html' %}
     </div>
