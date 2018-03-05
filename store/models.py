@@ -16,7 +16,7 @@ class User(AbstractUser):
     email = models.EmailField( verbose_name='email address', unique=True)
     email_token = models.CharField(verbose_name='email token', max_length=16, editable=False, null=True)
     is_verified = models.BooleanField(default=False)
-    phone = PhoneNumberField(default='True',
+    phone = PhoneNumberField(default='',
         help_text='Please use the following format: <em>+234 XXX XXX XXXX</em>.',
     )
     profile_pic_path = models.ImageField(upload_to=get_profile_pic_path, max_length=255)
