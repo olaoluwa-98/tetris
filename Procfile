@@ -1,2 +1,2 @@
-release: source release.sh
+release: ./release.sh
 web: gunicorn tetris.wsgi --log-file -
