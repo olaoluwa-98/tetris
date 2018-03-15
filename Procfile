@@ -1,2 +1,2 @@
-release: python manage.py migrate && python manage.py populate_db
+release: source release.sh
 web: gunicorn tetris.wsgi --log-file -
